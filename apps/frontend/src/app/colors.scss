@@ -97,6 +97,103 @@
 }
 
 :root {
+  --acadepost-black: #050505;
+  --acadepost-ink: #101010;
+  --acadepost-accent: #4cccb8;
+  --acadepost-warm: #fda100;
+  --acadepost-paper: #f4f4f4;
+  --acadepost-card: #ffffff;
+  --acadepost-muted: #7c7d86;
+  --acadepost-line: rgba(16, 16, 16, 0.1);
+  --acadepost-shadow: rgba(0, 0, 0, 0.08) 0 10px 30px -18px,
+    rgba(0, 0, 0, 0.06) 0 1px 4px;
+
+  .dark {
+    --new-back-drop: var(--acadepost-black);
+    --new-settings: #141414;
+    --new-border: rgba(76, 204, 184, 0.22);
+    --new-bgColor: var(--acadepost-black);
+    --new-bgColorInner: #101010;
+    --new-sep: rgba(255, 255, 255, 0.14);
+    --new-bgLineColor: rgba(255, 255, 255, 0.1);
+    --new-textItemFocused: rgba(76, 204, 184, 0.18);
+    --new-textItemBlur: #9b9b9b;
+    --new-boxFocused: var(--acadepost-accent);
+    --new-textColor: 255 255 255;
+    --new-blockSeparator: rgba(255, 255, 255, 0.08);
+    --new-btn-simple: #181818;
+    --new-btn-text: #ffffff;
+    --new-btn-primary: var(--acadepost-accent);
+    --new-ai-btn: var(--acadepost-warm);
+    --new-box-hover: #171717;
+    --new-table-border: rgba(255, 255, 255, 0.1);
+    --new-table-header: #121212;
+    --new-table-text: #b8b8b8;
+    --new-table-text-focused: var(--acadepost-accent);
+    --new-big-strips: #121212;
+    --new-col-color: #171717;
+    --new-menu-hover: var(--acadepost-accent);
+    --menu-shadow: rgba(0, 0, 0, 0.4) 0 18px 50px -24px;
+
+    --color-primary: var(--acadepost-black);
+    --color-secondary: #101010;
+    --color-text: #ffffff;
+    --color-third: #141414;
+    --color-forth: var(--acadepost-accent);
+    --color-seventh: var(--acadepost-accent);
+    --color-custom4: var(--acadepost-accent);
+    --color-custom7: var(--acadepost-accent);
+    --color-custom10: var(--acadepost-warm);
+    --color-custom13: var(--acadepost-warm);
+    --color-custom45: var(--acadepost-accent);
+    --color-custom50: var(--acadepost-ink);
+    --color-custom51: var(--acadepost-accent);
+  }
+
+  .light {
+    --new-back-drop: rgba(5, 5, 5, 0.55);
+    --new-settings: #f4f4f4;
+    --new-border: var(--acadepost-line);
+    --new-bgColor: var(--acadepost-paper);
+    --new-bgColorInner: var(--acadepost-card);
+    --new-bgLineColor: var(--acadepost-line);
+    --new-textItemFocused: rgba(76, 204, 184, 0.18);
+    --new-textItemBlur: #6b7280;
+    --new-boxFocused: rgba(76, 204, 184, 0.16);
+    --new-textColor: 16 16 16;
+    --new-blockSeparator: #eeeeee;
+    --new-btn-simple: #ffffff;
+    --new-btn-text: var(--acadepost-ink);
+    --new-btn-primary: var(--acadepost-black);
+    --new-ai-btn: var(--acadepost-warm);
+    --new-box-hover: #eeeeee;
+    --new-table-border: var(--acadepost-line);
+    --new-table-header: #ffffff;
+    --new-table-text: #6b7280;
+    --new-table-text-focused: var(--acadepost-accent);
+    --new-col-color: #eeeeee;
+    --new-menu-hover: var(--acadepost-black);
+    --menu-shadow: var(--acadepost-shadow);
+
+    --color-primary: var(--acadepost-paper);
+    --color-secondary: #ffffff;
+    --color-text: var(--acadepost-ink);
+    --color-third: #ffffff;
+    --color-forth: var(--acadepost-accent);
+    --color-seventh: var(--acadepost-accent);
+    --color-custom4: var(--acadepost-accent);
+    --color-custom7: var(--acadepost-accent);
+    --color-custom10: var(--acadepost-warm);
+    --color-custom13: var(--acadepost-warm);
+    --color-custom17: #242424;
+    --color-custom18: #6b7280;
+    --color-custom45: var(--acadepost-accent);
+    --color-custom50: var(--acadepost-black);
+    --color-custom51: var(--acadepost-accent);
+  }
+}
+
+:root {
   .dark {
     --color-primary: #0e0e0e;
     --color-secondary: #090b13;

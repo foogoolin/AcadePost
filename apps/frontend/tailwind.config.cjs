@@ -5,6 +5,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        acadeBlack: '#050505',
+        acadeInk: '#101010',
+        acadeMint: '#4cccb8',
+        acadeAmber: '#fda100',
+        acadePaper: '#f4f4f4',
         primary: 'var(--color-primary)',
         secondary: 'var(--color-secondary)',
         textColor: 'var(--new-btn-text)',
@@ -122,7 +127,8 @@ module.exports = {
         loginBg: 'url(/auth/bg-login.png)',
       },
       fontFamily: {
-        sans: ['Helvetica Neue'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        brand: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       animation: {
         fade: 'fadeOut 0.5s ease-in-out',

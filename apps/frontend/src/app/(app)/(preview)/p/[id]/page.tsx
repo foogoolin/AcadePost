@@ -1,4 +1,4 @@
-import { internalFetch } from '@gitroom/helpers/utils/internal.fetch';
+﻿import { internalFetch } from '@gitroom/helpers/utils/internal.fetch';
 import { sanitizePostContent } from '@gitroom/helpers/utils/sanitize.post.content';
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
@@ -15,7 +15,7 @@ import { RenderPreviewDateClient } from '@gitroom/frontend/components/preview/re
 
 dayjs.extend(utc);
 export const metadata: Metadata = {
-  title: `${isGeneralServerSide() ? 'Postiz' : 'Gitroom'} Preview`,
+  title: `${isGeneralServerSide() ? 'AcadéPost' : 'AcadéPost'} Preview`,
   description: '',
 };
 export default async function Auth(

@@ -57,6 +57,27 @@ export const useMenuItem = () => {
       path: '/launches',
     },
     {
+      name: 'Content Routing',
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+        >
+          <path
+            d="M4 6H13M13 6L10 3M13 6L10 9M20 18H11M11 18L14 15M11 18L14 21M4 18H7.5C9.98528 18 12 15.9853 12 13.5V10.5C12 8.01472 14.0147 6 16.5 6H20"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ),
+      path: '/content-routing',
+    },
+    {
       name: 'Agent',
       icon: (
         <svg
@@ -248,7 +269,7 @@ export const useMenuItem = () => {
           />
         </svg>
       ),
-      path: 'https://affiliate.postiz.com',
+      path: 'https://affiliate.acadepost.local',
       role: ['ADMIN', 'SUPERADMIN', 'USER'],
       requireBilling: true,
     },

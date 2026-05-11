@@ -14,6 +14,9 @@
 body {
   background: var(--new-bgColor) !important;
   color: var(--new-btn-text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
+  letter-spacing: 0;
 }
 
 body * {
@@ -787,6 +790,25 @@ html[dir='rtl'] [dir='ltr'] {
 .forceChange .changeColor {
   background: var(--new-btn-primary) !important;
   color: #fff !important;
+}
+
+.acadepost-card {
+  background: var(--new-bgColorInner);
+  border: 1px solid var(--new-bgLineColor);
+  border-radius: 12px;
+  box-shadow: var(--acadepost-shadow);
+}
+
+.acadepost-pill {
+  border-radius: 9999px;
+}
+
+.acadepost-accent {
+  color: var(--acadepost-accent);
+}
+
+.acadepost-warm {
+  color: var(--acadepost-warm);
 }
 
 .text-shadow-tags {
