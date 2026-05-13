@@ -57,7 +57,7 @@ export default async function Auth(
                 >
                   <div className="max-w-[55px]">
                     <SafeImage
-                      src={'/postiz.svg'}
+                      src={'/brand/acadepost-logo.png'}
                       width={55}
                       height={55}
                       alt="Logo"

@@ -23,7 +23,7 @@ export class OauthProvider extends AuthProviderAbstract {
       !POSTIZ_OAUTH_AUTH_URL ||
       !FRONTEND_URL
     ) {
-      throw new Error('POSTIZ_OAUTH environment variables are not set');
+      throw new Error('Generic OAuth environment variables are not set');
     }
 
     return {

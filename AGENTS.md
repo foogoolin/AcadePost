@@ -4,7 +4,7 @@
 
 - The UI product name is AcadéPost.
 - The repository/project slug is AcadePost.
-- The codebase is based on Postiz and is being adapted into a demo-ready AcadéPost MVP.
+- The codebase is being adapted into a demo-ready AcadéPost MVP.
 - The immediate priority is working software for customer demonstration.
 
 ## Implementation Rules
@@ -13,7 +13,7 @@
 - Do not rename internal package aliases or workspace package names during MVP unless the build proves it is safe.
 - Prefer small, customer-visible changes over broad refactors.
 - Keep `PROJECT_PLAN.md` current after significant work.
-- Add design rules from Claude Code skills only after reading and adapting them to the actual AcadéPost/Postiz frontend stack.
+- Add design rules from Claude Code skills only after reading and adapting them to the actual AcadéPost frontend stack.
 - Use black as the primary brand color, `#4cccb8` as the main accent, and `#fda100` as the secondary accent.
 
 ## Content Routing Defaults

@@ -33,14 +33,14 @@ export const startMcp = async (app: INestApplication) => {
   };
 
   const mastra = await mastraService.mastra();
-  const agent = mastra.getAgent('postiz');
+  const agent = mastra.getAgent('acadepost');
   const tools = await agent.listTools();
 
   const serverConfig = {
-    name: 'Postiz MCP',
+    name: 'AcadéPost MCP',
     version: '1.0.0',
     tools,
-    agents: { postiz: agent },
+    agents: { acadepost: agent },
   };
 
   const server = new MCPServer(serverConfig);

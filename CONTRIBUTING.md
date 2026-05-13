@@ -2,20 +2,20 @@
 
 Contributions are welcome - code, docs, whatever it might be! If this is your first contribution to an Open Source project or you're a core maintainer of multiple projects, your time and interest in contributing to this project is most welcome.
 
-## Read the developers guide
+## Read the developer notes
 
-The main documentation site has a [developer guide](https://docs.postiz.com/developer-guide) . That guide provides you a good understanding of the project structure, and how to setup your development environment. Read this document after you have read that guide. This document is intended to provide you a good understanding of how to submit your first contribution.
+Start with the repository README, `PROJECT_PLAN.md`, and `AGENTS.md`. These files describe the current AcadéPost MVP scope, project structure, and working rules.
 
-## Apply via the contribution form
+## Coordinate before larger changes
 
-To submit your contribution, please fill out the [contribution form](https://contribute.postiz.com/p/postiz). This helps us evaluate whether your contribution is a good fit for the project. We will review your submission and get back to you as soon as possible.
+For MVP work, please discuss larger feature changes with the project owner before opening a pull request. Small fixes, docs updates, and demo-readiness improvements can usually go straight to a branch.
 
 ## Write code with others
 
 This is an open source project, with an open and welcoming community that is always keen to welcome new contributors. We recommend the two best ways to interact with the community are:
 
 - **GitHub issues**: To discuss more slowly, or longer-written messages.
-- **[Discord chat](https://discord.postiz.com)**: To chat with people [Discord chat](https://discord.postiz.com/) and a quicker feedback.
+- **Project owner**: For roadmap, demo, and product-scope questions.
 
 As a general rule;
 
@@ -43,7 +43,7 @@ This project follows a Fork/Feature Branch/Pull Request model. If you're not fam
 1. **Fork the project:** Create a personal copy of the repository on your GitHub account.
 2. **Clone your fork:** Bring a copy of your fork to your local machine.
    ```bash
-   git clone https://github.com/YOUR_USERNAME/postiz.git
+   git clone https://github.com/YOUR_USERNAME/AcadePost.git
    ```
 3. **Create a new branch**: Start a new branch for your changes
    ```bash
@@ -58,6 +58,6 @@ This project follows a Fork/Feature Branch/Pull Request model. If you're not fam
 
 # Need Help?
 
-Again, do check the [developer guide](https://docs.postiz.com/developer-guide). Much of what you probably need to know is in there.
+Again, check the README, `PROJECT_PLAN.md`, and `AGENTS.md`. Much of what you probably need to know is in there.
 
-If you encounter any issues, please visit our [support page](https://docs.postiz.com/support) or check the community forums. Your contributions help make Postiz better!
+If you encounter any issues, open a GitHub issue or coordinate directly with the project owner. Your contributions help make AcadéPost better!

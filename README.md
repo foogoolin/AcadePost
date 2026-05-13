@@ -1,6 +1,6 @@
 # AcadéPost
 
-AcadéPost is a demo-ready social publishing MVP based on the Postiz codebase.
+AcadéPost is a demo-ready social publishing MVP for planning, routing, scheduling, and publishing social content.
 
 The product goal is to help teams prepare, route, schedule, and publish content across social channels with a workflow organized around content type:
 
@@ -10,7 +10,7 @@ The product goal is to help teams prepare, route, schedule, and publish content 
 
 ## Current MVP
 
-This repository keeps the existing Postiz architecture for speed:
+This repository keeps the existing upstream architecture for speed:
 
 - pnpm monorepo.
 - Next.js frontend.
@@ -20,7 +20,7 @@ This repository keeps the existing Postiz architecture for speed:
 - Temporal.
 - Docker Compose for local/self-hosted runtime.
 
-Internal aliases and package names may still reference `gitroom` or `postiz` during the first MVP. Customer-facing product language should use AcadéPost.
+Some legacy internal aliases and package names may remain during the first MVP when changing them would risk build stability. Customer-facing product language should use AcadéPost.
 
 ## Project Memory
 
