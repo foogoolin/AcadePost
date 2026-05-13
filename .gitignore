@@ -58,5 +58,7 @@ Thumbs.db
 .secrets/
 .mcp.json
 .claude/settings.local.json
+_byan-output/tool-log.jsonl
+docs/byan-cli-codex-feedback.pdf
 libraries/plugins/src/plugins.ts
 i18n.cache
