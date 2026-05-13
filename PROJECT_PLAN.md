@@ -74,6 +74,7 @@ The first workflow should classify content into one of these groups, make the ma
 - Root `build:extension` no longer calls Unix `rm`.
 - Verification: `corepack pnpm --filter ./apps/extension run build` passes locally. The generated ZIP contains `background.js`, `manifest.json`, `icon-32.png`, and `icon-128.png`.
 - Remaining caveat: local shell still uses Node `v24.13.0`; repo target remains `>=22.12.0 <23.0.0`.
+- Customer demo runbook added at `docs/customer-demo-runbook.md`.
 
 ## Open Questions
 
@@ -84,7 +85,6 @@ The first workflow should classify content into one of these groups, make the ma
 
 - Switch the local development runtime to Node 22.x and make `pnpm` available in PATH or change lifecycle scripts to use Corepack-safe commands.
 - Make backend/orchestrator builds set a larger Node heap consistently.
-- Add a short customer demo runbook.
 - Add the first content routing UI affordance without rewriting the publishing engine.
 
 ## Update Rule
