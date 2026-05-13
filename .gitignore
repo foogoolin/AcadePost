@@ -56,5 +56,7 @@ Thumbs.db
 
 # ignore Secrets folder
 .secrets/
+.mcp.json
+.claude/settings.local.json
 libraries/plugins/src/plugins.ts
 i18n.cache

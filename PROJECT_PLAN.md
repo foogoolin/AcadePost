@@ -56,6 +56,16 @@ The first workflow should classify content into one of these groups, make the ma
 - No-code continuation guidance: FlutterFlow or another no-code tool should be treated as a client shell over AcadéPost APIs, not a direct repository import. Keep the NestJS/Temporal/Postgres publishing engine in code, then expose stable API endpoints for a FlutterFlow/mobile/admin frontend if desired.
 - Next demo-readiness phase: install/use Node 22.x, fix cross-platform scripts, run browser smoke checks for auth, sidebar, `/content-routing`, public API/developer, onboarding, and billing surfaces.
 
+## BYAN Integration Update - 2026-05-13
+
+- Communication language set to Russian in BYAN configs; project/document output remains French.
+- Project context created at `_byan-output/project-context.md` for BYAN/Codex continuation.
+- Read `_byan/agents/byan.md` as the main BYAN agent and `_byan/bmb/agents/codex.md` as the Codex integration specialist.
+- Corrected `.codex/prompts` activation paths from stale `_bmad` references to real `_byan` agent files for the installed prompts.
+- Hermes installed as `_byan/core/agents/hermes.md`, registered in `_byan/_config/agent-manifest.csv`, and re-enabled through `.codex/prompts/hermes.md`.
+- Local validation found 32 prompt files pointing to existing BYAN agents.
+- Current local `codex-cli 0.130.0` does not expose the older `codex skill` command described by the BYAN Codex agent, so `.codex/prompts` should be treated as project prompt scaffolding rather than a verified CLI skill registry.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?
