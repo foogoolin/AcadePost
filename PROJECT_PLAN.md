@@ -66,6 +66,15 @@ The first workflow should classify content into one of these groups, make the ma
 - Local validation found 32 prompt files pointing to existing BYAN agents.
 - Current local `codex-cli 0.130.0` does not expose the older `codex skill` command described by the BYAN Codex agent, so `.codex/prompts` should be treated as project prompt scaffolding rather than a verified CLI skill registry.
 
+## Build Script Update - 2026-05-13
+
+- Replaced the extension package's Unix-only `rm/cp/zip` build command with Node-based cross-platform scripts.
+- `apps/extension/scripts/build.mjs` now cleans `dist`, runs Vite, copies `manifest.json`, and creates `apps/extension/extension.zip` without relying on a system `zip` binary.
+- `apps/extension/scripts/dev.mjs` replaces Unix inline env assignment for extension watch mode.
+- Root `build:extension` no longer calls Unix `rm`.
+- Verification: `corepack pnpm --filter ./apps/extension run build` passes locally. The generated ZIP contains `background.js`, `manifest.json`, `icon-32.png`, and `icon-128.png`.
+- Remaining caveat: local shell still uses Node `v24.13.0`; repo target remains `>=22.12.0 <23.0.0`.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?
@@ -75,7 +84,6 @@ The first workflow should classify content into one of these groups, make the ma
 
 - Switch the local development runtime to Node 22.x and make `pnpm` available in PATH or change lifecycle scripts to use Corepack-safe commands.
 - Make backend/orchestrator builds set a larger Node heap consistently.
-- Replace extension `rm/cp/zip` packaging with a cross-platform script.
 - Add a short customer demo runbook.
 - Add the first content routing UI affordance without rewriting the publishing engine.
 
