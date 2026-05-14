@@ -1,4 +1,4 @@
-# AcadéPost Project Plan
+﻿# AcadéPost Project Plan
 
 ## Current MVP Goal
 
@@ -80,15 +80,15 @@ The first workflow should classify content into one of these groups, make the ma
 
 - BYAN workflow: `@byan` doit piloter le travail. Les agents BYAN utilises pour ce passage sont Architect/Winston pour la validation de modele et Tea/Murat pour la matrice de verification.
 - Decision MVP: garder `Organization` comme limite technique interne de tenant, billing, API key, posts, media et integrations; presenter cette limite a l'utilisateur comme un `Projet`.
-- Roles visibles: `SUPERADMIN` devient `Proprietaire`, `ADMIN` reste `Admin`, `USER` devient `Editeur`. Aucun rename Prisma/enum n'est fait pour le MVP.
+- Roles visibles: `SUPERADMIN` devient `Propriétaire`, `ADMIN` reste `Admin`, `USER` devient `Éditeur`. Aucun rename Prisma/enum n'est fait pour le MVP.
 - Creation projet ajoutee via `POST /user/organizations` et le selecteur projet frontend. Le projet cree devient le projet actif via le cookie `showorg`.
 - Changement projet renforce: `POST /user/change-org` verifie maintenant que l'utilisateur est membre actif du projet avant de poser `showorg`.
-- UI demo labels ajoutes en francais: `Projet actuel`, `Nom du projet`, `Creer un projet`, `Membres du projet`, `Editeur`, `Proprietaire`.
-- RBAC demo renforce: en environnement sans Stripe key, les limites de subscription restent ouvertes pour le demo, mais les checks `ADMIN` continuent de bloquer les `Editeur`.
+- UI demo labels ajoutes en francais: `Projet actuel`, `Nom du projet`, `Creer un projet`, `Membres du projet`, `Éditeur`, `Propriétaire`.
+- RBAC demo renforce: en environnement sans Stripe key, les limites de subscription restent ouvertes pour le demo, mais les checks `ADMIN` continuent de bloquer les `Éditeur`.
 - Isolation renforcee sur les surfaces a risque: update de posts par `id`, remplacement d'un `group`, edition de tags, creation de commentaires et resolution de media par `id` verifient maintenant la frontiere `organizationId`.
 - Orchestrator mis a jour pour passer `organizationId` a la resolution media pendant la publication.
 - Verification locale: frontend build passe, backend build passe, orchestrator build passe. Les builds ont ete executes avec `corepack pnpm`; backend/orchestrator gardent `NODE_OPTIONS=--max-old-space-size=8192`. La machine locale signale toujours Node `v24.13.0` alors que le repo cible Node 22.x.
-- Verification restante avant demo navigateur: creer deux projets, inviter Admin/Editeur, verifier le switch projet, verifier que posts/media/integrations/tags/commentaires d'un projet ne sont pas visibles ni modifiables depuis un autre.
+- Verification restante avant demo navigateur: creer deux projets, inviter Admin/Éditeur, verifier le switch projet, verifier que posts/media/integrations/tags/commentaires d'un projet ne sont pas visibles ni modifiables depuis un autre.
 
 ## Deploiement demo serveur - 2026-05-13
 
@@ -107,6 +107,14 @@ The first workflow should classify content into one of these groups, make the ma
 - Validation locale: `docker compose --env-file .env.demo.example -f docker-compose.demo.yaml config --quiet` passe; les builds frontend/backend/orchestrator/extension passent hors Docker.
 - Limite locale: Docker Desktop Windows a interrompu le build image pendant `next build` avec une erreur engine `EOF`, puis a continue a produire des timeouts. La verification runtime doit donc etre faite sur le serveur Linux cible.
 
+## Encoding Memory Update - 2026-05-14
+
+- Problème récurrent enregistré pour Codex/BYAN: certains fichiers texte peuvent contenir du mojibake UTF-8 dans les accents français et dans le nom produit visible.
+- Correction appliquée dans `AGENTS.md`, `PROJECT_PLAN.md` et `_byan-output/project-context.md`.
+- Mémoire dédiée ajoutée dans `docs/codex-project-memory.md`.
+- `.editorconfig` ajouté pour demander `charset = utf-8` et `end_of_line = lf`.
+- Nouvelle règle: avant chaque commit qui touche docs, prompts, traductions ou labels UI, lancer la recherche mojibake documentée dans `docs/codex-project-memory.md`.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?
@@ -118,7 +126,7 @@ The first workflow should classify content into one of these groups, make the ma
 - Switch the local development runtime to Node 22.x and make `pnpm` available in PATH or change lifecycle scripts to use Corepack-safe commands.
 - Make backend/orchestrator builds set a larger Node heap consistently.
 - Add the first content routing UI affordance without rewriting the publishing engine.
-- Run browser smoke checks for multi-project access: owner project creation, Admin/Editeur invites, role-based settings, and cross-project negative access attempts.
+- Run browser smoke checks for multi-project access: owner project creation, Admin/Éditeur invites, role-based settings, and cross-project negative access attempts.
 
 ## Update Rule
 

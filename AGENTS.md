@@ -1,4 +1,4 @@
-# AcadéPost Working Rules
+﻿# AcadéPost Working Rules
 
 ## Project Identity
 
@@ -15,6 +15,13 @@
 - Keep `PROJECT_PLAN.md` current after significant work.
 - Add design rules from Claude Code skills only after reading and adapting them to the actual AcadéPost frontend stack.
 - Use black as the primary brand color, `#4cccb8` as the main accent, and `#fda100` as the secondary accent.
+
+## Encoding Guardrails
+
+- Keep project files in UTF-8, especially French UI text, docs, translations, BYAN prompts, and Codex memory files.
+- Known mojibake examples and the exact verification command are documented in `docs/codex-project-memory.md`.
+- Before committing text changes, run the documented mojibake search and repair visible strings back to UTF-8 French.
+- Longer Codex memory for this issue lives in `docs/codex-project-memory.md`.
 
 ## Content Routing Defaults
 

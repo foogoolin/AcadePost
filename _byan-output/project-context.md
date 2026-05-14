@@ -1,4 +1,4 @@
----
+﻿---
 project_name: "AcadéPost"
 project_slug: "AcadePost"
 user_name: "Yan"
@@ -11,6 +11,7 @@ sections_completed:
   - brand_rules
   - byan_codex_integration
   - demo_readiness
+  - encoding_guardrails
 ---
 
 # Contexte Projet pour Agents IA
@@ -43,6 +44,13 @@ Ce fichier est la référence courte pour les agents BYAN/Codex qui travaillent 
 - Nettoyer les traces publiques Postiz/Gitroom dans l'UI, les traductions, les métadonnées, les docs de démo et les textes fallback.
 - Ne pas renommer pendant le MVP les aliases internes `@gitroom/*`, les variables `POSTIZ_*`, `@postiz/wallets`, ni les clés techniques si cela risque de casser le build.
 - `LICENSE` est une piste légale séparée et reste sous décision du propriétaire.
+
+## Garde-fous encodage
+
+- Tous les fichiers projet doivent rester en UTF-8.
+- Problème déjà observé : mojibake UTF-8 dans des textes français et dans le nom produit visible.
+- Avant chaque commit touchant docs, prompts, traductions ou labels UI, lancer la recherche documentée dans `docs/codex-project-memory.md`.
+- Mémoire détaillée : `docs/codex-project-memory.md`.
 
 ## Routage de contenu MVP
 
