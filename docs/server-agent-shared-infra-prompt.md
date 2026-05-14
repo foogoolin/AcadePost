@@ -22,6 +22,7 @@ Important architecture:
   `ACADEPOST_PUBLIC_URL=https://post.fgln.pro`.
 - At image build time the frontend defaults to relative `/api`.
 - At runtime `.env` must set `NEXT_PUBLIC_BACKEND_URL=https://post.fgln.pro/api`, because backend MCP/OAuth code needs an absolute public backend URL.
+- The launcher can derive `NEXT_PUBLIC_BACKEND_URL` from `ACADEPOST_PUBLIC_URL` if the example placeholder is still present.
 
 Preflight:
 1. Check server resources:

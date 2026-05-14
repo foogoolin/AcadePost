@@ -50,11 +50,17 @@ if [ -n "${ACADEPOST_PUBLIC_URL:-}" ]; then
   replace_env_value "ACADEPOST_PUBLIC_URL" "${ACADEPOST_PUBLIC_URL}" "${ENV_FILE}"
 fi
 
-if grep -q "https://YOUR_DOMAIN" "${ENV_FILE}"; then
+if grep '^ACADEPOST_PUBLIC_URL=' "${ENV_FILE}" | grep -q "https://YOUR_DOMAIN"; then
   echo "Set ACADEPOST_PUBLIC_URL before starting the shared-infra demo." >&2
   echo "Example:" >&2
   echo "  ACADEPOST_PUBLIC_URL=https://example.com bash deploy/demo/server-up-shared-infra.sh" >&2
   exit 1
+fi
+
+PUBLIC_URL="$(grep '^ACADEPOST_PUBLIC_URL=' "${ENV_FILE}" | cut -d= -f2- | sed 's:/*$::')"
+BACKEND_URL="${PUBLIC_URL}/api"
+if ! grep -q '^NEXT_PUBLIC_BACKEND_URL=' "${ENV_FILE}" || grep '^NEXT_PUBLIC_BACKEND_URL=' "${ENV_FILE}" | grep -q 'https://YOUR_DOMAIN/api'; then
+  replace_env_value "NEXT_PUBLIC_BACKEND_URL" "${BACKEND_URL}" "${ENV_FILE}"
 fi
 
 if grep -q "CHANGE_ME_LONG_RANDOM_JWT_SECRET" "${ENV_FILE}"; then

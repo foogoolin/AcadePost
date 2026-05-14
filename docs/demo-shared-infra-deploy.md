@@ -27,7 +27,7 @@ FRONTEND_URL=https://YOUR_DOMAIN
 NEXT_PUBLIC_BACKEND_URL=https://YOUR_DOMAIN/api
 ```
 
-Dans compose, `MAIN_URL` et `FRONTEND_URL` sont derives de `ACADEPOST_PUBLIC_URL`. En runtime, `NEXT_PUBLIC_BACKEND_URL` doit etre absolu, par exemple `https://YOUR_DOMAIN/api`, car le backend l'utilise aussi pour generer des URLs MCP/OAuth.
+Dans compose, `MAIN_URL` et `FRONTEND_URL` sont derives de `ACADEPOST_PUBLIC_URL`. En runtime, `NEXT_PUBLIC_BACKEND_URL` doit etre absolu, par exemple `https://YOUR_DOMAIN/api`, car le backend l'utilise aussi pour generer des URLs MCP/OAuth. Le launcher le recalcule automatiquement depuis `ACADEPOST_PUBLIC_URL` si la valeur exemple n'a pas ete remplacee.
 
 ## Preparation PostgreSQL externe
 

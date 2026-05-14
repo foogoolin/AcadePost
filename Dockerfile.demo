@@ -7,16 +7,6 @@ ENV NODE_ENV=production
 ENV CI=1
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_PUBLIC_VERSION=$NEXT_PUBLIC_VERSION
-ENV MAIN_URL=http://localhost:5000
-ENV FRONTEND_URL=http://localhost:5000
-ENV NEXT_PUBLIC_BACKEND_URL=/api
-ENV NEXT_PUBLIC_UPLOAD_DIRECTORY=/uploads
-ENV NEXT_PUBLIC_UPLOAD_STATIC_DIRECTORY=/uploads
-ENV DATABASE_URL=postgresql://acadepost-user:acadepost-password@localhost:5432/acadepost-db-local
-ENV REDIS_URL=redis://localhost:6379
-ENV BACKEND_INTERNAL_URL=http://127.0.0.1:3000
-ENV TEMPORAL_ADDRESS=temporal:7233
-ENV IS_GENERAL=true
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
@@ -45,7 +35,18 @@ COPY var/docker/nginx.conf /etc/nginx/nginx.conf
 
 RUN touch /app/.env \
   && corepack pnpm install --frozen-lockfile \
-  && NODE_OPTIONS="--max-old-space-size=${NODE_BUILD_MAX_OLD_SPACE_SIZE}" corepack pnpm run build
+  && MAIN_URL="http://build.local" \
+    FRONTEND_URL="http://build.local" \
+    NEXT_PUBLIC_BACKEND_URL="/api" \
+    NEXT_PUBLIC_UPLOAD_DIRECTORY="/uploads" \
+    NEXT_PUBLIC_UPLOAD_STATIC_DIRECTORY="/uploads" \
+    DATABASE_URL="postgresql://acadepost-user:acadepost-password@localhost:5432/acadepost-db-local" \
+    REDIS_URL="redis://localhost:6379" \
+    BACKEND_INTERNAL_URL="http://127.0.0.1:3000" \
+    TEMPORAL_ADDRESS="temporal:7233" \
+    IS_GENERAL="true" \
+    NODE_OPTIONS="--max-old-space-size=${NODE_BUILD_MAX_OLD_SPACE_SIZE}" \
+    corepack pnpm run build
 
 EXPOSE 5000
 

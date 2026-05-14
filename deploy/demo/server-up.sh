@@ -42,11 +42,17 @@ if [ -n "${ACADEPOST_PUBLIC_URL:-}" ]; then
   replace_env_value "ACADEPOST_PUBLIC_URL" "${ACADEPOST_PUBLIC_URL}" "${ENV_FILE}"
 fi
 
-if grep -q "YOUR_SERVER_IP" "${ENV_FILE}"; then
+if grep '^ACADEPOST_PUBLIC_URL=' "${ENV_FILE}" | grep -q "YOUR_SERVER_IP"; then
   echo "Set ACADEPOST_PUBLIC_URL before starting the demo." >&2
   echo "Example:" >&2
   echo "  ACADEPOST_PUBLIC_URL=http://YOUR_SERVER_IP:4007 bash deploy/demo/server-up.sh" >&2
   exit 1
+fi
+
+PUBLIC_URL="$(grep '^ACADEPOST_PUBLIC_URL=' "${ENV_FILE}" | cut -d= -f2- | sed 's:/*$::')"
+BACKEND_URL="${PUBLIC_URL}/api"
+if ! grep -q '^NEXT_PUBLIC_BACKEND_URL=' "${ENV_FILE}" || grep '^NEXT_PUBLIC_BACKEND_URL=' "${ENV_FILE}" | grep -q 'YOUR_SERVER_IP'; then
+  replace_env_value "NEXT_PUBLIC_BACKEND_URL" "${BACKEND_URL}" "${ENV_FILE}"
 fi
 
 if grep -q "change-this-demo-postgres-password" "${ENV_FILE}"; then
