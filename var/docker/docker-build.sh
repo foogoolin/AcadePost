@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-IMAGE="${ACADEPOST_IMAGE:-acadepost/app:demo}"
+IMAGE="${ACADEPOST_IMAGE:-ghcr.io/foogoolin/acadepost:demo}"
 VERSION="${NEXT_PUBLIC_VERSION:-$(git rev-parse --short HEAD 2>/dev/null || echo demo)}"
 NODE_BUILD_MAX_OLD_SPACE_SIZE="${NODE_BUILD_MAX_OLD_SPACE_SIZE:-4096}"
 

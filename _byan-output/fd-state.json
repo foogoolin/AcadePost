@@ -1,0 +1,97 @@
+{
+  "fd_id": "20260514-201525-demo-deploy-branding-hardening",
+  "feature_name": "demo-deploy-branding-hardening",
+  "phase": "COMPLETED",
+  "started_at": "2026-05-14T18:15:25.381Z",
+  "updated_at": "2026-05-14T18:31:00.000Z",
+  "phase_history": [
+    {
+      "phase": "DISCOVERY",
+      "entered_at": "2026-05-14T18:15:25.381Z"
+    },
+    {
+      "phase": "DISPATCH",
+      "entered_at": "2026-05-14T18:16:00.000Z"
+    },
+    {
+      "phase": "BUILD",
+      "entered_at": "2026-05-14T18:17:00.000Z"
+    },
+    {
+      "phase": "VALIDATE",
+      "entered_at": "2026-05-14T18:31:00.000Z"
+    },
+    {
+      "phase": "COMPLETED",
+      "entered_at": "2026-05-14T18:31:00.000Z"
+    }
+  ],
+  "project_context": {
+    "name": "AcadéPost",
+    "slug": "AcadePost",
+    "domain": "social media publishing demo",
+    "stack": "Next.js, NestJS, Prisma, Docker Compose, Temporal, Redis, PostgreSQL, nginx, PM2",
+    "source": "local"
+  },
+  "raw_ideas": [
+    "Use GHCR prebuilt demo images instead of server-side builds.",
+    "Fold server-found Docker fixes back into source control.",
+    "Replace visible old logo surfaces with the AcadéPost brand asset."
+  ],
+  "backlog": [
+    {
+      "priority": "P1",
+      "feature": "Demo image deployment",
+      "problem": "Server deploys were building from source instead of pulling a reusable image.",
+      "mvp": "GitHub Actions publishes ghcr.io/foogoolin/acadepost:demo and launchers pull it."
+    },
+    {
+      "priority": "P1",
+      "feature": "Shared-infra runtime fixes",
+      "problem": "Temporal, Elasticsearch and PM2 paths required manual server overrides.",
+      "mvp": "Compose/scripts/ecosystem config include server-proven defaults."
+    },
+    {
+      "priority": "P1",
+      "feature": "Public logo cleanup",
+      "problem": "The visible app shell still showed the old placeholder logo.",
+      "mvp": "Shared logo/favicons/static logos use the AcadéPost brand asset."
+    }
+  ],
+  "dispatch_table": [
+    {
+      "feature": "demo-deploy-branding-hardening",
+      "component": "main-thread-opus",
+      "action": "implement and validate"
+    }
+  ],
+  "commits": [],
+  "review_findings": [
+    "Temporal needs BIND_ON_IP=0.0.0.0 in multi-network compose setups.",
+    "Elasticsearch bind-mount directory must be writable by uid/gid 1000.",
+    "PM2 scripts must point to apps/*/dist/apps/*/src/main.js.",
+    "The sidebar Logo component still rendered the old p-mark."
+  ],
+  "validate_verdict": {
+    "status": "OK_WITH_LOCAL_DOCKER_LIMIT",
+    "tests": [
+      "node -c ecosystem.demo.config.cjs",
+      "docker compose --env-file .env.demo.example -f docker-compose.demo.yaml config --quiet",
+      "docker compose --env-file .env.demo.shared-infra.example -f docker-compose.demo.shared-infra.yaml config --quiet",
+      "corepack pnpm --filter ./apps/frontend run build",
+      "corepack pnpm --filter ./apps/extension run build",
+      "git diff --check",
+      "mojibake rg check"
+    ],
+    "blocking_issues": [
+      "Local Docker Engine pipe is unavailable on Windows, so docker build --check could not run locally."
+    ]
+  },
+  "refactor_log": [],
+  "doc_log": [
+    "PROJECT_PLAN.md updated with deployment and logo cleanup notes."
+  ],
+  "notes": [
+    "User explicitly asked to continue, so FD gates were handled as an execution pass instead of pausing for menu confirmation."
+  ]
+}

@@ -14,7 +14,7 @@ Ce document decrit un deploiement brut pour demo client. Ce n'est pas une proced
 
 - Ubuntu 22.04 ou 24.04.
 - Docker Engine avec le plugin Docker Compose.
-- 4 CPU / 8 Go RAM minimum pour une demo courte; 16 Go RAM est plus confortable pendant le build Docker.
+- 4 CPU / 8 Go RAM minimum pour une demo courte.
 - 50 Go disque minimum.
 - Un domaine ou une IP publique.
 
@@ -66,7 +66,7 @@ ACADEPOST_PUBLIC_URL=https://demo.example.com
 ## Lancement
 
 ```bash
-docker compose --env-file .env.demo -f docker-compose.demo.yaml up -d --build
+bash deploy/demo/server-up.sh
 ```
 
 L'application sera disponible sur :
@@ -83,7 +83,7 @@ Depuis le dossier du depot sur le serveur :
 ACADEPOST_PUBLIC_URL=http://SERVER_IP:4007 bash deploy/demo/server-up.sh
 ```
 
-Le script cree `.env.demo` si absent, remplace les secrets demo par des valeurs aleatoires, valide le compose, construit l'image et lance la stack.
+Le script cree `.env.demo` si absent, remplace les secrets demo par des valeurs aleatoires, valide le compose, tire l'image `ghcr.io/foogoolin/acadepost:demo` et lance la stack.
 
 ## Logs
 
@@ -96,7 +96,8 @@ docker compose --env-file .env.demo -f docker-compose.demo.yaml logs -f acadepos
 
 ```bash
 curl -f http://SERVER_IP:4007/
-curl -f http://SERVER_IP:4007/api/monitor/queue/server
+curl -f http://SERVER_IP:4007/api/monitor/health
+curl -f http://SERVER_IP:4007/api/monitor/ready
 docker compose --env-file .env.demo -f docker-compose.demo.yaml exec acadepost-postgres pg_isready -U acadepost-user -d acadepost-db-local
 docker compose --env-file .env.demo -f docker-compose.demo.yaml exec acadepost-redis redis-cli ping
 ```
@@ -116,7 +117,7 @@ docker compose --env-file .env.demo -f docker-compose.demo.yaml exec acadepost-r
 
 ```bash
 git pull
-docker compose --env-file .env.demo -f docker-compose.demo.yaml up -d --build
+bash deploy/demo/server-up.sh
 ```
 
 Pour preserver les donnees de demo, ne jamais lancer :
@@ -139,7 +140,7 @@ Rollback :
 
 ```bash
 git checkout <previous-commit>
-docker compose --env-file .env.demo -f docker-compose.demo.yaml up -d --build
+bash deploy/demo/server-up.sh
 ```
 
 ## Limites connues

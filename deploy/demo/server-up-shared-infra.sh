@@ -31,6 +31,24 @@ require_network() {
   fi
 }
 
+fix_elasticsearch_permissions() {
+  local dir="$1"
+
+  if [ "$(id -u)" -eq 0 ]; then
+    chown -R 1000:1000 "${dir}"
+    chmod -R u+rwX,g+rwX "${dir}"
+    return
+  fi
+
+  if command -v sudo >/dev/null 2>&1; then
+    sudo chown -R 1000:1000 "${dir}"
+    sudo chmod -R u+rwX,g+rwX "${dir}"
+    return
+  fi
+
+  echo "Warning: cannot adjust ${dir} ownership. Elasticsearch needs write access for uid 1000." >&2
+}
+
 if ! command -v docker >/dev/null 2>&1; then
   echo "Docker is not installed. Install Docker Engine with the Compose plugin first." >&2
   exit 1
@@ -84,12 +102,16 @@ require_network "${BACKEND_NETWORK:-backend}"
 
 DATA_DIR="$(grep '^ACADEPOST_DATA_DIR=' "${ENV_FILE}" | cut -d= -f2-)"
 mkdir -p "${DATA_DIR:-./data}/config" "${DATA_DIR:-./data}/uploads" "${DATA_DIR:-./data}/redis" "${DATA_DIR:-./data}/temporal-elasticsearch"
+fix_elasticsearch_permissions "${DATA_DIR:-./data}/temporal-elasticsearch"
 
 echo "Validating ${COMPOSE_FILE}..."
 docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" config --quiet
 
+echo "Pulling AcadePost image..."
+docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" pull acadepost
+
 echo "Starting AcadePost shared-infra demo stack..."
-docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d --build
+docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d
 
 echo "Current stack status:"
 docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" ps

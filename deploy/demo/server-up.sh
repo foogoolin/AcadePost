@@ -70,8 +70,11 @@ fi
 echo "Validating ${COMPOSE_FILE}..."
 docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" config --quiet
 
+echo "Pulling AcadePost image..."
+docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" pull acadepost
+
 echo "Starting AcadePost demo stack..."
-docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d --build
+docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d
 
 echo "Current stack status:"
 docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" ps

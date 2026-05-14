@@ -14,6 +14,16 @@ Le compose shared-infra ne publie pas de port public. Caddy doit parler au conte
 - `docker-compose.demo.shared-infra.yaml`
 - `deploy/demo/server-up-shared-infra.sh`
 
+## Image preconstruite
+
+Le serveur ne construit pas l'application. Il tire l'image publiee par GitHub Actions :
+
+```text
+ghcr.io/foogoolin/acadepost:demo
+```
+
+Si le pull echoue avec une erreur d'authentification, rendre le package GHCR public dans GitHub Packages ou faire un `docker login ghcr.io` avec un token autorise.
+
 ## Image portable
 
 Le domaine n'est pas grave dans l'image Docker. Pendant le build, le bundle frontend utilise une route relative `/api`, donc le meme build peut fonctionner derriere n'importe quel domaine.
@@ -58,7 +68,8 @@ nano .env.demo.shared-infra
 bash deploy/demo/server-up-shared-infra.sh
 ```
 
-Le script verifie que les reseaux `proxy` et `backend` existent, cree les dossiers sous `ACADEPOST_DATA_DIR`, valide Compose et lance la stack.
+Le script verifie que les reseaux `proxy` et `backend` existent, cree les dossiers sous `ACADEPOST_DATA_DIR`, valide Compose, tire l'image GHCR et lance la stack.
+Il ajuste aussi les droits du dossier `temporal-elasticsearch` pour l'utilisateur `1000` utilise par Elasticsearch.
 
 ## Variables critiques
 

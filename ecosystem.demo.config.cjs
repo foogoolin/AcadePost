@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'backend',
       cwd: '/app',
-      script: './dist/apps/backend/src/main.js',
+      script: '/app/apps/backend/dist/apps/backend/src/main.js',
       interpreter: 'node',
       node_args: '--experimental-require-module',
       autorestart: true,
@@ -16,8 +16,8 @@ module.exports = {
     },
     {
       name: 'frontend',
-      cwd: '/app',
-      script: './node_modules/next/dist/bin/next',
+      cwd: '/app/apps/frontend',
+      script: '/app/node_modules/next/dist/bin/next',
       args: 'start -p 4200',
       interpreter: 'node',
       autorestart: true,
@@ -30,7 +30,7 @@ module.exports = {
     {
       name: 'orchestrator',
       cwd: '/app',
-      script: './dist/apps/orchestrator/src/main.js',
+      script: '/app/apps/orchestrator/dist/apps/orchestrator/src/main.js',
       interpreter: 'node',
       node_args: '--experimental-require-module',
       autorestart: true,

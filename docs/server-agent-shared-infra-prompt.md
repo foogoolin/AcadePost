@@ -15,6 +15,8 @@ Important architecture:
 - Do NOT use the clean-VPS compose for this server.
 - Use `docker-compose.demo.shared-infra.yaml`.
 - Use `.env.demo.shared-infra`, created from `.env.demo.shared-infra.example`.
+- Use the prebuilt image `ghcr.io/foogoolin/acadepost:demo`.
+- Do NOT build the AcadePost image on the server unless explicitly asked for emergency fallback.
 - Do NOT open public port 4007.
 - Do NOT add a UFW rule for 4007.
 - Caddy must reverse proxy to `acadepost:5000` over the Docker `proxy` network.
@@ -59,6 +61,9 @@ Prepare repository:
    - inspect `git status`
    - `git fetch origin main`
    - update safely to latest `main`
+3. Confirm the image is available:
+   - `docker pull ghcr.io/foogoolin/acadepost:demo`
+   - If pull returns unauthorized, make the GHCR package public or run `docker login ghcr.io` with an authorized token.
 
 Prepare env:
 1. `cd /opt/AcadePost`
@@ -86,6 +91,8 @@ Start:
 cd /opt/AcadePost
 bash deploy/demo/server-up-shared-infra.sh
 ```
+The launcher pulls the GHCR image and runs Compose without local build.
+It also fixes the bind-mount permissions for Temporal Elasticsearch data so uid `1000` can write to it.
 
 Caddy:
 If Caddy is attached to Docker network `proxy`, use:

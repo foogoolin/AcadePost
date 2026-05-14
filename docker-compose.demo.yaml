@@ -1,12 +1,6 @@
 services:
   acadepost:
-    build:
-      context: .
-      dockerfile: Dockerfile.demo
-      args:
-        NEXT_PUBLIC_VERSION: ${NEXT_PUBLIC_VERSION:-demo}
-        NODE_BUILD_MAX_OLD_SPACE_SIZE: ${NODE_BUILD_MAX_OLD_SPACE_SIZE:-4096}
-    image: ${ACADEPOST_IMAGE:-acadepost/app:demo}
+    image: ${ACADEPOST_IMAGE:-ghcr.io/foogoolin/acadepost:demo}
     container_name: acadepost
     restart: unless-stopped
     environment:
@@ -170,6 +164,7 @@ services:
       - ENABLE_ES=true
       - ES_SEEDS=temporal-elasticsearch
       - ES_VERSION=v7
+      - BIND_ON_IP=0.0.0.0
       - TEMPORAL_NAMESPACE=default
     networks:
       - temporal-network

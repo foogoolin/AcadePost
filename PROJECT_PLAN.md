@@ -131,6 +131,33 @@ The first workflow should classify content into one of these groups, make the ma
 - Health endpoints ajoutes: `/api/monitor/health` et `/api/monitor/ready`.
 - `TRUST_PROXY=true` est supporte cote backend et active dans le shared-infra compose.
 
+## GHCR Image Deployment Update - 2026-05-14
+
+- Ajout du workflow GitHub Actions `.github/workflows/build-demo-image.yml`.
+- Le workflow publie l'image demo vers `ghcr.io/foogoolin/acadepost:demo` et vers un tag SHA.
+- Les compose demo utilisent maintenant l'image preconstruite par defaut au lieu de construire sur le serveur.
+- Les scripts `deploy/demo/server-up.sh` et `deploy/demo/server-up-shared-infra.sh` font `docker compose pull acadepost` puis `up -d`, sans `--build`.
+- La construction locale reste possible via `var/docker/docker-build.sh`, mais elle n'est plus le chemin normal de deploiement serveur.
+- Corrections serveur integrees apres le premier deploiement: `BIND_ON_IP=0.0.0.0` pour Temporal multi-reseaux, droits bind-mount Elasticsearch pour uid `1000`, et chemins PM2 vers `apps/*/dist/...`.
+
+## Contabo Demo Deployment Result - 2026-05-14
+
+- Deploiement shared-infra verifie par l'agent serveur sur `https://post.fgln.pro`.
+- TLS Let's Encrypt actif via Caddy.
+- `/api/monitor/ready` retourne `200`.
+- Conteneurs actifs: `acadepost`, `acadepost-redis`, `temporal`, `temporal-elasticsearch`.
+- Infrastructure utilisee: PostgreSQL partage, Caddy reverse proxy, reseaux Docker `proxy` et `backend`.
+- Fixes serveur reportes et integres dans le repo: droits Elasticsearch bind-mount, `BIND_ON_IP=0.0.0.0`, chemins PM2 backend/orchestrator et `cwd` frontend.
+- Action urgente hors code: revoquer les tokens GitHub exposes pendant le deploiement et supprimer `/root/.github-token` sur le serveur apres revocation.
+
+## Logo Cleanup - 2026-05-14
+
+- Le logo public utilise maintenant l'asset fourni `apps/frontend/public/brand/acadepost-logo.png` dans la sidebar, les ecrans OAuth, billing et auth via les composants partages.
+- Les favicons Next des surfaces app/provider/extension pointent vers l'asset AcadéPost au lieu de l'ancien `favicon.ico`.
+- Les fichiers `favicon.png`, `favicon.ico`, `apps/extension/public/icon-32.png` et `apps/extension/public/icon-128.png` ont ete regeneres depuis l'asset AcadéPost.
+- Les endpoints statiques `/logo.svg` et `/logo-text.svg` servent une variante AcadéPost.
+- La preview publique remplace le vieux wordmark inline par le nom `AcadéPost`.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?

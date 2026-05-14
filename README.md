@@ -67,10 +67,10 @@ For a raw single-server demo deployment, use the dedicated demo compose:
 
 ```bash
 cp .env.demo.example .env.demo
-docker compose --env-file .env.demo -f docker-compose.demo.yaml up -d --build
+bash deploy/demo/server-up.sh
 ```
 
-On a Linux VPS, the assisted demo launcher can create `.env.demo`, generate demo secrets, validate Compose, and start the stack:
+On a Linux VPS, the assisted demo launcher can create `.env.demo`, generate demo secrets, pull the prebuilt `ghcr.io/foogoolin/acadepost:demo` image, validate Compose, and start the stack:
 
 ```bash
 ACADEPOST_PUBLIC_URL=http://SERVER_IP:4007 bash deploy/demo/server-up.sh
