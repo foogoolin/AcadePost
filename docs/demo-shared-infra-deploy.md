@@ -16,7 +16,7 @@ Le compose shared-infra ne publie pas de port public. Caddy doit parler au conte
 
 ## Image portable
 
-Le domaine n'est pas grave dans l'image Docker. Le client frontend utilise `NEXT_PUBLIC_BACKEND_URL=/api`, donc le meme build peut fonctionner derriere n'importe quel domaine si le runtime env et Caddy pointent correctement.
+Le domaine n'est pas grave dans l'image Docker. Pendant le build, le bundle frontend utilise une route relative `/api`, donc le meme build peut fonctionner derriere n'importe quel domaine.
 
 Le domaine est une configuration runtime :
 
@@ -24,10 +24,10 @@ Le domaine est une configuration runtime :
 ACADEPOST_PUBLIC_URL=https://YOUR_DOMAIN
 MAIN_URL=https://YOUR_DOMAIN
 FRONTEND_URL=https://YOUR_DOMAIN
-NEXT_PUBLIC_BACKEND_URL=/api
+NEXT_PUBLIC_BACKEND_URL=https://YOUR_DOMAIN/api
 ```
 
-Dans compose, `MAIN_URL` et `FRONTEND_URL` sont derives de `ACADEPOST_PUBLIC_URL`.
+Dans compose, `MAIN_URL` et `FRONTEND_URL` sont derives de `ACADEPOST_PUBLIC_URL`. En runtime, `NEXT_PUBLIC_BACKEND_URL` doit etre absolu, par exemple `https://YOUR_DOMAIN/api`, car le backend l'utilise aussi pour generer des URLs MCP/OAuth.
 
 ## Preparation PostgreSQL externe
 

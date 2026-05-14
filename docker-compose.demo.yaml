@@ -4,8 +4,6 @@ services:
       context: .
       dockerfile: Dockerfile.demo
       args:
-        ACADEPOST_PUBLIC_URL: ${ACADEPOST_PUBLIC_URL:-http://localhost:4007}
-        NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:-/api}
         NEXT_PUBLIC_VERSION: ${NEXT_PUBLIC_VERSION:-demo}
         NODE_BUILD_MAX_OLD_SPACE_SIZE: ${NODE_BUILD_MAX_OLD_SPACE_SIZE:-4096}
     image: ${ACADEPOST_IMAGE:-acadepost/app:demo}
@@ -14,7 +12,7 @@ services:
     environment:
       MAIN_URL: ${ACADEPOST_PUBLIC_URL:-http://localhost:4007}
       FRONTEND_URL: ${ACADEPOST_PUBLIC_URL:-http://localhost:4007}
-      NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:-/api}
+      NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:?NEXT_PUBLIC_BACKEND_URL is required}
       BACKEND_INTERNAL_URL: http://127.0.0.1:3000
       DATABASE_URL: postgresql://${POSTGRES_USER:-acadepost-user}:${POSTGRES_PASSWORD:-acadepost-password}@acadepost-postgres:5432/${POSTGRES_DB:-acadepost-db-local}
       REDIS_URL: redis://acadepost-redis:6379

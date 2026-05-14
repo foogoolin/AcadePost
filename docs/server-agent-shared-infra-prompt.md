@@ -20,7 +20,8 @@ Important architecture:
 - Caddy must reverse proxy to `acadepost:5000` over the Docker `proxy` network.
 - The Docker image must stay domain-portable. The domain belongs in runtime env only:
   `ACADEPOST_PUBLIC_URL=https://post.fgln.pro`.
-- `NEXT_PUBLIC_BACKEND_URL` should stay `/api`, not a hardcoded domain.
+- At image build time the frontend defaults to relative `/api`.
+- At runtime `.env` must set `NEXT_PUBLIC_BACKEND_URL=https://post.fgln.pro/api`, because backend MCP/OAuth code needs an absolute public backend URL.
 
 Preflight:
 1. Check server resources:
@@ -63,7 +64,7 @@ Prepare env:
 2. `cp .env.demo.shared-infra.example .env.demo.shared-infra` if missing.
 3. Set:
    - `ACADEPOST_PUBLIC_URL=https://post.fgln.pro`
-   - `NEXT_PUBLIC_BACKEND_URL=/api`
+   - `NEXT_PUBLIC_BACKEND_URL=https://post.fgln.pro/api`
    - `DATABASE_URL=postgresql://acadepost:APP_PASSWORD@postgres:5432/acadepost`
    - `TEMPORAL_POSTGRES_HOST=postgres`
    - `TEMPORAL_POSTGRES_USER=temporal`
