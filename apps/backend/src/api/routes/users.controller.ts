@@ -31,6 +31,7 @@ import { TrackEnum } from '@gitroom/nestjs-libraries/user/track.enum';
 import { TrackService } from '@gitroom/nestjs-libraries/track/track.service';
 import { makeId } from '@gitroom/nestjs-libraries/services/make.is';
 import { AuthorizationActions, Sections } from '@gitroom/backend/services/auth/permissions/permission.exception.class';
+import { CreateProjectDto } from '@gitroom/nestjs-libraries/dtos/settings/create.project.dto';
 
 @ApiTags('User')
 @Controller('/user')
@@ -212,11 +213,50 @@ export class UsersController {
     );
   }
 
+  @Post('/organizations')
+  async createOrg(
+    @GetUserFromRequest() user: User,
+    @Body() body: CreateProjectDto,
+    @Res({ passthrough: true }) response: Response
+  ) {
+    const project = await this._orgService.createProjectForUser(
+      user.id,
+      body.name
+    );
+
+    response.cookie('showorg', project.id, {
+      domain: getCookieUrlFromDomain(process.env.FRONTEND_URL!),
+      ...(!process.env.NOT_SECURED
+        ? {
+            secure: true,
+            httpOnly: true,
+            sameSite: 'none',
+          }
+        : {}),
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+    });
+
+    if (process.env.NOT_SECURED) {
+      response.header('showorg', project.id);
+    }
+
+    return project;
+  }
+
   @Post('/change-org')
-  changeOrg(
+  async changeOrg(
+    @GetUserFromRequest() user: User,
     @Body('id') id: string,
     @Res({ passthrough: true }) response: Response
   ) {
+    const organization = (await this._orgService.getOrgsByUserId(user.id)).find(
+      (org) => org.id === id && !org.users[0].disabled
+    );
+
+    if (!organization) {
+      throw new HttpForbiddenException();
+    }
+
     response.cookie('showorg', id, {
       domain: getCookieUrlFromDomain(process.env.FRONTEND_URL!),
       ...(!process.env.NOT_SECURED

@@ -20,7 +20,7 @@ import { useT } from '@gitroom/react/translation/get.transation.service.client';
 
 const roles = [
   {
-    name: 'User',
+    name: 'Éditeur',
     value: 'USER',
   },
   {
@@ -81,8 +81,8 @@ export const AddMember = () => {
               name="email"
             />
           )}
-          <Select label="Role" name="role">
-            <option value="">{t('select_role', 'Select Role')}</option>
+          <Select label="Rôle" name="role">
+            <option value="">{t('select_role', 'Sélectionner un rôle')}</option>
             {roles.map((role) => (
               <option key={role.value} value={role.value}>
                 {role.name}
@@ -94,11 +94,11 @@ export const AddMember = () => {
               <Checkbox name="sendEmail" />
             </div>
             <div>
-              {t('send_invitation_via_email', 'Send invitation via email?')}
+              {t('send_invitation_via_email', "Envoyer l'invitation par e-mail ?")}
             </div>
           </div>
           <Button type="submit" className="mt-[18px]">
-            {sendEmail ? t('send_invitation_link', 'Send Invitation Link') : t('copy_link', 'Copy Link')}
+            {sendEmail ? t('send_invitation_link', "Envoyer l'invitation") : t('copy_link', 'Copier le lien')}
           </Button>
         </div>
       </form>
@@ -150,7 +150,7 @@ export const TeamsComponent = () => {
       async () => {
         if (
           !(await deleteDialog(
-            t('are_you_sure_remove_team_member', 'Are you sure you want to remove this team member?')
+            t('are_you_sure_remove_team_member', 'Supprimer ce membre du projet ?')
           ))
         ) {
           return;
@@ -165,11 +165,11 @@ export const TeamsComponent = () => {
 
   return (
     <div className="flex flex-col">
-      <h3 className="text-[20px]">{t('team_members', 'Team Members')}</h3>
+      <h3 className="text-[20px]">{t('team_members', 'Membres du projet')}</h3>
       <div className="text-customColor18 mt-[4px]">
         {t(
           'invite_your_assistant_or_team_member_to_manage_your_account',
-          'Invite your assistant or team member to manage your account'
+          'Invitez une personne à collaborer sur ce projet'
         )}
       </div>
       <div className="my-[16px] mt-[16px] bg-sixth border-fifth border rounded-[4px] p-[24px] flex flex-col gap-[24px]">
@@ -181,10 +181,10 @@ export const TeamsComponent = () => {
               </div>
               <div className="flex-1">
                 {p.role === 'USER'
-                  ? t('user', 'User')
+                  ? t('editor', 'Éditeur')
                   : p.role === 'ADMIN'
                   ? t('admin', 'Admin')
-                  : t('super_admin', 'Super Admin')}
+                  : t('owner', 'Propriétaire')}
               </div>
               {+myLevel > +getLevel(p.role) ? (
                 <div className="flex-1 flex justify-end">
@@ -208,7 +208,7 @@ export const TeamsComponent = () => {
                           />
                         </svg>
                       </div>
-                      <div>{t('remove', 'Remove')}</div>
+                      <div>{t('remove', 'Supprimer')}</div>
                     </div>
                   </Button>
                 </div>
@@ -220,7 +220,7 @@ export const TeamsComponent = () => {
         </div>
         <div>
           <Button onClick={addMember}>
-            {t('add_another_member', 'Add another member')}
+            {t('add_another_member', 'Ajouter un membre')}
           </Button>
         </div>
       </div>

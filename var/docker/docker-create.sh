@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-docker kill postiz || true 
-docker rm postiz || true 
-docker create --name postiz -p 3000:3000 -p 4200:4200 localhost/postiz
+ENV_FILE="${1:-.env.demo}"
+
+if [ ! -f "${ENV_FILE}" ]; then
+  echo "Missing ${ENV_FILE}. Copy .env.demo.example to ${ENV_FILE} and edit it first." >&2
+  exit 1
+fi
+
+docker compose --env-file "${ENV_FILE}" -f docker-compose.demo.yaml up -d --build

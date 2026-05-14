@@ -489,6 +489,23 @@ export class PostsRepository {
     const uuid = uuidv4();
 
     for (const value of body.value) {
+      if (value.id) {
+        const existingPost = await this._post.model.post.findFirst({
+          where: {
+            id: value.id,
+            organizationId: orgId,
+            deletedAt: null,
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        if (!existingPost) {
+          throw new Error('Post not found');
+        }
+      }
+
       const updateData = (type: 'create' | 'update') => ({
         publishDate: dayjs(date).toDate(),
         integration: {
@@ -594,6 +611,7 @@ export class PostsRepository {
           await this._post.model.post.findFirst({
             where: {
               group: body.group,
+              organizationId: orgId,
               deletedAt: null,
               parentPostId: null,
             },
@@ -608,6 +626,7 @@ export class PostsRepository {
       await this._post.model.post.updateMany({
         where: {
           group: body.group,
+          organizationId: orgId,
           deletedAt: null,
         },
         data: {
@@ -761,10 +780,12 @@ export class PostsRepository {
     );
   }
 
-  async getComments(postId: string) {
+  async getComments(postId: string, orgId?: string) {
     return this._comments.model.comments.findMany({
       where: {
         postId,
+        ...(orgId ? { organizationId: orgId } : {}),
+        deletedAt: null,
       },
       orderBy: {
         createdAt: 'asc',
@@ -795,6 +816,7 @@ export class PostsRepository {
     return this._tags.model.tags.update({
       where: {
         id,
+        orgId,
       },
       data: {
         name: body.name,
@@ -815,12 +837,27 @@ export class PostsRepository {
     });
   }
 
-  createComment(
+  async createComment(
     orgId: string,
     userId: string,
     postId: string,
     content: string
   ) {
+    const post = await this._post.model.post.findFirst({
+      where: {
+        id: postId,
+        organizationId: orgId,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!post) {
+      throw new Error('Post not found');
+    }
+
     return this._comments.model.comments.create({
       data: {
         organizationId: orgId,

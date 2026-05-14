@@ -76,16 +76,49 @@ The first workflow should classify content into one of these groups, make the ma
 - Remaining caveat: local shell still uses Node `v24.13.0`; repo target remains `>=22.12.0 <23.0.0`.
 - Customer demo runbook added at `docs/customer-demo-runbook.md`.
 
+## Mise a jour acces multi-projets - 2026-05-13
+
+- BYAN workflow: `@byan` doit piloter le travail. Les agents BYAN utilises pour ce passage sont Architect/Winston pour la validation de modele et Tea/Murat pour la matrice de verification.
+- Decision MVP: garder `Organization` comme limite technique interne de tenant, billing, API key, posts, media et integrations; presenter cette limite a l'utilisateur comme un `Projet`.
+- Roles visibles: `SUPERADMIN` devient `Proprietaire`, `ADMIN` reste `Admin`, `USER` devient `Editeur`. Aucun rename Prisma/enum n'est fait pour le MVP.
+- Creation projet ajoutee via `POST /user/organizations` et le selecteur projet frontend. Le projet cree devient le projet actif via le cookie `showorg`.
+- Changement projet renforce: `POST /user/change-org` verifie maintenant que l'utilisateur est membre actif du projet avant de poser `showorg`.
+- UI demo labels ajoutes en francais: `Projet actuel`, `Nom du projet`, `Creer un projet`, `Membres du projet`, `Editeur`, `Proprietaire`.
+- RBAC demo renforce: en environnement sans Stripe key, les limites de subscription restent ouvertes pour le demo, mais les checks `ADMIN` continuent de bloquer les `Editeur`.
+- Isolation renforcee sur les surfaces a risque: update de posts par `id`, remplacement d'un `group`, edition de tags, creation de commentaires et resolution de media par `id` verifient maintenant la frontiere `organizationId`.
+- Orchestrator mis a jour pour passer `organizationId` a la resolution media pendant la publication.
+- Verification locale: frontend build passe, backend build passe, orchestrator build passe. Les builds ont ete executes avec `corepack pnpm`; backend/orchestrator gardent `NODE_OPTIONS=--max-old-space-size=8192`. La machine locale signale toujours Node `v24.13.0` alors que le repo cible Node 22.x.
+- Verification restante avant demo navigateur: creer deux projets, inviter Admin/Editeur, verifier le switch projet, verifier que posts/media/integrations/tags/commentaires d'un projet ne sont pas visibles ni modifiables depuis un autre.
+
+## Deploiement demo serveur - 2026-05-13
+
+- Scope confirme: deploiement brut demo/staging, pas production.
+- Agents BYAN utilises: Architect/Winston pour l'architecture single-server, Dev/Amelia pour les fichiers Docker/runtime, Tea/Murat pour les gates de verification.
+- Ajout de `Dockerfile.demo` pour construire une image demo Node 22 avec nginx, PM2 et build monorepo.
+- Ajout de `docker-compose.demo.yaml` pour lancer AcadéPost, PostgreSQL, Redis et Temporal sur un serveur Linux avec un seul port public par defaut: `4007`.
+- Ajout de `.env.demo.example` pour sortir les secrets et URL publiques du compose.
+- Ajout de `ecosystem.demo.config.cjs` et `deploy/demo/entrypoint.sh` pour demarrer backend, frontend et orchestrator via `pm2-runtime`; l'entrypoint attend Temporal avant de lancer les services applicatifs.
+- Ajout de `deploy/demo/server-up.sh` pour un lancement assiste sur VPS Linux/Contabo: creation de `.env.demo`, generation de secrets demo, validation Compose, build et `up -d`.
+- Le bootstrap Prisma est explicite via `ACADEPOST_DEMO_DB_PUSH=true`; il doit rester reserve au demo/staging.
+- `var/docker/docker-build.sh` et `var/docker/docker-create.sh` pointent maintenant vers le workflow demo AcadéPost au lieu des anciennes commandes upstream.
+- `.dockerignore` evite d'envoyer les secrets locaux, BYAN, Codex, Claude et artefacts locaux dans le contexte Docker.
+- `var/docker/nginx.conf` ajoute les headers proxy et timeouts necessaires pour un serveur demo.
+- Documentation de deploiement ajoutee: `docs/demo-server-deploy.md`.
+- Validation locale: `docker compose --env-file .env.demo.example -f docker-compose.demo.yaml config --quiet` passe; les builds frontend/backend/orchestrator/extension passent hors Docker.
+- Limite locale: Docker Desktop Windows a interrompu le build image pendant `next build` avec une erreur engine `EOF`, puis a continue a produire des timeouts. La verification runtime doit donc etre faite sur le serveur Linux cible.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?
 - Which real social platform API should be connected first for the customer demo?
+- Should public preview endpoints expose full post payloads by id, or should the demo use a narrower public DTO?
 
 ## Next Steps
 
 - Switch the local development runtime to Node 22.x and make `pnpm` available in PATH or change lifecycle scripts to use Corepack-safe commands.
 - Make backend/orchestrator builds set a larger Node heap consistently.
 - Add the first content routing UI affordance without rewriting the publishing engine.
+- Run browser smoke checks for multi-project access: owner project creation, Admin/Editeur invites, role-based settings, and cross-project negative access attempts.
 
 ## Update Rule
 

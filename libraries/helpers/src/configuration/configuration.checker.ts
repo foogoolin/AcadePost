@@ -31,6 +31,8 @@ export class ConfigurationChecker {
     this.checkIsValidUrl('NEXT_PUBLIC_BACKEND_URL');
     this.checkIsValidUrl('BACKEND_INTERNAL_URL');
     this.checkNonEmpty('STORAGE_PROVIDER', 'Needed to setup storage.');
+    this.checkNonEmpty('TEMPORAL_ADDRESS', 'Needed to run scheduled publishing workflows.');
+    this.checkLocalStorage();
   }
 
   checkNonEmpty(key: string, description?: string): boolean {
@@ -60,6 +62,18 @@ export class ConfigurationChecker {
   checkDatabaseServers() {
     this.checkRedis();
     this.checkIsValidUrl('DATABASE_URL');
+  }
+
+  checkLocalStorage() {
+    if (this.get('STORAGE_PROVIDER') !== 'local') {
+      return;
+    }
+
+    this.checkNonEmpty('UPLOAD_DIRECTORY', 'Needed when STORAGE_PROVIDER=local.');
+    this.checkNonEmpty(
+      'NEXT_PUBLIC_UPLOAD_STATIC_DIRECTORY',
+      'Needed when STORAGE_PROVIDER=local.'
+    );
   }
 
   checkRedis() {

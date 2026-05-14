@@ -300,6 +300,42 @@ export class OrganizationRepository {
     });
   }
 
+  async createProjectForUser(userId: string, name: string) {
+    return this._organization.model.organization.create({
+      data: {
+        name,
+        apiKey: AuthService.fixedEncryption(makeId(20)),
+        allowTrial: true,
+        isTrailing: true,
+        users: {
+          create: {
+            role: Role.SUPERADMIN,
+            userId,
+          },
+        },
+      },
+      include: {
+        users: {
+          where: {
+            userId,
+          },
+          select: {
+            disabled: true,
+            role: true,
+          },
+        },
+        subscription: {
+          select: {
+            subscriptionTier: true,
+            totalChannels: true,
+            isLifetime: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+  }
+
   getOrgByCustomerId(customerId: string) {
     return this._organization.model.organization.findFirst({
       where: {

@@ -53,6 +53,17 @@ export class OrganizationService {
     return this._organizationRepository.getOrgByApiKey(api);
   }
 
+  createProjectForUser(userId: string, name: string) {
+    const projectName = name.trim();
+    if (!projectName) {
+      throw new Error('Project name is required');
+    }
+    return this._organizationRepository.createProjectForUser(
+      userId,
+      projectName
+    );
+  }
+
   getUserOrg(id: string) {
     return this._organizationRepository.getUserOrg(id);
   }
@@ -86,8 +97,8 @@ export class OrganizationService {
     if (body.sendEmail) {
       await this._notificationsService.sendEmail(
         body.email,
-        'You have been invited to join an organization',
-        `You have been invited to join an organization. Click <a href="${url}">here</a> to join.<br />The link will expire in 1 hour.`
+        'Invitation a rejoindre un projet AcadePost',
+        `Vous avez ete invite a rejoindre un projet AcadePost. Cliquez <a href="${url}">ici</a> pour accepter l'invitation.<br />Le lien expire dans 1 heure.`
       );
     }
     return { url };

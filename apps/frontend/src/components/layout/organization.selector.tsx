@@ -1,19 +1,24 @@
 'use client';
 
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import useSWR from 'swr';
 import { useUser } from '@gitroom/frontend/components/layout/user.context';
 import clsx from 'clsx';
+import { useT } from '@gitroom/react/translation/get.transation.service.client';
+
 export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
   asOpenSelect,
 }) => {
   const fetch = useFetch();
   const user = useUser();
+  const t = useT();
+  const [creating, setCreating] = useState(false);
+  const [projectName, setProjectName] = useState('');
   const load = useCallback(async () => {
     return await (await fetch('/user/organizations')).json();
-  }, []);
-  const { isLoading, data } = useSWR('organizations', load, {
+  }, [fetch]);
+  const { isLoading, data, mutate } = useSWR('organizations', load, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     refreshWhenOffline: false,
@@ -22,10 +27,27 @@ export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
   });
   const current = useMemo(() => {
     return data?.find((d: any) => d.id === user?.orgId);
-  }, [data]);
+  }, [data, user?.orgId]);
   const withoutCurrent = useMemo(() => {
     return data?.filter((d: any) => d.id !== user?.orgId);
-  }, [current, data]);
+  }, [data, user?.orgId]);
+  const createProject = useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const name = projectName.trim();
+      if (!name) {
+        return;
+      }
+
+      await fetch('/user/organizations', {
+        method: 'POST',
+        body: JSON.stringify({ name }),
+      });
+      await mutate();
+      window.location.reload();
+    },
+    [fetch, mutate, projectName]
+  );
   const changeOrg = useCallback(
     (org: { name: string; id: string }) => async () => {
       await fetch('/user/change-org', {
@@ -36,9 +58,9 @@ export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
       });
       window.location.reload();
     },
-    []
+    [fetch]
   );
-  if (isLoading || (!isLoading && data?.length === 1)) {
+  if (isLoading) {
     return null;
   }
   return (
@@ -46,10 +68,15 @@ export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
       <div className="hover:text-newTextColor">
         <div className="group text-[12px] relative">
           {asOpenSelect && (
-            <div className="bg-btnPrimary !flex !relative max-w-[500px] mx-auto py-[12px] px-[12px]">Select Organization</div>
+            <div className="bg-btnPrimary !flex !relative max-w-[500px] mx-auto py-[12px] px-[12px]">
+              {current?.name || t('select_project', 'Selectionner un projet')}
+            </div>
           )}
           {!asOpenSelect && (
-            <div className="flex items-center">
+            <div
+              className="flex items-center"
+              title={current?.name || t('projects', 'Projets')}
+            >
               <svg
                 className={user?.tier.current === 'FREE' ? 'animate-bounce drop-shadow-glow': ''}
                 width="24"
@@ -65,18 +92,64 @@ export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
               </svg>
             </div>
           )}
-          {data?.length > 1 && (
+          {!!data?.length && (
             <div
               className={clsx(
-                'hidden py-[12px] px-[12px] group-hover:flex absolute top-[100%] end-0 bg-third border-tableBorder border gap-[12px] cursor-pointer flex-col',
+                'hidden py-[12px] px-[12px] group-hover:flex absolute top-[100%] end-0 bg-third border-tableBorder border gap-[12px] cursor-pointer flex-col min-w-[220px]',
                 asOpenSelect ? '!flex !relative max-w-[500px] mx-auto mb-[10px]' : '',
               )}
             >
-              {data?.map((org: { name: string; id: string }) => (
-                <div key={org.id} onClick={changeOrg(org)}>
+              {!!current && (
+                <div className="border-b border-tableBorder pb-[10px] cursor-default">
+                  <div className="text-[10px] uppercase text-customColor18">
+                    {t('current_project', 'Projet actuel')}
+                  </div>
+                  <div className="mt-[4px] max-w-[260px] break-words">
+                    {current.name}
+                  </div>
+                </div>
+              )}
+              {withoutCurrent?.map((org: { name: string; id: string }) => (
+                <div
+                  key={org.id}
+                  className="max-w-[260px] break-words hover:text-newTextColor"
+                  onClick={changeOrg(org)}
+                >
                   {org.name}
                 </div>
               ))}
+              <div className="border-t border-tableBorder pt-[10px]">
+                {creating ? (
+                  <form
+                    className="flex flex-col gap-[8px] cursor-default"
+                    onSubmit={createProject}
+                  >
+                    <input
+                      className="bg-input border border-tableBorder rounded-[4px] px-[8px] py-[7px] text-textColor outline-none"
+                      autoFocus
+                      maxLength={80}
+                      value={projectName}
+                      onChange={(event) => setProjectName(event.target.value)}
+                      placeholder={t('project_name', 'Nom du projet')}
+                    />
+                    <button
+                      className="bg-btnPrimary text-textColor rounded-[4px] px-[10px] py-[8px] text-left disabled:opacity-50"
+                      disabled={!projectName.trim()}
+                      type="submit"
+                    >
+                      {t('create_project', 'Creer le projet')}
+                    </button>
+                  </form>
+                ) : (
+                  <button
+                    className="text-left hover:text-newTextColor"
+                    onClick={() => setCreating(true)}
+                    type="button"
+                  >
+                    {t('create_project', 'Creer un projet')}
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>

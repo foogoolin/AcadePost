@@ -4,6 +4,15 @@
 **/node_modules
 node_modules/*
 node_modules
+.env
+.env.*
+!.env.example
+!.env.demo.example
+.mcp.json
+.claude
+.codex
+_byan
+_byan-output
 docker-data/*
 dist
 .nx

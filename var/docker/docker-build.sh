@@ -1,7 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -o xtrace
+set -euo pipefail
 
-docker rmi localhost/postiz || true
-docker build --target dist -t localhost/postiz -f Dockerfile.dev .
-docker build --target devcontainer -t localhost/postiz-devcontainer -f Dockerfile.dev .
+IMAGE="${ACADEPOST_IMAGE:-acadepost/app:demo}"
+PUBLIC_URL="${ACADEPOST_PUBLIC_URL:-http://localhost:4007}"
+VERSION="${NEXT_PUBLIC_VERSION:-$(git rev-parse --short HEAD 2>/dev/null || echo demo)}"
+NODE_BUILD_MAX_OLD_SPACE_SIZE="${NODE_BUILD_MAX_OLD_SPACE_SIZE:-4096}"
+
+docker build \
+  --build-arg ACADEPOST_PUBLIC_URL="${PUBLIC_URL}" \
+  --build-arg NEXT_PUBLIC_VERSION="${VERSION}" \
+  --build-arg NODE_BUILD_MAX_OLD_SPACE_SIZE="${NODE_BUILD_MAX_OLD_SPACE_SIZE}" \
+  -t "${IMAGE}" \
+  -f Dockerfile.demo .

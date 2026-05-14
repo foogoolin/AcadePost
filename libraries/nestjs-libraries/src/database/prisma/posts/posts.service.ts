@@ -321,7 +321,12 @@ export class PostsService {
     );
   }
 
-  async updateMedia(id: string, imagesList: any[], convertToJPEG = false) {
+  async updateMedia(
+    orgId: string,
+    postId: string,
+    imagesList: any[],
+    convertToJPEG = false
+  ) {
     try {
       let imageUpdateNeeded = false;
       const getImageList = await Promise.all(
@@ -330,7 +335,14 @@ export class PostsService {
             (imagesList || []).map(async (p: any) => {
               if (!p.path && p.id) {
                 imageUpdateNeeded = true;
-                return this._mediaService.getMediaById(p.id);
+                const media = await this._mediaService.getMediaById(
+                  orgId,
+                  p.id
+                );
+                if (!media) {
+                  throw new Error('Media not found');
+                }
+                return media;
               }
 
               return p;
@@ -409,7 +421,7 @@ export class PostsService {
 
       if (imageUpdateNeeded) {
         await this._postRepository.updateImages(
-          id,
+          postId,
           JSON.stringify(getImageList)
         );
       }
@@ -478,6 +490,7 @@ export class PostsService {
         (posts || []).map(async (post) => ({
           ...post,
           image: await this.updateMedia(
+            orgId,
             post.id,
             JSON.parse(post.image || '[]'),
             convertToJPEG
@@ -516,6 +529,7 @@ export class PostsService {
         (posts || []).map(async (post) => ({
           ...post,
           image: await this.updateMedia(
+            orgId,
             post.id,
             JSON.parse(post.image || '[]'),
             convertToJPEG
@@ -980,8 +994,8 @@ export class PostsService {
     return date.clone().add(num, 'minutes').format('YYYY-MM-DDTHH:mm:00');
   }
 
-  getComments(postId: string) {
-    return this._postRepository.getComments(postId);
+  getComments(postId: string, orgId?: string) {
+    return this._postRepository.getComments(postId, orgId);
   }
 
   getTags(orgId: string) {
