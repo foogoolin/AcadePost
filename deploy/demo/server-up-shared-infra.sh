@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "${ROOT_DIR}"
+
+ENV_FILE="${ENV_FILE:-.env.demo.shared-infra}"
+COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.demo.shared-infra.yaml}"
+
+replace_env_value() {
+  local key="$1"
+  local value="$2"
+  local file="$3"
+
+  if grep -q "^${key}=" "${file}"; then
+    sed -i "s|^${key}=.*|${key}=${value}|" "${file}"
+  else
+    printf '\n%s=%s\n' "${key}" "${value}" >> "${file}"
+  fi
+}
+
+random_secret() {
+  openssl rand -hex 32
+}
+
+require_network() {
+  local network="$1"
+  if ! docker network inspect "${network}" >/dev/null 2>&1; then
+    echo "Missing external Docker network: ${network}" >&2
+    exit 1
+  fi
+}
+
+if ! command -v docker >/dev/null 2>&1; then
+  echo "Docker is not installed. Install Docker Engine with the Compose plugin first." >&2
+  exit 1
+fi
+
+if ! docker compose version >/dev/null 2>&1; then
+  echo "Docker Compose plugin is not available. Install the docker compose plugin first." >&2
+  exit 1
+fi
+
+if [ ! -f "${ENV_FILE}" ]; then
+  cp .env.demo.shared-infra.example "${ENV_FILE}"
+  echo "Created ${ENV_FILE} from .env.demo.shared-infra.example."
+fi
+
+if [ -n "${ACADEPOST_PUBLIC_URL:-}" ]; then
+  replace_env_value "ACADEPOST_PUBLIC_URL" "${ACADEPOST_PUBLIC_URL}" "${ENV_FILE}"
+fi
+
+if grep -q "https://YOUR_DOMAIN" "${ENV_FILE}"; then
+  echo "Set ACADEPOST_PUBLIC_URL before starting the shared-infra demo." >&2
+  echo "Example:" >&2
+  echo "  ACADEPOST_PUBLIC_URL=https://example.com bash deploy/demo/server-up-shared-infra.sh" >&2
+  exit 1
+fi
+
+if grep -q "CHANGE_ME_LONG_RANDOM_JWT_SECRET" "${ENV_FILE}"; then
+  replace_env_value "JWT_SECRET" "$(random_secret)" "${ENV_FILE}"
+fi
+
+if grep -q "CHANGE_ME_APP_DB_PASSWORD" "${ENV_FILE}"; then
+  echo "DATABASE_URL still contains CHANGE_ME_APP_DB_PASSWORD. Create the shared Postgres DB/user and set DATABASE_URL first." >&2
+  exit 1
+fi
+
+if grep -q "CHANGE_ME_TEMPORAL_DB_PASSWORD" "${ENV_FILE}"; then
+  echo "TEMPORAL_POSTGRES_PASSWORD still contains CHANGE_ME_TEMPORAL_DB_PASSWORD. Create the shared Temporal DB/user and set it first." >&2
+  exit 1
+fi
+
+PROXY_NETWORK="$(grep '^PROXY_NETWORK=' "${ENV_FILE}" | cut -d= -f2-)"
+BACKEND_NETWORK="$(grep '^BACKEND_NETWORK=' "${ENV_FILE}" | cut -d= -f2-)"
+require_network "${PROXY_NETWORK:-proxy}"
+require_network "${BACKEND_NETWORK:-backend}"
+
+DATA_DIR="$(grep '^ACADEPOST_DATA_DIR=' "${ENV_FILE}" | cut -d= -f2-)"
+mkdir -p "${DATA_DIR:-./data}/config" "${DATA_DIR:-./data}/uploads" "${DATA_DIR:-./data}/redis" "${DATA_DIR:-./data}/temporal-elasticsearch"
+
+echo "Validating ${COMPOSE_FILE}..."
+docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" config --quiet
+
+echo "Starting AcadePost shared-infra demo stack..."
+docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d --build
+
+echo "Current stack status:"
+docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" ps
+
+echo "Demo URL:"
+grep '^ACADEPOST_PUBLIC_URL=' "${ENV_FILE}" | cut -d= -f2-
+
+echo "Caddy upstream, if Caddy is attached to the proxy network:"
+echo "  reverse_proxy acadepost:5000"

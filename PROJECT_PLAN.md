@@ -115,6 +115,20 @@ The first workflow should classify content into one of these groups, make the ma
 - `.editorconfig` ajouté pour demander `charset = utf-8` et `end_of_line = lf`.
 - Nouvelle règle: avant chaque commit qui touche docs, prompts, traductions ou labels UI, lancer la recherche mojibake documentée dans `docs/codex-project-memory.md`.
 
+## Shared Infra Deployment Update - 2026-05-14
+
+- Ajout d'un chemin de deploiement shared-infra separe du compose clean-VPS.
+- Nouveau compose: `docker-compose.demo.shared-infra.yaml`.
+- Nouveau template env: `.env.demo.shared-infra.example`.
+- Nouveau launcher: `deploy/demo/server-up-shared-infra.sh`.
+- Nouveau runbook: `docs/demo-shared-infra-deploy.md`.
+- Prompt agent serveur ajoute: `docs/server-agent-shared-infra-prompt.md`.
+- Le build Docker n'embarque plus un domaine public dans `NEXT_PUBLIC_BACKEND_URL`; la valeur par defaut est relative: `/api`.
+- Le domaine public reste une configuration runtime via `ACADEPOST_PUBLIC_URL`, afin que la meme image puisse etre lancee derriere n'importe quel domaine.
+- Le shared-infra compose utilise un PostgreSQL externe via `DATABASE_URL`, les reseaux externes `proxy` et `backend`, Redis local au stack, Temporal local au stack avec PostgreSQL externe, et aucun port public expose.
+- Health endpoints ajoutes: `/api/monitor/health` et `/api/monitor/ready`.
+- `TRUST_PROXY=true` est supporte cote backend et active dans le shared-infra compose.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?

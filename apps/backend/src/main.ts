@@ -47,6 +47,10 @@ async function start() {
     },
   });
 
+  if (process.env.TRUST_PROXY === 'true') {
+    app.getHttpAdapter().getInstance().set('trust proxy', 1);
+  }
+
   await startMcp(app);
 
   app.useGlobalPipes(
@@ -74,7 +78,7 @@ async function start() {
 
     checkConfiguration(); // Do this last, so that users will see obvious issues at the end of the startup log without having to scroll up.
 
-    Logger.log(`🚀 Backend is running on: http://localhost:${port}`);
+    Logger.log(`Backend is running on: http://localhost:${port}`);
   } catch (e) {
     Logger.error(`Backend failed to start on port ${port}`, e);
   }

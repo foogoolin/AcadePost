@@ -78,6 +78,15 @@ ACADEPOST_PUBLIC_URL=http://SERVER_IP:4007 bash deploy/demo/server-up.sh
 
 See `docs/demo-server-deploy.md`.
 
+For a server that already has Caddy, shared PostgreSQL, and Docker networks named `proxy` and `backend`, use the shared-infra demo compose instead:
+
+```bash
+cp .env.demo.shared-infra.example .env.demo.shared-infra
+bash deploy/demo/server-up-shared-infra.sh
+```
+
+See `docs/demo-shared-infra-deploy.md`.
+
 ## Design Intake
 
 Claude Code design rules, markdown instructions, CSS tokens, or component references should be added under `docs/design/` and then adapted to the actual frontend stack.
