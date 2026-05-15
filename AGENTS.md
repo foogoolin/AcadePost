@@ -6,6 +6,7 @@
 - The repository/project slug is AcadePost.
 - The codebase is being adapted into a demo-ready AcadéPost MVP.
 - The immediate priority is working software for customer demonstration.
+- The public `A` logo is the supplied raster asset at `apps/frontend/public/brand/acadepost-logo.png`; do not replace it with generated text, a new glyph, or an approximate recreation.
 
 ## Implementation Rules
 
@@ -15,6 +16,7 @@
 - Keep `PROJECT_PLAN.md` current after significant work.
 - Add design rules from Claude Code skills only after reading and adapting them to the actual AcadéPost frontend stack.
 - Use black as the primary brand color, `#4cccb8` as the main accent, and `#fda100` as the secondary accent.
+- Preserve both existing visual themes, dark and light, during visual redesign work.
 
 ## Encoding Guardrails
 

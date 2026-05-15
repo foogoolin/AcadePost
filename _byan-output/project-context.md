@@ -41,6 +41,8 @@ Ce fichier est la référence courte pour les agents BYAN/Codex qui travaillent 
 - UI : utiliser `AcadéPost`.
 - Identifiants techniques, exemples de package, slugs : utiliser `AcadePost`.
 - Couleurs : noir comme couleur primaire, `#4cccb8` comme accent principal, `#fda100` comme accent secondaire.
+- Logo public : garder l'image fournie `A` dans `apps/frontend/public/brand/acadepost-logo.png`; ne pas la remplacer par une lettre dessinee, un pictogramme genere ou une recreation approximative.
+- Themes : conserver les deux themes existants, sombre et clair, pendant le redesign visuel.
 - Nettoyer les traces publiques de l'ancienne marque upstream dans l'UI, les traductions, les métadonnées, les docs de démo et les textes fallback.
 - Ne pas renommer pendant le MVP les aliases internes `@gitroom/*`, les variables `POSTIZ_*`, `@postiz/wallets`, ni les clés techniques si cela risque de casser le build.
 - `LICENSE` est une piste légale séparée et reste sous décision du propriétaire.

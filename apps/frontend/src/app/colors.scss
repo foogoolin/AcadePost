@@ -335,3 +335,43 @@
     --color-modalCustom: transparent;
   }
 }
+
+:root {
+  .dark {
+    --new-border: rgba(76, 204, 184, 0.22);
+    --new-btn-primary: var(--acadepost-accent);
+    --new-ai-btn: var(--acadepost-warm);
+    --new-boxFocused: rgba(76, 204, 184, 0.18);
+    --new-table-text-focused: var(--acadepost-accent);
+    --new-menu-hover: var(--acadepost-accent);
+
+    --color-forth: var(--acadepost-accent);
+    --color-seventh: var(--acadepost-accent);
+    --color-custom4: var(--acadepost-accent);
+    --color-custom7: var(--acadepost-accent);
+    --color-custom10: var(--acadepost-warm);
+    --color-custom13: var(--acadepost-warm);
+    --color-custom45: var(--acadepost-accent);
+    --color-custom50: var(--acadepost-ink);
+    --color-custom51: var(--acadepost-accent);
+  }
+
+  .light {
+    --new-border: var(--acadepost-line);
+    --new-btn-primary: var(--acadepost-black);
+    --new-ai-btn: var(--acadepost-warm);
+    --new-boxFocused: rgba(76, 204, 184, 0.16);
+    --new-table-text-focused: var(--acadepost-accent);
+    --new-menu-hover: var(--acadepost-black);
+
+    --color-forth: var(--acadepost-accent);
+    --color-seventh: var(--acadepost-accent);
+    --color-custom4: var(--acadepost-accent);
+    --color-custom7: var(--acadepost-accent);
+    --color-custom10: var(--acadepost-warm);
+    --color-custom13: var(--acadepost-warm);
+    --color-custom45: var(--acadepost-accent);
+    --color-custom50: var(--acadepost-black);
+    --color-custom51: var(--acadepost-accent);
+  }
+}

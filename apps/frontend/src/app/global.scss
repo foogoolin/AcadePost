@@ -811,6 +811,170 @@ html[dir='rtl'] [dir='ltr'] {
   color: var(--acadepost-warm);
 }
 
+.acadepost-date-picker-trigger {
+  border: 1px solid var(--new-bgLineColor);
+  border-radius: 8px;
+  background: var(--new-bgColorInner);
+  color: rgb(var(--new-textColor));
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.02);
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.acadepost-date-picker-trigger:hover {
+  border-color: rgba(76, 204, 184, 0.55);
+  box-shadow: 0 0 0 3px rgba(76, 204, 184, 0.12);
+}
+
+.acadepost-date-popover {
+  min-width: 324px;
+  padding: 12px;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #292929;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.acadepost-calendar-root {
+  color: #292929;
+}
+
+.acadepost-calendar-header {
+  margin-bottom: 16px;
+}
+
+.acadepost-calendar-header-control {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: #292929;
+  opacity: 0.7;
+  transition: opacity 150ms ease;
+}
+
+.acadepost-calendar-header-control:hover {
+  opacity: 1;
+  background: transparent;
+}
+
+.acadepost-calendar-header-level {
+  color: #292929;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.acadepost-calendar-header-level:hover {
+  background: transparent;
+}
+
+.acadepost-calendar-month {
+  border-collapse: separate;
+  border-spacing: 4px;
+}
+
+.acadepost-calendar-weekday {
+  padding-bottom: 8px;
+  color: #292929;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.acadepost-calendar-day,
+.acadepost-calendar-day-base {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  background: #f5f5f5;
+  color: #292929;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.acadepost-calendar-day:hover:not(:disabled),
+.acadepost-calendar-day-base:hover:not(:disabled) {
+  border-color: #292929;
+  background: #f5f5f5;
+  color: #292929;
+}
+
+.acadepost-calendar-day-selected,
+.acadepost-calendar-day-selected:hover:not(:disabled) {
+  border-color: #292929;
+  background: #292929;
+  color: #ffffff;
+}
+
+.acadepost-calendar-day-outside,
+.acadepost-calendar-day-disabled {
+  background: transparent;
+  color: #acacac;
+  opacity: 0.5;
+}
+
+.acadepost-calendar-day-today::after {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background: #292929;
+  content: '';
+  transform: translateX(-50%);
+}
+
+.acadepost-calendar-day-selected.acadepost-calendar-day-today::after {
+  background: #ffffff;
+}
+
+.acadepost-time-label {
+  padding: 12px 0 8px;
+  color: #292929;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.acadepost-time-input {
+  height: 40px;
+  border: 1px solid #e1e1e1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #292929;
+  font-size: 16px;
+  outline: none;
+}
+
+.acadepost-time-input:focus {
+  border-color: #292929;
+}
+
+.acadepost-date-close {
+  background: #292929 !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+}
+
+.acadepost-date-close:hover {
+  background: #101010 !important;
+}
+
 .text-shadow-tags {
   text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black,
     1px 1px 0 black;

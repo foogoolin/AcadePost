@@ -7,6 +7,7 @@ import { isUSCitizen } from './isuscitizen.utils';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { newDayjs } from '@gitroom/frontend/components/layout/set.timezone';
 import { CalendarIcon } from '@gitroom/frontend/components/ui/icons';
+import clsx from 'clsx';
 export const DatePicker: FC<{
   date: dayjs.Dayjs;
   onChange: (day: dayjs.Dayjs) => void;
@@ -35,7 +36,7 @@ export const DatePicker: FC<{
   );
   return (
     <div
-      className="px-[16px] border border-newTextColor/10 rounded-[8px] justify-center flex gap-[8px] items-center relative h-[44px] text-[15px] font-[600] ml-[7px] select-none flex-1"
+      className="acadepost-date-picker-trigger px-[16px] justify-center flex gap-[8px] items-center relative h-[44px] text-[15px] font-[600] ml-[7px] select-none flex-1"
       onClick={changeShow}
       ref={ref}
     >
@@ -48,41 +49,41 @@ export const DatePicker: FC<{
       {open && (
         <div
           onClick={(e) => e.stopPropagation()}
-          className="animate-fadeIn absolute bottom-[100%] mb-[16px] start-[50%] -translate-x-[50%] bg-sixth border border-tableBorder text-textColor rounded-[16px] z-[300] p-[16px] flex flex-col"
+          className="acadepost-date-popover animate-fadeIn absolute bottom-[100%] mb-[16px] start-[50%] -translate-x-[50%] z-[300] flex flex-col"
         >
           <Calendar
             onChange={changeDate('date')}
             value={date.toDate()}
             dayClassName={(date, modifiers) => {
-              if (modifiers.weekend) {
-                return '!text-customColor28';
-              }
-              if (modifiers.outside) {
-                return '!text-gray';
-              }
-              if (modifiers.selected) {
-                return '!text-white !bg-seventh !outline-none';
-              }
-              return '!text-textColor';
+              const isToday = newDayjs(date).isSame(newDayjs(), 'day');
+              return clsx(
+                'acadepost-calendar-day',
+                modifiers.outside && 'acadepost-calendar-day-outside',
+                modifiers.disabled && 'acadepost-calendar-day-disabled',
+                modifiers.selected && 'acadepost-calendar-day-selected',
+                isToday && 'acadepost-calendar-day-today'
+              );
             }}
             classNames={{
-              day: 'hover:bg-seventh',
-              calendarHeaderControl: 'text-textColor hover:bg-third',
-              calendarHeaderLevel: 'text-textColor hover:bg-third', // cell: 'child:!text-textColor'
+              calendarHeader: 'acadepost-calendar-header',
+              calendarHeaderControl: 'acadepost-calendar-header-control',
+              calendarHeaderLevel: 'acadepost-calendar-header-level',
+              month: 'acadepost-calendar-month',
+              weekday: 'acadepost-calendar-weekday',
+              day: 'acadepost-calendar-day-base',
             }}
           />
           <TimeInput
             onChange={changeDate('time')}
-            label="Pick time"
+            label={t('pick_time', 'Heure')}
             classNames={{
-              label: 'text-textColor py-[12px]',
-              input:
-                'bg-sixth h-[40px] border border-tableBorder text-textColor rounded-[4px] outline-none',
+              label: 'acadepost-time-label',
+              input: 'acadepost-time-input',
             }}
             defaultValue={date.toDate()}
           />
-          <Button className="mt-[12px]" onClick={changeShow}>
-            {t('close', 'Close')}
+          <Button className="acadepost-date-close mt-[12px]" onClick={changeShow}>
+            {t('close', 'Fermer')}
           </Button>
         </div>
       )}

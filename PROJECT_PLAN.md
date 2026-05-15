@@ -8,11 +8,13 @@ AcadéPost is a fast demo-ready social publishing MVP adapted from an existing s
 
 - UI product name: AcadéPost.
 - Repository/project slug: AcadePost.
+- Public logo mark: keep the supplied `A` raster asset at `apps/frontend/public/brand/acadepost-logo.png`; do not replace it with a generated or approximate mark.
 - Technical base: the existing upstream monorepo structure.
 - Priority: customer-demo readiness before deep refactors.
 - Architecture: keep the existing monorepo, Docker, Prisma, PostgreSQL, Redis, Temporal, NestJS, and Next.js structure for the first MVP.
 - Internal package aliases such as `@gitroom/*` can remain during MVP if changing them risks build instability.
 - Legal and licensing handling is owned separately by the project owner and does not block MVP work.
+- Visual redesign guardrails: preserve dark and light themes, black primary UI, `#4cccb8` main accent, and `#fda100` secondary accent.
 
 ## Content Routing MVP
 
@@ -163,6 +165,14 @@ The first workflow should classify content into one of these groups, make the ma
 - Passe BYAN/Codex: les derniers noms directs de l'ancienne marque ont ete retires du runbook demo, du contexte BYAN et de la ligne d'audit du plan.
 - Verification: recherche directe des noms legacy dans les app/docs publics sans resultat; recherche mojibake hors memoire dediee sans resultat; `git diff --check` passe.
 - Exceptions techniques inchangees: aliases internes, variables d'environnement historiques, cles techniques et piste legale `LICENSE`.
+
+## Visual Redesign Guardrails - 2026-05-15
+
+- Le travail visuel doit se faire sur une branche separee avant merge vers `main`.
+- Le logo public `A` est l'image fournie `apps/frontend/public/brand/acadepost-logo.png`; ne pas le remplacer par une lettre dessinee, un nouveau pictogramme ou un logo genere.
+- Les deux themes existants, sombre et clair, doivent etre conserves.
+- Les couleurs de marque restent: noir comme base, `#4cccb8` comme accent principal, `#fda100` comme accent secondaire.
+- Le fichier `C:\Users\my\Documents\byan-test\DESIGN.md` est une specification de calendrier/date-picker Cal.com-like, pas un redesign complet de tout le produit.
 
 ## Open Questions
 
