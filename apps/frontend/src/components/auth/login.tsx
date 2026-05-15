@@ -65,12 +65,12 @@ export function Login() {
       <form className="flex-1 flex" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="flex flex-col flex-1">
           <div>
-            <h1 className="text-[40px] font-[500] -tracking-[0.8px] text-start cursor-pointer">
-              {t('sign_in', 'Sign In')}
+            <h1 className="acadepost-auth-heading text-[40px] text-start cursor-pointer">
+              {t('sign_in', 'Connexion')}
             </h1>
           </div>
-          <div className="text-[14px] mt-[32px] mb-[12px]">
-            {t('continue_with', 'Continue With')}
+          <div className="text-[14px] mt-[32px] mb-[12px] font-[700]">
+            {t('continue_with', 'Continuer avec')}
           </div>
           <div className="flex flex-col">
             {isGeneral && genericOauth ? (
@@ -89,7 +89,9 @@ export function Login() {
               <div
                 className={`absolute z-[1] justify-center items-center w-full start-0 -top-[4px] flex`}
               >
-                <div className="px-[16px]">{t('or', 'or')}</div>
+                <div className="acadepost-auth-divider px-[16px]">
+                  {t('or', 'ou')}
+                </div>
               </div>
             </div>
             <div className="flex flex-col gap-[12px]">
@@ -99,7 +101,7 @@ export function Login() {
                   translationKey="label_email"
                   {...form.register('email')}
                   type="email"
-                  placeholder={t('email_address', 'Email Address')}
+                  placeholder={t('email_address', 'Adresse email')}
                 />
                 <Input
                   label="Password"
@@ -107,7 +109,7 @@ export function Login() {
                   {...form.register('password')}
                   autoComplete="off"
                   type="password"
-                  placeholder={t('label_password', 'Password')}
+                  placeholder={t('label_password', 'Mot de passe')}
                 />
               </div>
               {notActivated && (
@@ -115,14 +117,17 @@ export function Login() {
                   <p className="text-amber-400 text-sm mb-2">
                     {t(
                       'account_not_activated',
-                      'Your account is not activated yet. Please check your email for the activation link.'
+                      "Votre compte n'est pas encore activé. Vérifiez votre email pour ouvrir le lien d'activation."
                     )}
                   </p>
                   <Link
                     href="/auth/activate"
                     className="text-amber-400 underline hover:font-bold text-sm"
                   >
-                    {t('resend_activation_email', 'Resend Activation Email')}
+                    {t(
+                      'resend_activation_email',
+                      "Renvoyer l'email d'activation"
+                    )}
                   </Link>
                 </div>
               )}
@@ -133,21 +138,24 @@ export function Login() {
                     className="flex-1 rounded-[10px] !h-[52px]"
                     loading={loading}
                   >
-                    {t('sign_in_1', 'Sign in')}
+                    {t('sign_in_1', 'Se connecter')}
                   </Button>
                 </div>
                 <p className="mt-4 text-sm">
-                  {t('don_t_have_an_account', "Don't Have An Account?")}&nbsp;
-                  <Link href="/auth" className="underline cursor-pointer">
-                    {t('sign_up', 'Sign Up')}
+                  {t('don_t_have_an_account', 'Pas encore de compte ?')}&nbsp;
+                  <Link
+                    href="/auth"
+                    className="acadepost-auth-link cursor-pointer"
+                  >
+                    {t('sign_up', 'Créer un compte')}
                   </Link>
                 </p>
                 <p className="mt-4 text-sm">
                   <Link
                     href="/auth/forgot"
-                    className="underline hover:font-bold cursor-pointer"
+                    className="acadepost-auth-link cursor-pointer"
                   >
-                    {t('forgot_password', 'Forgot password')}
+                    {t('forgot_password', 'Mot de passe oublié')}
                   </Link>
                 </p>
               </div>

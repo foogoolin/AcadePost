@@ -204,7 +204,7 @@ const AddOrRemoveSignature: FC<{
             <CopilotTextarea
               disableBranding={true}
               className={clsx(
-                '!min-h-40 !max-h-80 p-2 overflow-x-hidden scrollbar scrollbar-thumb-[#612AD5] bg-bigStrip outline-none'
+                '!min-h-40 !max-h-80 p-2 overflow-x-hidden scrollbar scrollbar-thumb-[#4cccb8] bg-bigStrip outline-none'
               )}
               value={text}
               onChange={(e) => {
@@ -225,12 +225,8 @@ const AddOrRemoveSignature: FC<{
               setValueAs: (value) => value === 'true',
             })}
           >
-            <option value="false">
-              {t('no', 'No')}
-            </option>
-            <option value="true">
-              {t('yes', 'Yes')}
-            </option>
+            <option value="false">{t('no', 'No')}</option>
+            <option value="true">{t('yes', 'Yes')}</option>
           </Select>
 
           <Button type="submit">{t('save', 'Save')}</Button>

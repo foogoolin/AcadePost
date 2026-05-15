@@ -174,6 +174,18 @@ The first workflow should classify content into one of these groups, make the ma
 - Les couleurs de marque restent: noir comme base, `#4cccb8` comme accent principal, `#fda100` comme accent secondaire.
 - Le fichier `C:\Users\my\Documents\byan-test\DESIGN.md` est une specification de calendrier/date-picker Cal.com-like, pas un redesign complet de tout le produit.
 
+## Visual Redesign Safe Pass - 2026-05-15
+
+- Branche de travail: `codex/visual-redesign-safe-pass`.
+- BYAN/Codex applique un premier passage frontend-only sans changement backend, Prisma, auth, billing engine, posting engine ou Docker.
+- Le shell applicatif a maintenant des classes scindées `acadepost-*` pour la sidebar, le topbar, les états actifs, le sélecteur projet et les panneaux demo.
+- Les écrans auth prioritaires (`login`, `register`, `forgot`, `activate`, reset password) utilisent le logo raster `A`, les textes fallback français et la palette noir/mint/amber.
+- La langue par défaut de l'application est maintenant `fr`; le sélecteur de langue continue de fonctionner via le cookie `i18next`.
+- `/content-routing` est passé en écran de démonstration français avec groupes `Vidéo`, `Texte court`, `Carrousel`, plateformes associées et accès vers calendrier/média.
+- Le date-picker/calendrier garde le style Cal.com-like issu de `DESIGN.md`: cellules carrées, sélection near-black, Inter/system typography, aucun purple actif.
+- Les surfaces visibles billing, public API/developer et OAuth authorization ont perdu les principaux CTA purple et mojibake détectés.
+- Vérification locale: `corepack pnpm --filter ./apps/frontend run build` passe avec l'avertissement connu Node `v24.13.0` vs cible repo `>=22.12.0 <23.0.0`.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?

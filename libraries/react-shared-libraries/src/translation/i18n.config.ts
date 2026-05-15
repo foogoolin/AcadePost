@@ -1,10 +1,10 @@
-export const fallbackLng = 'en';
+export const fallbackLng = 'fr';
 export const languages = [
   fallbackLng,
+  'en',
   'he',
   'ru',
   'zh',
-  'fr',
   'es',
   'pt',
   'de',

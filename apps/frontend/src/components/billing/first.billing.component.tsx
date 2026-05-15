@@ -116,12 +116,12 @@ export const FirstBillingComponent = () => {
       <>
         <div className="text-[46px] font-[600] leading-[110%] tablet:text-[36px] mobile:!text-[30px] whitespace-pre-line text-balance">
           {t('billing_join_over', 'Join Over')}{' '}
-          <span className="text-[#FC69FF]">
+          <span className="text-acadeMint">
             {t('billing_entrepreneurs_count', '20,000+ Entrepreneurs')}
           </span>{' '}
           {t('billing_who_use', 'who use')}{' '}
           {t(
-            'billing_postiz_grow_social',
+            'billing_acadepost_grow_social',
             'AcadéPost To Grow Their Social Presence'
           )}
         </div>
@@ -137,7 +137,7 @@ export const FirstBillingComponent = () => {
                 alt="YouTube"
               />
             </div>
-            <div>See the power of AcadéPost (click here)</div>
+            <div>Voir AcadéPost en action</div>
           </div>
         </div>
 
@@ -147,7 +147,9 @@ export const FirstBillingComponent = () => {
               <div>
                 <CheckIconComponent />
               </div>
-              <div>{t('billing_no_risk_trial', '100% No-Risk Free Trial')}</div>
+              <div>
+                {t('billing_no_risk_trial', 'Essai gratuit sans risque')}
+              </div>
             </div>
             <div className="flex-1 flex gap-[8px] justify-center mobile:justify-start">
               <div>
@@ -156,7 +158,7 @@ export const FirstBillingComponent = () => {
               <div>
                 {t(
                   'billing_pay_nothing_7_days',
-                  'Pay NOTHING for the first 7-days'
+                  'Rien à payer pendant les 7 premiers jours'
                 )}
               </div>
             </div>
@@ -165,7 +167,10 @@ export const FirstBillingComponent = () => {
                 <CheckIconComponent />
               </div>
               <div>
-                {t('billing_cancel_anytime', 'Cancel anytime, from settings')}
+                {t(
+                  'billing_cancel_anytime',
+                  'Annulation possible depuis les paramètres'
+                )}
               </div>
             </div>
           </div>

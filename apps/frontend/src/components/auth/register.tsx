@@ -75,11 +75,11 @@ export function Register() {
 function getHelpfulReasonForRegistrationFailure(httpCode: number) {
   switch (httpCode) {
     case 400:
-      return 'Email already exists';
+      return 'Cet email existe déjà';
     case 404:
-      return 'Your browser got a 404 when trying to contact the API, the most likely reasons for this are the NEXT_PUBLIC_BACKEND_URL is set incorrectly, or the backend is not running.';
+      return "Votre navigateur a reçu une erreur 404 en contactant l'API. Vérifiez NEXT_PUBLIC_BACKEND_URL et le backend.";
   }
-  return 'Unhandled error: ' + httpCode;
+  return 'Erreur non gérée : ' + httpCode;
 }
 export function RegisterAfter({
   token,
@@ -139,9 +139,9 @@ export function RegisterAfter({
       .catch((e) => {
         form.setError('email', {
           message:
-            'General error: ' +
+            'Erreur générale : ' +
             e.toString() +
-            '. Please check your browser console.',
+            '. Vérifiez la console du navigateur.',
         });
       });
   };
@@ -150,12 +150,12 @@ export function RegisterAfter({
       <form className="flex-1 flex" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="flex flex-col flex-1">
           <div>
-            <h1 className="text-[40px] font-[500] -tracking-[0.8px] text-start cursor-pointer">
-              {t('sign_up', 'Sign Up')}
+            <h1 className="acadepost-auth-heading text-[40px] text-start cursor-pointer">
+              {t('sign_up', 'Créer un compte')}
             </h1>
           </div>
-          <div className="text-[14px] mt-[32px] mb-[12px]">
-            {t('continue_with', 'Continue With')}
+          <div className="text-[14px] mt-[32px] mb-[12px] font-[700]">
+            {t('continue_with', 'Continuer avec')}
           </div>
           <div className="flex flex-col">
             {!isAfterProvider &&
@@ -178,7 +178,9 @@ export function RegisterAfter({
                 <div
                   className={`absolute z-[1] justify-center items-center w-full start-0 -top-[4px] flex`}
                 >
-                  <div className="px-[16px]">{t('or', 'or')}</div>
+                  <div className="acadepost-auth-divider px-[16px]">
+                    {t('or', 'ou')}
+                  </div>
                 </div>
               </div>
             )}
@@ -191,7 +193,7 @@ export function RegisterAfter({
                       translationKey="label_email"
                       {...form.register('email')}
                       type="email"
-                      placeholder={t('email_address', 'Email Address')}
+                      placeholder={t('email_address', 'Adresse email')}
                     />
                     <Input
                       label="Password"
@@ -199,7 +201,7 @@ export function RegisterAfter({
                       {...form.register('password')}
                       autoComplete="off"
                       type="password"
-                      placeholder={t('label_password', 'Password')}
+                      placeholder={t('label_password', 'Mot de passe')}
                     />
                   </>
                 )}
@@ -209,30 +211,30 @@ export function RegisterAfter({
                   {...form.register('company')}
                   autoComplete="off"
                   type="text"
-                  placeholder={t('label_company', 'Company')}
+                  placeholder={t('label_company', 'Nom du projet')}
                 />
               </div>
               <div className={clsx('text-[12px]')}>
                 {t(
                   'by_registering_you_agree_to_our',
-                  'By registering you agree to our'
+                  'En créant un compte, vous acceptez nos'
                 )}
                 &nbsp;
                 <a
                   href={`https://acadepost.com/terms`}
-                  className="underline hover:font-bold"
+                  className="acadepost-auth-link"
                   rel="nofollow"
                 >
-                  {t('terms_of_service', 'Terms of Service')}
+                  {t('terms_of_service', "conditions d'utilisation")}
                 </a>
                 &nbsp;
-                {t('and', 'and')}&nbsp;
+                {t('and', 'et')}&nbsp;
                 <a
                   href={`https://acadepost.com/privacy`}
                   rel="nofollow"
-                  className="underline hover:font-bold"
+                  className="acadepost-auth-link"
                 >
-                  {t('privacy_policy', 'Privacy Policy')}
+                  {t('privacy_policy', 'politique de confidentialité')}
                 </a>
                 &nbsp;
               </div>
@@ -243,17 +245,17 @@ export function RegisterAfter({
                     className="flex-1 rounded-[10px] !h-[52px]"
                     loading={loading}
                   >
-                    {t('create_account', 'Create Account')}
+                    {t('create_account', 'Créer le compte')}
                   </Button>
                 </div>
                 <p className="mt-4 text-sm">
-                  {t('already_have_an_account', 'Already Have An Account?')}
+                  {t('already_have_an_account', 'Vous avez déjà un compte ?')}
                   &nbsp;
                   <Link
                     href="/auth/login"
-                    className="underline  cursor-pointer"
+                    className="acadepost-auth-link cursor-pointer"
                   >
-                    {t('sign_in', 'Sign In')}
+                    {t('sign_in', 'Se connecter')}
                   </Link>
                 </p>
               </div>

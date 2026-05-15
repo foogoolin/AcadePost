@@ -159,13 +159,7 @@ const getMcpConfig = (
   }
 };
 
-const CopyButton = ({
-  text,
-  label,
-}: {
-  text: string;
-  label: string;
-}) => {
+const CopyButton = ({ text, label }: { text: string; label: string }) => {
   const toaster = useToaster();
   return (
     <button
@@ -218,7 +212,10 @@ const McpSection = ({
 
   const maskedConfig = revealed
     ? config
-    : config.replace(new RegExp(user.publicApi.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '*'.repeat(user.publicApi.length));
+    : config.replace(
+        new RegExp(user.publicApi.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+        '*'.repeat(user.publicApi.length)
+      );
 
   const maskedRemoteUrl = revealed
     ? remoteUrl
@@ -233,8 +230,8 @@ const McpSection = ({
           </div>
           <div className="text-[13px] text-customColor18 mt-[2px]">
             {t(
-              'connect_your_mcp_client_to_postiz_to_schedule_your_posts_faster',
-              'Connect the AcadéPost MCP server to your client (HTTP streaming) to schedule posts faster.'
+              'connect_your_mcp_client_to_acadepost_to_schedule_your_posts_faster',
+              'Connectez le serveur MCP AcadéPost à votre client pour planifier plus vite.'
             )}
           </div>
         </div>
@@ -252,7 +249,7 @@ const McpSection = ({
                 className={clsx(
                   'cursor-pointer px-[14px] h-[36px] text-[13px] font-[500] rounded-[8px] transition-colors',
                   method === m
-                    ? 'bg-[#612BD3] text-white'
+                    ? 'bg-acadeMint text-black'
                     : 'bg-btnSimple text-customColor18 hover:bg-boxHover hover:text-textColor'
                 )}
                 onClick={() => setMethod(m)}
@@ -277,7 +274,7 @@ const McpSection = ({
                   className={clsx(
                     'cursor-pointer px-[14px] h-[36px] text-[13px] font-[500] rounded-[8px] transition-colors',
                     activeClient === client
-                      ? 'bg-[#612BD3] text-white'
+                      ? 'bg-acadeMint text-black'
                       : 'bg-btnSimple text-customColor18 hover:bg-boxHover hover:text-textColor'
                   )}
                   onClick={() => setActiveClient(client)}
@@ -336,10 +333,7 @@ const McpSection = ({
               label={t('copy', 'Copy')}
             />
             {method === 'header' && (
-              <CopyButton
-                text={cliUrl}
-                label={t('copy_url', 'Copy URL')}
-              />
+              <CopyButton text={cliUrl} label={t('copy_url', 'Copy URL')} />
             )}
           </div>
         </div>
@@ -426,7 +420,7 @@ const CliSection = ({ apiKey }: { apiKey: string }) => {
               className={clsx(
                 'cursor-pointer px-[14px] h-[36px] text-[13px] font-[500] rounded-[8px] transition-colors',
                 mode === m
-                  ? 'bg-[#612BD3] text-white'
+                  ? 'bg-acadeMint text-black'
                   : 'bg-btnSimple text-customColor18 hover:bg-boxHover hover:text-textColor'
               )}
               onClick={() => setMode(m)}
@@ -557,8 +551,8 @@ const PublicApiContent = () => {
             </div>
             <div className="text-[13px] text-customColor18 mt-[2px]">
               {t(
-                'use_postiz_api_to_integrate_with_your_tools',
-                'Use the AcadéPost API to integrate with your tools.'
+                'use_acadepost_api_to_integrate_with_your_tools',
+                'Utilisez l’API AcadéPost pour connecter vos outils.'
               )}
             </div>
           </div>
@@ -683,14 +677,12 @@ export const PublicComponent = () => {
             className={clsx(
               'cursor-pointer px-[20px] h-[44px] text-[15px] font-[600] rounded-[8px] transition-colors',
               subTab === tab
-                ? 'bg-[#612BD3] text-white'
+                ? 'bg-acadeMint text-black'
                 : 'bg-btnSimple text-customColor18 hover:bg-boxHover hover:text-textColor'
             )}
             onClick={() => setSubTab(tab)}
           >
-            {tab === 'api'
-              ? t('access', 'Access')
-              : t('apps', 'Apps')}
+            {tab === 'api' ? t('access', 'Access') : t('apps', 'Apps')}
           </button>
         ))}
       </div>

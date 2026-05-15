@@ -8,14 +8,16 @@
 @tailwind utilities;
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 body {
   background: var(--new-bgColor) !important;
   color: var(--new-btn-text);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    'Segoe UI', sans-serif;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', sans-serif;
   letter-spacing: 0;
 }
 
@@ -326,7 +328,7 @@ body * {
 }
 //
 //:root {
-//  --copilot-kit-primary-color: #612ad5 !important;
+//  --copilot-kit-primary-color: #4cccb8 !important;
 //  --copilot-kit-background-color: #0b0f1c !important;
 //  --copilot-kit-separator-color: #1f2941 !important;
 //  --copilot-kit-contrast-color: #ffffff !important;
@@ -811,15 +813,255 @@ html[dir='rtl'] [dir='ltr'] {
   color: var(--acadepost-warm);
 }
 
+.acadepost-app-frame {
+  background: radial-gradient(
+      circle at 12% 8%,
+      rgba(76, 204, 184, 0.08),
+      transparent 28%
+    ),
+    var(--new-bgColor);
+  color: rgb(var(--new-textColor));
+}
+
+.acadepost-sidebar-rail {
+  border: 1px solid var(--new-bgLineColor);
+  background: color-mix(in srgb, var(--new-bgColorInner) 94%, transparent);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.18);
+}
+
+.acadepost-sidebar-inner {
+  border-radius: 10px;
+}
+
+.acadepost-sidebar-logo {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto;
+  border: 1px solid rgba(76, 204, 184, 0.28);
+  border-radius: 10px;
+  background: rgba(76, 204, 184, 0.08);
+  box-shadow: 0 12px 30px rgba(76, 204, 184, 0.14);
+}
+
+.acadepost-main-panel {
+  border: 1px solid var(--new-bgLineColor);
+  background: var(--new-bgLineColor);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.16);
+}
+
+.acadepost-topbar {
+  border-bottom: 1px solid var(--new-bgLineColor);
+  background: color-mix(in srgb, var(--new-bgColorInner) 96%, transparent);
+}
+
+.acadepost-topbar-actions {
+  color: rgb(var(--new-textColor));
+}
+
+.acadepost-topbar-icon {
+  width: 36px;
+  height: 36px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: rgb(var(--new-textColor));
+  opacity: 0.78;
+  transition: border-color 150ms ease, background-color 150ms ease,
+    color 150ms ease, opacity 150ms ease;
+}
+
+.acadepost-topbar-icon:hover,
+.acadepost-topbar-icon:focus-visible {
+  border-color: rgba(76, 204, 184, 0.32);
+  background: rgba(76, 204, 184, 0.1);
+  color: var(--acadepost-accent);
+  opacity: 1;
+}
+
+.acadepost-menu-item {
+  border: 1px solid transparent;
+  color: rgb(var(--new-textColor) / 0.58);
+  transition: border-color 150ms ease, background-color 150ms ease,
+    color 150ms ease, transform 150ms ease;
+}
+
+.acadepost-menu-item:hover,
+.acadepost-menu-item:focus-visible,
+.acadepost-menu-item-active {
+  border-color: rgba(76, 204, 184, 0.28);
+  background: rgba(76, 204, 184, 0.12);
+  color: rgb(var(--new-textColor));
+}
+
+.acadepost-menu-item-active {
+  box-shadow: inset 3px 0 0 var(--acadepost-accent);
+}
+
+.acadepost-menu-item:hover {
+  transform: translateX(1px);
+}
+
+.acadepost-wordmark {
+  letter-spacing: 0;
+}
+
+.acadepost-auth-shell {
+  background: linear-gradient(120deg, rgba(76, 204, 184, 0.12), transparent 36%),
+    var(--new-bgColor);
+  color: rgb(var(--new-textColor));
+}
+
+.acadepost-auth-panel {
+  border-right: 1px solid var(--new-bgLineColor);
+  background: color-mix(in srgb, var(--new-bgColorInner) 97%, transparent);
+}
+
+.acadepost-auth-hero {
+  background: radial-gradient(
+      circle at 18% 24%,
+      rgba(76, 204, 184, 0.18),
+      transparent 28%
+    ),
+    radial-gradient(circle at 86% 14%, rgba(253, 161, 0, 0.12), transparent 22%),
+    #050505;
+  color: #ffffff;
+}
+
+.acadepost-auth-kicker {
+  color: var(--acadepost-accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.acadepost-auth-stat {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.acadepost-auth-heading {
+  color: rgb(var(--new-textColor));
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.acadepost-auth-divider {
+  color: color-mix(in srgb, rgb(var(--new-textColor)) 56%, transparent);
+}
+
+.acadepost-auth-link {
+  color: var(--acadepost-accent);
+  font-weight: 700;
+}
+
+.acadepost-auth-link:hover {
+  color: var(--acadepost-warm);
+}
+
+.acadepost-testimonial-card {
+  border: 1px solid rgba(76, 204, 184, 0.18);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.24);
+}
+
+.acadepost-project-trigger {
+  border: 1px solid rgba(76, 204, 184, 0.22);
+  border-radius: 9999px;
+  background: rgba(76, 204, 184, 0.08);
+  color: rgb(var(--new-textColor));
+}
+
+.acadepost-project-menu {
+  border: 1px solid var(--new-bgLineColor);
+  border-radius: 10px;
+  background: var(--new-bgColorInner);
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.18);
+}
+
+.acadepost-project-field {
+  border: 1px solid var(--new-bgLineColor);
+  border-radius: 8px;
+  background: var(--new-bgColor);
+  color: rgb(var(--new-textColor));
+}
+
+.acadepost-project-button {
+  border-radius: 8px;
+  background: var(--new-btn-primary);
+  color: var(--new-btn-text);
+  font-weight: 700;
+}
+
+.acadepost-content-page {
+  min-height: 100%;
+  background: linear-gradient(
+      180deg,
+      rgba(76, 204, 184, 0.08),
+      transparent 360px
+    ),
+    var(--new-bgColor);
+  color: rgb(var(--new-textColor));
+}
+
+.acadepost-routing-hero {
+  border-bottom: 1px solid var(--new-bgLineColor);
+  background: color-mix(in srgb, var(--new-bgColorInner) 82%, transparent);
+}
+
+.acadepost-routing-badge {
+  border: 1px solid rgba(76, 204, 184, 0.35);
+  border-radius: 9999px;
+  background: rgba(76, 204, 184, 0.1);
+  color: var(--acadepost-accent);
+}
+
+.acadepost-routing-card {
+  border: 1px solid var(--new-bgLineColor);
+  border-radius: 8px;
+  background: var(--new-bgColorInner);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.12);
+}
+
+.acadepost-routing-card:hover {
+  border-color: rgba(76, 204, 184, 0.34);
+}
+
+.acadepost-routing-chip {
+  border: 1px solid var(--new-bgLineColor);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--new-bgColor) 82%, transparent);
+  color: rgb(var(--new-textColor));
+}
+
+.acadepost-routing-workflow {
+  border: 1px solid var(--new-bgLineColor);
+  border-radius: 8px;
+  background: var(--new-bgColorInner);
+}
+
+.acadepost-routing-primary-action {
+  border-radius: 8px;
+  background: var(--new-btn-primary);
+  color: var(--new-btn-text);
+  font-weight: 800;
+}
+
+.acadepost-routing-secondary-action {
+  border: 1px solid var(--new-bgLineColor);
+  border-radius: 8px;
+  color: rgb(var(--new-textColor));
+}
+
 .acadepost-date-picker-trigger {
   border: 1px solid var(--new-bgLineColor);
   border-radius: 8px;
   background: var(--new-bgColorInner);
   color: rgb(var(--new-textColor));
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.02);
-  transition:
-    border-color 150ms ease,
-    background-color 150ms ease,
+  transition: border-color 150ms ease, background-color 150ms ease,
     box-shadow 150ms ease;
 }
 
@@ -900,9 +1142,7 @@ html[dir='rtl'] [dir='ltr'] {
   font-size: 14px;
   font-weight: 500;
   line-height: 1;
-  transition:
-    border-color 150ms ease,
-    background-color 150ms ease,
+  transition: border-color 150ms ease, background-color 150ms ease,
     color 150ms ease;
 }
 

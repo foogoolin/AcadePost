@@ -19,12 +19,12 @@ export default function OAuthAuthorizePage() {
 
   useEffect(() => {
     if (!clientId || !responseType) {
-      setError('Missing required parameters (client_id, response_type)');
+      setError('Paramètres OAuth requis manquants (client_id, response_type)');
       setLoading(false);
       return;
     }
     if (responseType !== 'code') {
-      setError('Only response_type=code is supported');
+      setError('Seul response_type=code est pris en charge');
       setLoading(false);
       return;
     }
@@ -39,14 +39,14 @@ export default function OAuthAuthorizePage() {
       .then((r) => r.json())
       .then((data) => {
         if (data.statusCode && data.statusCode >= 400) {
-          setError(data.message || 'Invalid OAuth request');
+          setError(data.message || 'Requête OAuth invalide');
         } else {
           setAppInfo(data);
         }
         setLoading(false);
       })
       .catch(() => {
-        setError('Failed to validate OAuth request');
+        setError('Impossible de valider la requête OAuth');
         setLoading(false);
       });
   }, [clientId, responseType, state]);
@@ -70,7 +70,7 @@ export default function OAuthAuthorizePage() {
           window.location.href = result.redirect;
         }
       } catch {
-        setError('Failed to process authorization');
+        setError("Impossible de traiter l'autorisation");
         setSubmitting(false);
       }
     },
@@ -79,20 +79,14 @@ export default function OAuthAuthorizePage() {
 
   if (loading) {
     return (
-      <div className="flex flex-1 items-center justify-center text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-[20%] left-[10%] w-[300px] h-[300px] bg-[#612BD3] rounded-full blur-[120px]" />
-          <div className="absolute bottom-[20%] right-[10%] w-[250px] h-[250px] bg-[#FC69FF] rounded-full blur-[120px]" />
-        </div>
+      <div className="flex flex-1 items-center justify-center text-white relative overflow-hidden bg-[#050505]">
         <div className="relative z-10 text-center">
           <div className="flex justify-center mb-[24px]">
             <Logo />
           </div>
-          <div className="text-[16px] text-gray-400">
-            Please wait...
-          </div>
+          <div className="text-[16px] text-gray-400">Veuillez patienter...</div>
           <div className="mt-[32px] flex justify-center">
-            <div className="w-[48px] h-[48px] border-[3px] border-[#612BD3] border-t-transparent rounded-full animate-spin" />
+            <div className="w-[48px] h-[48px] border-[3px] border-acadeMint border-t-transparent rounded-full animate-spin" />
           </div>
         </div>
       </div>
@@ -101,11 +95,7 @@ export default function OAuthAuthorizePage() {
 
   if (error) {
     return (
-      <div className="flex flex-1 items-center justify-center text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-[20%] left-[10%] w-[300px] h-[300px] bg-[#612BD3] rounded-full blur-[120px]" />
-          <div className="absolute bottom-[20%] right-[10%] w-[250px] h-[250px] bg-[#FC69FF] rounded-full blur-[120px]" />
-        </div>
+      <div className="flex flex-1 items-center justify-center text-white relative overflow-hidden bg-[#050505]">
         <div className="relative z-10 text-center">
           <div className="flex justify-center mb-[24px]">
             <Logo />
@@ -124,11 +114,9 @@ export default function OAuthAuthorizePage() {
             </svg>
           </div>
           <div className="text-[28px] font-semibold mb-[12px]">
-            Authorization Error
+            Erreur d'autorisation
           </div>
-          <div className="text-[16px] text-gray-400 max-w-[400px]">
-            {error}
-          </div>
+          <div className="text-[16px] text-gray-400 max-w-[400px]">{error}</div>
         </div>
       </div>
     );
@@ -139,18 +127,13 @@ export default function OAuthAuthorizePage() {
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center text-white relative overflow-hidden">
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-[20%] left-[10%] w-[300px] h-[300px] bg-[#612BD3] rounded-full blur-[120px]" />
-        <div className="absolute bottom-[20%] right-[10%] w-[250px] h-[250px] bg-[#FC69FF] rounded-full blur-[120px]" />
-      </div>
-
+    <div className="flex flex-1 items-center justify-center text-white relative overflow-hidden bg-[#050505]">
       <div className="relative z-10 w-full max-w-[500px] mx-auto px-[20px]">
         <div className="flex justify-center mb-[32px]">
           <Logo />
         </div>
 
-        <div className="bg-[#1A1919] rounded-[16px] p-[32px] flex flex-col gap-[24px]">
+        <div className="bg-[#101010] border border-white/10 rounded-[12px] p-[32px] flex flex-col gap-[24px]">
           <div className="flex flex-col items-center gap-[16px]">
             {appInfo.app.picture?.path ? (
               <img
@@ -175,13 +158,13 @@ export default function OAuthAuthorizePage() {
 
           <div className="border-t border-[#2A2929] pt-[16px]">
             <div className="text-[14px] text-gray-400 mb-[12px]">
-              This application is requesting access to your AcadéPost account. It
-              will be able to:
+              Cette application demande l’accès à votre compte AcadéPost. Elle
+              pourra :
             </div>
             <ul className="text-[14px] list-disc list-inside space-y-[4px]">
-              <li>Access your integrations and channels</li>
-              <li>Create and schedule posts on your behalf</li>
-              <li>Read your post analytics</li>
+              <li>Accéder à vos intégrations et canaux</li>
+              <li>Créer et planifier des publications en votre nom</li>
+              <li>Lire les statistiques de vos publications</li>
             </ul>
           </div>
 
@@ -189,16 +172,16 @@ export default function OAuthAuthorizePage() {
             <button
               onClick={() => handleAction('approve')}
               disabled={submitting}
-              className="flex-1 bg-[#612BD3] hover:bg-[#7B3FF2] disabled:opacity-50 text-white rounded-[8px] py-[10px] px-[16px] text-[14px] font-semibold transition-colors"
+              className="flex-1 bg-acadeMint hover:bg-[#3db9a7] disabled:opacity-50 text-black rounded-[8px] py-[10px] px-[16px] text-[14px] font-semibold transition-colors"
             >
-              Authorize
+              Autoriser
             </button>
             <button
               onClick={() => handleAction('deny')}
               disabled={submitting}
               className="flex-1 bg-[#2A2929] hover:bg-[#3A3939] disabled:opacity-50 text-white rounded-[8px] py-[10px] px-[16px] text-[14px] font-semibold transition-colors"
             >
-              Deny
+              Refuser
             </button>
           </div>
         </div>

@@ -5,7 +5,7 @@ export const Logo = () => {
     <img
       src="/brand/acadepost-logo.png"
       alt="AcadéPost"
-      className="mt-[8px] h-[52px] w-[52px] min-w-[52px] object-contain"
+      className="acadepost-sidebar-logo mt-[8px] h-[52px] w-[52px] min-w-[52px] object-contain"
     />
   );
 };

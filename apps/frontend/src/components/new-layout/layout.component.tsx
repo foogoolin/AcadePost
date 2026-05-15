@@ -88,7 +88,7 @@ export const LayoutComponent = ({ children }: { children: ReactNode }) => {
             <ContinueProvider />
             <div
               className={clsx(
-                'flex flex-col min-h-screen min-w-screen text-newTextColor p-[12px]',
+                'acadepost-app-frame flex flex-col min-h-screen min-w-screen text-newTextColor p-[12px]',
                 jakartaSans.className
               )}
             >
@@ -100,30 +100,30 @@ export const LayoutComponent = ({ children }: { children: ReactNode }) => {
                   <AnnouncementBanner />
                   <div className="flex-1 flex gap-[8px]">
                     <Support />
-                    <div className="flex flex-col bg-newBgColorInner w-[80px] rounded-[12px]">
+                    <div className="acadepost-sidebar-rail flex flex-col w-[84px] rounded-[12px]">
                       <div
                         id="left-menu"
                         className={clsx(
-                          'fixed h-full w-[64px] start-[17px] flex flex-1 top-0',
+                          'fixed h-full w-[68px] start-[20px] flex flex-1 top-0',
                           user?.admin && 'pt-[60px] max-h-[1000px]:w-[500px]'
                         )}
                       >
-                        <div className="flex flex-col h-full gap-[32px] flex-1 py-[12px]">
+                        <div className="acadepost-sidebar-inner flex flex-col h-full gap-[28px] flex-1 py-[12px]">
                           <Logo />
                           <TopMenu />
                         </div>
                       </div>
                     </div>
-                    <div className="flex-1 bg-newBgLineColor rounded-[12px] overflow-hidden flex flex-col gap-[1px] blurMe">
-                      <div className="flex bg-newBgColorInner h-[80px] px-[20px] items-center">
-                        <div className="text-[24px] font-[600] flex flex-1">
+                    <div className="acadepost-main-panel flex-1 rounded-[12px] overflow-hidden flex flex-col gap-[1px] blurMe">
+                      <div className="acadepost-topbar flex h-[76px] px-[22px] items-center">
+                        <div className="text-[22px] font-[700] flex flex-1">
                           <Title />
                         </div>
-                        <div className="flex gap-[20px] text-textItemBlur">
+                        <div className="acadepost-topbar-actions flex gap-[18px] text-textItemBlur items-center">
                           <StreakComponent />
                           <div className="w-[1px] h-[20px] bg-blockSeparator" />
                           <OrganizationSelector />
-                          <div className="hover:text-newTextColor">
+                          <div className="acadepost-topbar-icon flex items-center justify-center">
                             <ModeComponent />
                           </div>
                           <div className="w-[1px] h-[20px] bg-blockSeparator" />

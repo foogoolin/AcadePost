@@ -36,7 +36,9 @@ export const useMenuItem = () => {
 
   const firstMenu = [
     {
-      name: isGeneral ? t('calendar', 'Calendar') : t('launches', 'Launches'),
+      name: isGeneral
+        ? t('calendar', 'Calendrier')
+        : t('launches', 'Publications'),
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +59,7 @@ export const useMenuItem = () => {
       path: '/launches',
     },
     {
-      name: 'Content Routing',
+      name: 'Routage',
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -96,7 +98,7 @@ export const useMenuItem = () => {
       path: '/agents',
     },
     {
-      name: t('analytics', 'Analytics'),
+      name: t('analytics', 'Analytique'),
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -117,7 +119,7 @@ export const useMenuItem = () => {
       path: '/analytics',
     },
     {
-      name: t('media', 'Media'),
+      name: t('media', 'Médias'),
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -138,7 +140,7 @@ export const useMenuItem = () => {
       path: '/media',
     },
     {
-      name: t('plugs', 'Plugs'),
+      name: t('plugs', 'Plugins'),
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -159,7 +161,7 @@ export const useMenuItem = () => {
       path: '/plugs',
     },
     {
-      name: t('integrations', 'Integrations'),
+      name: t('integrations', 'Intégrations'),
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -274,7 +276,7 @@ export const useMenuItem = () => {
       requireBilling: true,
     },
     {
-      name: t('billing', 'Billing'),
+      name: t('billing', 'Facturation'),
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -297,7 +299,7 @@ export const useMenuItem = () => {
       requireBilling: true,
     },
     {
-      name: t('settings', 'Settings'),
+      name: t('settings', 'Paramètres'),
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -354,7 +356,7 @@ export const TopMenu: FC = () => {
                 if (f.requireBilling && !billingEnabled) {
                   return false;
                 }
-                if (f.name === 'Billing' && user?.isLifetime) {
+                if (f.path === '/billing' && user?.isLifetime) {
                   return false;
                 }
                 if (f.role) {
@@ -382,7 +384,7 @@ export const TopMenu: FC = () => {
             if (f.requireBilling && !billingEnabled) {
               return false;
             }
-            if (f.name === 'Billing' && user?.isLifetime) {
+            if (f.path === '/billing' && user?.isLifetime) {
               return false;
             }
             if (f.role) {

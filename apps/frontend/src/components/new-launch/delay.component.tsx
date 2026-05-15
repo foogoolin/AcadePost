@@ -1,7 +1,10 @@
 'use client';
 
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { DelayIcon, DropdownArrowIcon } from '@gitroom/frontend/components/ui/icons';
+import {
+  DelayIcon,
+  DropdownArrowIcon,
+} from '@gitroom/frontend/components/ui/icons';
 import clsx from 'clsx';
 import { useLaunchStore } from '@gitroom/frontend/components/new-launch/store';
 import { useShallow } from 'zustand/react/shallow';
@@ -26,8 +29,9 @@ export const DelayComponent: FC<{
   const t = useT();
   const [isOpen, setIsOpen] = useState(false);
   const [customValue, setCustomValue] = useState('');
-  
-  const isCustomDelay = currentDelay > 0 && !delayOptions.some((opt) => opt.value === currentDelay);
+
+  const isCustomDelay =
+    currentDelay > 0 && !delayOptions.some((opt) => opt.value === currentDelay);
 
   useEffect(() => {
     if (isOpen && isCustomDelay) {
@@ -85,7 +89,10 @@ export const DelayComponent: FC<{
         data-tooltip-content={
           !currentDelay
             ? t('delay_comment', 'Delay comment')
-            : `${t('delay_comment_by', 'Comment delayed by')} ${getCurrentDelayLabel()}`
+            : `${t(
+                'delay_comment_by',
+                'Comment delayed by'
+              )} ${getCurrentDelayLabel()}`
         }
         className={clsx(
           'cursor-pointer flex items-center gap-[4px]',
@@ -103,7 +110,8 @@ export const DelayComponent: FC<{
                 key={option.value}
                 className={clsx(
                   'h-[32px] flex items-center justify-center rounded-[4px] cursor-pointer hover:bg-newBgColor text-[13px]',
-                  currentDelay === option.value && 'bg-[#612BD3] text-white hover:bg-[#612BD3]'
+                  currentDelay === option.value &&
+                    'bg-[#4cccb8] text-white hover:bg-[#4cccb8]'
                 )}
               >
                 {option.label}
@@ -120,8 +128,8 @@ export const DelayComponent: FC<{
                 onClick={(e) => e.stopPropagation()}
                 placeholder="Custom min"
                 className={clsx(
-                  'flex-1 w-full h-[32px] px-[8px] rounded-[4px] bg-newBgColor border text-[13px] outline-none focus:border-[#612BD3]',
-                  isCustomDelay ? 'border-[#612BD3]' : 'border-newTextColor/10'
+                  'flex-1 w-full h-[32px] px-[8px] rounded-[4px] bg-newBgColor border text-[13px] outline-none focus:border-[#4cccb8]',
+                  isCustomDelay ? 'border-[#4cccb8]' : 'border-newTextColor/10'
                 )}
               />
               <button
@@ -133,7 +141,7 @@ export const DelayComponent: FC<{
                     setCustomValue('');
                   }
                 }}
-                className="h-[32px] px-[10px] rounded-[4px] bg-[#612BD3] text-white text-[12px] font-[600] hover:bg-[#612BD3]/80"
+                className="h-[32px] px-[10px] rounded-[4px] bg-[#4cccb8] text-white text-[12px] font-[600] hover:bg-[#4cccb8]/80"
               >
                 Set
               </button>

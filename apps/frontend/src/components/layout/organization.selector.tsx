@@ -68,17 +68,21 @@ export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
       <div className="hover:text-newTextColor">
         <div className="group text-[12px] relative">
           {asOpenSelect && (
-            <div className="bg-btnPrimary !flex !relative max-w-[500px] mx-auto py-[12px] px-[12px]">
-              {current?.name || t('select_project', 'Selectionner un projet')}
+            <div className="acadepost-project-trigger !flex !relative max-w-[500px] mx-auto py-[12px] px-[14px]">
+              {current?.name || t('select_project', 'Sélectionner un projet')}
             </div>
           )}
           {!asOpenSelect && (
             <div
-              className="flex items-center"
+              className="acadepost-project-trigger flex items-center justify-center w-[36px] h-[36px]"
               title={current?.name || t('projects', 'Projets')}
             >
               <svg
-                className={user?.tier.current === 'FREE' ? 'animate-bounce drop-shadow-glow': ''}
+                className={
+                  user?.tier.current === 'FREE'
+                    ? 'animate-bounce drop-shadow-glow'
+                    : ''
+                }
                 width="24"
                 height="24"
                 viewBox="0 0 26 26"
@@ -95,13 +99,15 @@ export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
           {!!data?.length && (
             <div
               className={clsx(
-                'hidden py-[12px] px-[12px] group-hover:flex absolute top-[100%] end-0 bg-third border-tableBorder border gap-[12px] cursor-pointer flex-col min-w-[220px]',
-                asOpenSelect ? '!flex !relative max-w-[500px] mx-auto mb-[10px]' : '',
+                'acadepost-project-menu hidden py-[14px] px-[14px] group-hover:flex absolute top-[calc(100%+10px)] end-0 gap-[12px] cursor-pointer flex-col min-w-[240px] z-[20]',
+                asOpenSelect
+                  ? '!flex !relative max-w-[500px] mx-auto mb-[10px]'
+                  : ''
               )}
             >
               {!!current && (
                 <div className="border-b border-tableBorder pb-[10px] cursor-default">
-                  <div className="text-[10px] uppercase text-customColor18">
+                  <div className="text-[10px] uppercase text-customColor18 font-[700] tracking-[0.08em]">
                     {t('current_project', 'Projet actuel')}
                   </div>
                   <div className="mt-[4px] max-w-[260px] break-words">
@@ -125,7 +131,7 @@ export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
                     onSubmit={createProject}
                   >
                     <input
-                      className="bg-input border border-tableBorder rounded-[4px] px-[8px] py-[7px] text-textColor outline-none"
+                      className="acadepost-project-field px-[10px] py-[9px] outline-none"
                       autoFocus
                       maxLength={80}
                       value={projectName}
@@ -133,20 +139,20 @@ export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
                       placeholder={t('project_name', 'Nom du projet')}
                     />
                     <button
-                      className="bg-btnPrimary text-textColor rounded-[4px] px-[10px] py-[8px] text-left disabled:opacity-50"
+                      className="acadepost-project-button px-[10px] py-[9px] text-left disabled:opacity-50"
                       disabled={!projectName.trim()}
                       type="submit"
                     >
-                      {t('create_project', 'Creer le projet')}
+                      {t('create_project', 'Créer le projet')}
                     </button>
                   </form>
                 ) : (
                   <button
-                    className="text-left hover:text-newTextColor"
+                    className="text-left hover:text-newTextColor font-[700]"
                     onClick={() => setCreating(true)}
                     type="button"
                   >
-                    {t('create_project', 'Creer un projet')}
+                    {t('create_project', 'Créer un projet')}
                   </button>
                 )}
               </div>

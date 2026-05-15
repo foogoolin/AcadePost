@@ -9,7 +9,10 @@ import { useClickOutside } from '@mantine/hooks';
 import { useToaster } from '@gitroom/react/toaster/toaster';
 import { useLaunchStore } from '@gitroom/frontend/components/new-launch/store';
 import { useShallow } from 'zustand/react/shallow';
-import { UserIcon, DropdownArrowIcon } from '@gitroom/frontend/components/ui/icons';
+import {
+  UserIcon,
+  DropdownArrowIcon,
+} from '@gitroom/frontend/components/ui/icons';
 
 export const SelectCustomer: FC<{
   onChange: (value: string) => void;
@@ -59,7 +62,7 @@ export const SelectCustomer: FC<{
         onClick={openClose}
         className={clsx(
           'relative z-[20] cursor-pointer h-[42px] rounded-[8px] pl-[16px] pr-[12px] gap-[8px] border flex items-center',
-          open ? 'border-[#612BD3]' : 'border-newColColor'
+          open ? 'border-[#4cccb8]' : 'border-newColColor'
         )}
       >
         <div>
@@ -89,7 +92,7 @@ export const SelectCustomer: FC<{
                   setCustomer(p.customer?.id);
                   onChange(p.customer?.id);
                   setOpen(false);
-                  setCurrent('global')
+                  setCurrent('global');
                 }}
                 key={p.customer?.id}
                 className="p-[12px] hover:bg-newBgColor text-[14px] font-[500] h-[32px] flex items-center"
