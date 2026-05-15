@@ -59,10 +59,10 @@ corepack pnpm run dev
 Vérifier ces écrans dans le navigateur :
 
 1. Page d'authentification : le branding visible doit être `AcadéPost`.
-2. Sidebar : absence de traces publiques Postiz/Gitroom.
+2. Sidebar : absence de traces publiques de l'ancienne marque upstream.
 3. `/content-routing` : les trois familles de routage doivent être visibles.
 4. Écrans onboarding : textes en français et branding AcadéPost.
-5. Billing/FAQ : pas de CTA ou lien public vers Postiz.
+5. Billing/FAQ : pas de CTA ou lien public vers l'ancienne marque upstream.
 6. Public API/developer : wording AcadéPost ou `AcadePost` pour les slugs techniques.
 7. Extension : `apps/extension/extension.zip` doit contenir `manifest.json`, `background.js`, `icon-32.png`, `icon-128.png`.
 

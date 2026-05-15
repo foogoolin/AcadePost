@@ -41,7 +41,7 @@ Ce fichier est la référence courte pour les agents BYAN/Codex qui travaillent 
 - UI : utiliser `AcadéPost`.
 - Identifiants techniques, exemples de package, slugs : utiliser `AcadePost`.
 - Couleurs : noir comme couleur primaire, `#4cccb8` comme accent principal, `#fda100` comme accent secondaire.
-- Nettoyer les traces publiques Postiz/Gitroom dans l'UI, les traductions, les métadonnées, les docs de démo et les textes fallback.
+- Nettoyer les traces publiques de l'ancienne marque upstream dans l'UI, les traductions, les métadonnées, les docs de démo et les textes fallback.
 - Ne pas renommer pendant le MVP les aliases internes `@gitroom/*`, les variables `POSTIZ_*`, `@postiz/wallets`, ni les clés techniques si cela risque de casser le build.
 - `LICENSE` est une piste légale séparée et reste sous décision du propriétaire.
 

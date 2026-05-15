@@ -50,7 +50,7 @@ The first workflow should classify content into one of these groups, make the ma
 - Cleanup scope: Public UI Only with technical exceptions allowed.
 - Public product wording should use `AcadéPost`; technical slugs and package examples should use `AcadePost`.
 - Internal aliases such as `@gitroom/*`, translation key names, `POSTIZ_*` environment variables, and `@postiz/wallets` stay unchanged during the MVP unless a separate build-safe rename pass is planned.
-- Direct brand search is clean for public code/docs after cleanup. The only remaining direct `Postiz` hit is in `LICENSE`, which is legal-track and should be handled by the project owner before any attribution rewrite.
+- Direct old-brand search is clean for public code/docs after cleanup. The only remaining legacy attribution hit is in `LICENSE`, which is legal-track and should be handled by the project owner before any attribution rewrite.
 - Dependency/build verification status: `corepack pnpm dlx prisma@6.5.0 generate`, frontend build, backend build, orchestrator build, and extension Vite build pass locally. Backend/orchestrator need `NODE_OPTIONS=--max-old-space-size=8192` in this shell.
 - Current environment caveats: the shell is running Node `v24.13.0` while the repo requests `>=22.12.0 <23.0.0`; `corepack pnpm install --frozen-lockfile` reaches postinstall but fails because the lifecycle script calls bare `pnpm`, which is not in PATH on this Windows setup; the extension package build script uses Unix `rm/cp/zip`, so it needs a cross-platform packaging script.
 - No-code continuation guidance: FlutterFlow or another no-code tool should be treated as a client shell over AcadéPost APIs, not a direct repository import. Keep the NestJS/Temporal/Postgres publishing engine in code, then expose stable API endpoints for a FlutterFlow/mobile/admin frontend if desired.
@@ -157,6 +157,12 @@ The first workflow should classify content into one of these groups, make the ma
 - Les fichiers `favicon.png`, `favicon.ico`, `apps/extension/public/icon-32.png` et `apps/extension/public/icon-128.png` ont ete regeneres depuis l'asset AcadéPost.
 - Les endpoints statiques `/logo.svg` et `/logo-text.svg` servent une variante AcadéPost.
 - La preview publique remplace le vieux wordmark inline par le nom `AcadéPost`.
+
+## Nettoyage references marque - 2026-05-15
+
+- Passe BYAN/Codex: les derniers noms directs de l'ancienne marque ont ete retires du runbook demo, du contexte BYAN et de la ligne d'audit du plan.
+- Verification: recherche directe des noms legacy dans les app/docs publics sans resultat; recherche mojibake hors memoire dediee sans resultat; `git diff --check` passe.
+- Exceptions techniques inchangees: aliases internes, variables d'environnement historiques, cles techniques et piste legale `LICENSE`.
 
 ## Open Questions
 
