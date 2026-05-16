@@ -226,6 +226,16 @@ The first workflow should classify content into one of these groups, make the ma
 - `/api/monitor/ready` retourne un statut minimal sans exposer hosts/ports internes des dependances.
 - Rapport dedie ajoute: `docs/security/acadepost-security-review-2026-05-16.md`.
 
+## Social Provider Readiness - 2026-05-16
+
+- BYAN Marc a inventorie les providers reels dans `libraries/nestjs-libraries/src/integrations/integration.manager.ts` et le flow OAuth `FRONTEND_URL/integrations/social/{provider}`.
+- Verification Context7 effectuee pour les plateformes a risque: TikTok Content Posting API, Meta Facebook/Instagram/Threads publishing et LinkedIn Community Management.
+- Rapport ajoute: `docs/integrations/social-provider-readiness-2026-05-16.md`.
+- Conclusion: AcadéPost garde les providers Postiz-style, mais self-host ne herite pas des credentials/app approvals Postiz Cloud; chaque plateforme doit etre configuree via `.env` et son portail developpeur.
+- Docker demo corrige pour transmettre les credentials manquants: Instagram standalone, Google My Business, Telegram, Twitch, Kick, VK, Neynar/Farcaster, MeWe, Whop, X analytics et Facebook Pixel.
+- Corrections integration: parsing callback MeWe unifie et suppression du log Telegram contenant l'objet chat.
+- Risques suivis: `wrapcast` ne correspond pas au nom public `warpcast` de la doc Postiz, Dribbble contient encore un `refreshToken()` avec endpoints Pinterest, Skool depend d'une extension non disponible dans le build demo.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?

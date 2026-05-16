@@ -58,9 +58,15 @@ export const ContinueIntegration: FC<{
   );
   const modifiedParams = useMemo(() => {
     if (provider === 'mewe') {
+      const hash =
+        typeof window !== 'undefined' ? window.location.hash.substring(1) : '';
+      const hashParams = new URLSearchParams(hash);
       return {
-        state: searchParams.state || '',
-        code: searchParams.loginRequestToken || '',
+        state: hashParams.get('state') || searchParams.state || '',
+        code:
+          hashParams.get('loginRequestToken') ||
+          searchParams.loginRequestToken ||
+          '',
         refresh: searchParams.refresh || '',
       };
     }
@@ -77,17 +83,6 @@ export const ContinueIntegration: FC<{
         ...searchParams,
         state: searchParams.state || '',
         code: searchParams.code + '&&&&' + searchParams.device_id,
-      };
-    }
-
-    if (provider === 'mewe') {
-      const hash =
-        typeof window !== 'undefined' ? window.location.hash.substring(1) : '';
-      const hashParams = new URLSearchParams(hash);
-      return {
-        state: hashParams.get('state') || searchParams.state || '',
-        code: hashParams.get('loginRequestToken') || '',
-        refresh: searchParams.refresh || '',
       };
     }
 
@@ -177,7 +172,7 @@ export const ContinueIntegration: FC<{
             () => {}
           );
         } catch {
-          // Silently ignore — extension may not be available
+          // Silently ignore; the extension may not be available.
         }
       }
 

@@ -58,7 +58,6 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
   }) {
     const chat = await telegramBot.getChat(params.code);
 
-    console.log(JSON.stringify(chat));
     if (!chat?.id) {
       return 'No chat found';
     }
