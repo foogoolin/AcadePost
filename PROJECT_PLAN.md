@@ -224,6 +224,7 @@ The first workflow should classify content into one of these groups, make the ma
 - Upload/render hardening: les remote uploads et rendus template ont des limites de taille et ne loggent plus les payloads de posts publics.
 - Docker hardening: Temporal UI debug bind sur `127.0.0.1` par defaut, shared-infra garde `ACADEPOST_DEMO_DB_PUSH=false` par defaut, `update.sh` avertit sur le tag mutable `:demo` et affiche le digest precedent si disponible.
 - `/api/monitor/ready` retourne un statut minimal sans exposer hosts/ports internes des dependances.
+- Rapport dedie ajoute: `docs/security/acadepost-security-review-2026-05-16.md`.
 
 ## Open Questions
 
