@@ -1,94 +1,171 @@
 # AcadéPost
 
-AcadéPost is a demo-ready social publishing MVP for planning, routing, scheduling, and publishing social content.
+AcadéPost is a self-hostable social publishing workspace for planning, preparing, scheduling and publishing content across multiple social platforms.
 
-The product goal is to help teams prepare, route, schedule, and publish content across social channels with a workflow organized around content type:
+Current version: `v1.1.0`
 
-- Video: YouTube, TikTok, Instagram Reels.
-- Short text: Threads, X.
-- Carousel: Meta, Pinterest.
+## Overview
 
-## Current MVP
+AcadéPost provides a team workspace for social publishing:
 
-This repository keeps the existing upstream architecture for speed:
+- Multi-project publishing workspaces.
+- Calendar-based scheduled posts.
+- Media library.
+- Social channel connections.
+- Project-level provider credentials.
+- n8n/webhook agent integration.
+- Human-in-the-loop and full-access agent workflows.
+- Editor presets for reusable post and carousel visuals.
+- Docker-based self-hosted demo deployment.
 
-- pnpm monorepo.
-- Next.js frontend.
-- NestJS backend.
-- Prisma with PostgreSQL.
-- Redis.
-- Temporal.
-- Docker Compose for local/self-hosted runtime.
+The product is currently an MVP. Provider code can exist before a platform is fully verified with real developer credentials, app review and live publishing smoke tests.
 
-Some legacy internal aliases and package names may remain during the first MVP when changing them would risk build stability. Customer-facing product language should use AcadéPost.
+## MVP Provider Credentials
 
-## Project Memory
+The first provider credentials gate focuses on:
 
-The project plan lives in `PROJECT_PLAN.md` and must be updated after meaningful changes.
+- Telegram.
+- Facebook Pages.
+- Instagram Business.
+- Threads.
+- YouTube.
+- Pinterest.
 
-Working rules for future coding agents live in `AGENTS.md`.
+Credentials are configured per project from the AcadéPost UI. Facebook, Instagram and Threads are treated as separate credentials, even when a user manually reuses the same Meta app values.
 
-## Local Development
+`.env` is still used for infrastructure and legacy/demo fallback values such as database, Redis, public URL, JWT, encryption key, SMTP and optional provider fallback credentials.
 
-Install dependencies:
+## Deployment
 
-```bash
-pnpm install
+AcadéPost publishes a demo Docker image to GitHub Container Registry:
+
+```text
+ghcr.io/foogoolin/acadepost:demo
 ```
 
-Start local infrastructure:
+Versioned images are also published for releases, for example:
 
-```bash
-pnpm run dev:docker
+```text
+ghcr.io/foogoolin/acadepost:v1.1.0
 ```
 
-Generate Prisma client and push the schema:
+Two Compose modes are provided:
 
-```bash
-pnpm run prisma-generate
-pnpm run prisma-db-push
-```
+- `docker-compose.demo.yaml` for a clean VPS stack.
+- `docker-compose.demo.shared-infra.yaml` for servers that already provide reverse proxy, PostgreSQL and Docker networks.
 
-Run the app:
-
-```bash
-pnpm run dev
-```
-
-## Docker Demo
-
-The main `docker-compose.yaml` is configured as an AcadéPost self-hosted demo stack. It builds the local code with `Dockerfile.dev` and runs the app with PostgreSQL, Redis, and Temporal.
-
-```bash
-docker compose up --build
-```
-
-For a raw single-server demo deployment, use the dedicated demo compose:
+Example first-time setup:
 
 ```bash
 cp .env.demo.example .env.demo
 bash deploy/demo/server-up.sh
 ```
 
-On a Linux VPS, the assisted demo launcher can create `.env.demo`, generate demo secrets, pull the prebuilt `ghcr.io/foogoolin/acadepost:demo` image, validate Compose, and start the stack:
-
-```bash
-ACADEPOST_PUBLIC_URL=http://SERVER_IP:4007 bash deploy/demo/server-up.sh
-```
-
-See `docs/demo-server-deploy.md`.
-
-For a server that already has Caddy, shared PostgreSQL, and Docker networks named `proxy` and `backend`, use the shared-infra demo compose instead:
+Shared-infra setup:
 
 ```bash
 cp .env.demo.shared-infra.example .env.demo.shared-infra
 bash deploy/demo/server-up-shared-infra.sh
 ```
 
-See `docs/demo-shared-infra-deploy.md`.
+Deployment docs:
 
-## Design Intake
+- `docs/demo-server-deploy.md`
+- `docs/demo-shared-infra-deploy.md`
+- `docs/demo-docker-update.md`
 
-Claude Code design rules, markdown instructions, CSS tokens, or component references should be added under `docs/design/` and then adapted to the actual frontend stack.
+## Configuration
 
-Do not paste design rules directly into implementation files until they are reviewed and mapped to existing AcadéPost components/styles.
+Important runtime values are supplied through `.env`:
+
+```env
+ACADEPOST_PUBLIC_URL=https://your-domain.example
+ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:demo
+DATABASE_URL=postgresql://user:password@postgres:5432/acadepost
+JWT_SECRET=change-me
+ACADEPOST_CREDENTIALS_ENCRYPTION_KEY=change-me
+TRUST_PROXY=true
+```
+
+External platform apps must use callback URLs in this form:
+
+```text
+https://your-domain.example/integrations/social/{provider}
+```
+
+Examples:
+
+```text
+https://your-domain.example/integrations/social/facebook
+https://your-domain.example/integrations/social/instagram
+https://your-domain.example/integrations/social/threads
+https://your-domain.example/integrations/social/youtube
+https://your-domain.example/integrations/social/pinterest
+```
+
+Telegram uses a bot token rather than OAuth. Create the bot in BotFather, add the bot to the group/channel, then connect it from the AcadéPost UI.
+
+## Local Development
+
+Required Node version:
+
+```text
+>=22.12.0 <23.0.0
+```
+
+Install dependencies:
+
+```bash
+corepack enable
+corepack pnpm install --frozen-lockfile
+```
+
+Generate Prisma client:
+
+```bash
+corepack pnpm run prisma-generate
+```
+
+Start local infrastructure:
+
+```bash
+corepack pnpm run dev:docker
+```
+
+Run the app:
+
+```bash
+corepack pnpm run dev
+```
+
+## Verification
+
+```bash
+corepack pnpm run prisma-generate
+corepack pnpm --filter ./apps/backend run build
+corepack pnpm --filter ./apps/orchestrator run build
+corepack pnpm --filter ./apps/frontend run build
+git diff --check
+```
+
+Backend and orchestrator builds may need a larger Node heap locally:
+
+```bash
+export NODE_OPTIONS=--max-old-space-size=8192
+```
+
+PowerShell:
+
+```powershell
+$env:NODE_OPTIONS='--max-old-space-size=8192'
+```
+
+## Documentation
+
+- `PROJECT_PLAN.md` - current implementation plan and decisions.
+- `CHANGELOG.md` - version history.
+- `AGENTS.md` - working rules for coding agents.
+- `docs/integrations/social-provider-readiness-2026-05-16.md` - provider readiness matrix.
+- `docs/product/postiz-feature-comparison-2026-05-16.md` - feature comparison and product gaps.
+- `docs/security/acadepost-security-review-2026-05-16.md` - latest security review.
+- `docs/codex-project-memory.md` - encoding and mojibake guardrails.

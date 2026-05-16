@@ -281,6 +281,10 @@ The first workflow should classify content into one of these groups, make the ma
 
 ## MVP Provider Credentials Gate - 2026-05-16
 
+- Version produit fixee: `v1.1.0`.
+- README public remplace l'ancien brouillon interne: presentation produit, providers MVP, deploiement, configuration, developpement local et documentation.
+- `CHANGELOG.md` ajoute avec les notes `v1.1.0` et le baseline `v1.0.0`.
+- GitHub Actions demo image publie maintenant `ghcr.io/foogoolin/acadepost:demo`, `ghcr.io/foogoolin/acadepost:v1.1.0` et le tag SHA.
 - Scope implemente directement dans `main`: Telegram, Facebook Pages, Instagram Business, Threads, YouTube et Pinterest.
 - Source de checklist: documentation Postiz providers pour champs requis, redirect URIs, permissions/scopes et caveats tester/app-review; l'architecture `.env` Postiz n'est pas reprise comme modele principal.
 - BYAN workflow: Rachid a valide que Docker/GHCR/update path reste `pull` + `up --no-build`; Marc a audite le contrat credentials/API; Skeptic a audite les risques security et a bloque toute promesse de fonctionnement sans smoke test reel.
