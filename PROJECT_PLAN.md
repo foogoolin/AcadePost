@@ -250,6 +250,14 @@ The first workflow should classify content into one of these groups, make the ma
 - L'orchestrator et le refresh workflow resolvent aussi les credentials projet pour les providers qui en ont besoin pendant publication ou refresh token.
 - Docker demo expose et genere `ACADEPOST_CREDENTIALS_ENCRYPTION_KEY`; le domaine reste configurable par `.env`, jamais encode dans l'image.
 
+## Vibe-coding / Open-source Rework Guardrails - 2026-05-16
+
+- Ajout de `docs/vibecoder-open-source-rework-guardrails.md` comme checklist owner-facing pour travailler avec des LLM sur un fork open-source.
+- Les regles projet `AGENTS.md` incluent maintenant des garde-fous explicites: verifier avant de declarer une feature fonctionnelle, ne pas exposer de secrets, garder Docker domain-agnostic, controler les agents Full Access et ne pas pretendre qu'un provider social fonctionne sans smoke test reel.
+- Decisions appliquees a AcadéPost: le rebrand ne doit pas masquer les contraintes de licence/attribution, le fork n'herite pas des approvals/credentials SaaS du produit upstream, et les integrations sociales restent le risque produit prioritaire.
+- Nouveau gate de travail: toute demande LLM substantielle doit finir par un artefact verifiable, par exemple source, reference de fichier, build/test, smoke flow ou risque ouvert dans `PROJECT_PLAN.md`.
+- Sources de reference ajoutees dans le document: GitHub licensing, ChooseALicense, OWASP LLM Top 10, OpenSSF Scorecard et OpenSSF Best Practices.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?

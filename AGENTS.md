@@ -35,3 +35,13 @@
 
 - Legal and licensing decisions are handled by the project owner.
 - Do not block engineering work on legal interpretation unless the owner asks for it.
+
+## LLM / Vibe-coding Guardrails
+
+- Treat LLM output as a draft until it is backed by source links, code references, passing checks, or an explicit risk note.
+- Before claiming a feature works, verify the full path: UI, API, persistence, auth/RBAC, Docker/env impact, build, and smoke flow.
+- Do not claim any social provider works until a real developer app, callback URL, credential, connect flow, publish/schedule test, and release/status verification have passed.
+- Do not paste or preserve real secrets in prompts, docs, logs, screenshots, or reports. Any exposed token should be considered compromised and rotated.
+- Keep Docker images domain-agnostic. Domains, ports, credentials, database URLs, and OAuth callback hosts belong in `.env` or reverse-proxy config.
+- For agent automation, keep Human in the loop as the default. Full Access must be explicit, scoped, revocable, and separate from the project API key.
+- Use `docs/vibecoder-open-source-rework-guardrails.md` as the owner-facing checklist when adapting upstream open-source behavior into AcadéPost.
