@@ -66,6 +66,7 @@ import { AgentRunsService } from '@gitroom/nestjs-libraries/database/prisma/agen
 import { ExternalAgentsService } from '@gitroom/nestjs-libraries/database/prisma/external-agents/external.agents.service';
 import { PublicAgentRunDto } from '@gitroom/nestjs-libraries/dtos/external-agents/external.agents.dto';
 import { makeId } from '@gitroom/nestjs-libraries/services/make.is';
+import { ProviderCredentialsService } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.service';
 
 @ApiTags('Public API')
 @Controller('/public/v1')
@@ -81,7 +82,8 @@ export class PublicIntegrationsController {
     private _refreshIntegrationService: RefreshIntegrationService,
     private _postTemplatesService: PostTemplatesService,
     private _agentRunsService: AgentRunsService,
-    private _externalAgentsService: ExternalAgentsService
+    private _externalAgentsService: ExternalAgentsService,
+    private _providerCredentialsService: ProviderCredentialsService
   ) {}
 
   @Post('/upload')
@@ -493,8 +495,23 @@ export class PublicIntegrationsController {
     }
 
     try {
+      const existingIntegration = refresh
+        ? await this._integrationService.getIntegrationById(org.id, refresh)
+        : undefined;
+      const runtimeClientInformation = existingIntegration?.providerCredentialId
+        ? await this._providerCredentialsService.resolveClientInformationByCredentialId(
+            org.id,
+            integration,
+            existingIntegration.providerCredentialId
+          )
+        : await this._providerCredentialsService.resolveClientInformation(
+            org.id,
+            integration
+          );
       const { codeVerifier, state, url } =
-        await integrationProvider.generateAuthUrl();
+        await integrationProvider.generateAuthUrl(
+          runtimeClientInformation || undefined
+        );
 
       if (refresh) {
         await ioRedis.set(`refresh:${state}`, refresh, 'EX', 3600);
@@ -502,6 +519,14 @@ export class PublicIntegrationsController {
 
       await ioRedis.set(`organization:${state}`, org.id, 'EX', 3600);
       await ioRedis.set(`login:${state}`, codeVerifier, 'EX', 3600);
+      if (runtimeClientInformation?.credentialId) {
+        await ioRedis.set(
+          `credential:${state}`,
+          runtimeClientInformation.credentialId,
+          'EX',
+          3600
+        );
+      }
 
       return { url };
     } catch (err) {

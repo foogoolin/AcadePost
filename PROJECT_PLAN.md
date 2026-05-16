@@ -258,6 +258,18 @@ The first workflow should classify content into one of these groups, make the ma
 - Nouveau gate de travail: toute demande LLM substantielle doit finir par un artefact verifiable, par exemple source, reference de fichier, build/test, smoke flow ou risque ouvert dans `PROJECT_PLAN.md`.
 - Sources de reference ajoutees dans le document: GitHub licensing, ChooseALicense, OWASP LLM Top 10, OpenSSF Scorecard et OpenSSF Best Practices.
 
+## Security/Posting Reliability Pass - 2026-05-16
+
+- Decision owner: les membres d'un projet peuvent utiliser/tester les agents webhook du projet, mais la creation, modification, suppression, URL webhook, secret et scopes `Full Access` sont reserves aux roles `ADMIN`/`SUPERADMIN`.
+- Les endpoints app `/agent-webhooks` gardent `list`, `test` et `run` accessibles aux membres authentifies du projet; `POST`, `PUT` et `DELETE` exigent maintenant `Sections.ADMIN`.
+- Les secrets des nouveaux agents externes sont stockes en HMAC `hmac-sha256` avec comparaison timing-safe; le format chiffre historique reste accepte en fallback pour ne pas casser les agents demo existants.
+- Nouveau lien de fiabilite publication: `Integration` peut maintenant stocker `providerCredentialId`, afin qu'un canal social reste attache au credential utilise pendant son OAuth connect.
+- Le flow OAuth stocke le `credentialId` dans Redis avec le `state`; le callback sauvegarde cette valeur dans l'integration creee.
+- Les workflows `refresh` et `orchestrator post/comment` resolvent d'abord le credential rattache au canal, puis retombent sur le credential actif ou `.env` seulement si aucun credential n'est lie.
+- L'endpoint public `/public/v1/social/:integration` utilise aussi les credentials projet et transporte le `credentialId` dans le state OAuth.
+- Les providers encore non relies au runtime credentials UI sont marques dans les notes de configuration: Discord, Slack, Mastodon, Dribbble, Kick, Twitch, VK, Farcaster/Warpcast, Telegram, MeWe et Whop restent dependants des variables serveur `.env` pour le MVP.
+- Verification locale: `prisma generate`, backend build, orchestrator build, frontend build, `docker compose config --quiet` pour clean-VPS et shared-infra, recherche mojibake hors memoire dediee et `git diff --check` passent. Avertissement connu: Node local `v24.13.0` au lieu de la plage cible Node 22.x.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?

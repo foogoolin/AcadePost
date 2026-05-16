@@ -152,11 +152,7 @@ export class PostActivity {
     const getIntegration = this._integrationManager.getSocialIntegration(
       integration.providerIdentifier
     );
-    const clientInformation =
-      await this._providerCredentialsService.resolveClientInformation(
-        integration.organizationId,
-        integration.providerIdentifier
-      );
+    const clientInformation = await this.resolveClientInformation(integration);
 
     const newPosts = await this._postService.updateTags(
       integration.organizationId,
@@ -209,11 +205,7 @@ export class PostActivity {
     const getIntegration = this._integrationManager.getSocialIntegration(
       integration.providerIdentifier
     );
-    const clientInformation =
-      await this._providerCredentialsService.resolveClientInformation(
-        integration.organizationId,
-        integration.providerIdentifier
-      );
+    const clientInformation = await this.resolveClientInformation(integration);
 
     const newPosts = await this._postService.updateTags(
       integration.organizationId,
@@ -273,6 +265,19 @@ export class PostActivity {
       });
 
     return postNow;
+  }
+
+  private resolveClientInformation(integration: Integration) {
+    return integration.providerCredentialId
+      ? this._providerCredentialsService.resolveClientInformationByCredentialId(
+          integration.organizationId,
+          integration.providerIdentifier,
+          integration.providerCredentialId
+        )
+      : this._providerCredentialsService.resolveClientInformation(
+          integration.organizationId,
+          integration.providerIdentifier
+        );
   }
 
   @ActivityMethod()

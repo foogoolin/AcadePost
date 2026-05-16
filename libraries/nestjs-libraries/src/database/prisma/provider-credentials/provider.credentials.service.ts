@@ -192,11 +192,49 @@ export class ProviderCredentialsService {
       providerIdentifier
     );
 
-    if (!credentials) {
-      return undefined;
+    return credentials
+      ? this.clientInformationFromRuntimeCredentials(credentials)
+      : undefined;
+  }
+
+  async resolveClientInformationByCredentialId(
+    orgId: string,
+    providerIdentifier: string,
+    credentialId: string
+  ) {
+    const credential = await this._providerCredentialsRepository.get(
+      orgId,
+      credentialId
+    );
+    if (!credential || !credential.enabled) {
+      throw new NotFoundException('Credential not found');
     }
 
+    const lookup = this.lookupFor(providerIdentifier);
+    if (!lookup.includes(credential.providerIdentifier as any)) {
+      throw new BadRequestException('Credential does not match provider');
+    }
+
+    const fields = this.decrypt(
+      orgId,
+      credential.providerIdentifier,
+      credential.encryptedData
+    );
+
+    return this.clientInformationFromRuntimeCredentials({
+      credentialId: credential.id,
+      providerIdentifier: credential.providerIdentifier,
+      fields,
+      source: 'database',
+    });
+  }
+
+  private clientInformationFromRuntimeCredentials(
+    credentials: ProviderRuntimeCredentials
+  ) {
     return {
+      credentialId: credentials.credentialId || '',
+      credentialSource: credentials.source,
       client_id:
         credentials.fields.clientId ||
         credentials.fields.appId ||

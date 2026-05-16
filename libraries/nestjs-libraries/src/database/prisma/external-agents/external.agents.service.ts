@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import crypto from 'crypto';
 import { ExternalAgent } from '@prisma/client';
 import { AuthService } from '@gitroom/helpers/auth/auth.service';
 import { makeId } from '@gitroom/nestjs-libraries/services/make.is';
@@ -42,7 +43,7 @@ export class ExternalAgentsService {
     const agent = await this._externalAgentsRepository.create(
       orgId,
       this.normalizeBody(body),
-      AuthService.fixedEncryption(secret)
+      this.hashSecret(secret)
     );
 
     return {
@@ -54,7 +55,7 @@ export class ExternalAgentsService {
   async update(orgId: string, id: string, body: ExternalAgentDto) {
     await this.get(orgId, id);
     const encryptedSecret = body.secret
-      ? AuthService.fixedEncryption(body.secret)
+      ? this.hashSecret(body.secret)
       : undefined;
     const agent = await this._externalAgentsRepository.update(
       orgId,
@@ -117,7 +118,7 @@ export class ExternalAgentsService {
       throw new BadRequestException('Agent is disabled');
     }
 
-    if (AuthService.fixedEncryption(secret) !== agent.secret) {
+    if (!this.secretMatches(secret, agent.secret)) {
       throw new BadRequestException('Invalid agent secret');
     }
 
@@ -200,6 +201,30 @@ export class ExternalAgentsService {
       accessMode,
       scopes,
     };
+  }
+
+  private hashSecret(secret: string) {
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new BadRequestException('JWT_SECRET is required before creating agent secrets');
+    }
+
+    return `hmac-sha256:${crypto
+      .createHmac('sha256', jwtSecret)
+      .update(secret)
+      .digest('hex')}`;
+  }
+
+  private secretMatches(secret: string, storedSecret: string) {
+    const candidate = storedSecret.startsWith('hmac-sha256:')
+      ? this.hashSecret(secret)
+      : AuthService.fixedEncryption(secret);
+    const candidateBuffer = Buffer.from(candidate);
+    const storedBuffer = Buffer.from(storedSecret);
+    return (
+      candidateBuffer.length === storedBuffer.length &&
+      crypto.timingSafeEqual(candidateBuffer, storedBuffer)
+    );
   }
 
   private getScopes(agent: ExternalAgent) {

@@ -94,11 +94,20 @@ export class NoAuthIntegrationsController {
     if (onboarding) {
       await ioRedis.del(`onboarding:${body.state}`);
     }
-    const runtimeClientInformation =
-      await this._providerCredentialsService.resolveClientInformation(
-        org.id,
-        integration
-      );
+    const providerCredentialId = await ioRedis.get(`credential:${body.state}`);
+    if (providerCredentialId) {
+      await ioRedis.del(`credential:${body.state}`);
+    }
+    const runtimeClientInformation = providerCredentialId
+      ? await this._providerCredentialsService.resolveClientInformationByCredentialId(
+          org.id,
+          integration,
+          providerCredentialId
+        )
+      : await this._providerCredentialsService.resolveClientInformation(
+          org.id,
+          integration
+        );
     const externalDetails = details ? JSON.parse(details) : undefined;
     const clientInformation = {
       ...(runtimeClientInformation || {}),
@@ -248,7 +257,8 @@ export class NoAuthIntegrationsController {
           ? AuthService.signJWT(
               JSON.parse(Buffer.from(body.code, 'base64').toString())
             )
-          : undefined
+          : undefined,
+        providerCredentialId || undefined
       );
 
     this._refreshIntegrationService
@@ -399,7 +409,8 @@ export class NoAuthIntegrationsController {
       undefined,
       AuthService.signJWT(
         JSON.parse(Buffer.from(body.cookies, 'base64').toString())
-      )
+      ),
+      integration.providerCredentialId || undefined
     );
 
     return { success: true };

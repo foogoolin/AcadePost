@@ -44,6 +44,9 @@ const clientFields = (
   },
 ];
 
+const serverRuntimeNote =
+  "MVP: ce fournisseur utilise encore les variables serveur .env au runtime; l'identifiant UI ne remplace pas encore la configuration serveur.";
+
 export const PROVIDER_CREDENTIAL_DEFINITIONS: ProviderCredentialDefinition[] = [
   {
     identifier: 'x',
@@ -151,12 +154,14 @@ export const PROVIDER_CREDENTIAL_DEFINITIONS: ProviderCredentialDefinition[] = [
         placeholder: 'bot-token',
       },
     ],
+    notes: [serverRuntimeNote],
   },
   {
     identifier: 'slack',
     name: 'Slack',
     group: 'Community',
     fields: clientFields('SLACK_ID', 'SLACK_SECRET', 'Client ID', 'Client Secret'),
+    notes: [serverRuntimeNote],
   },
   {
     identifier: 'mastodon',
@@ -173,24 +178,28 @@ export const PROVIDER_CREDENTIAL_DEFINITIONS: ProviderCredentialDefinition[] = [
       },
       ...clientFields('MASTODON_CLIENT_ID', 'MASTODON_CLIENT_SECRET'),
     ],
+    notes: [serverRuntimeNote],
   },
   {
     identifier: 'dribbble',
     name: 'Dribbble',
     group: 'Creative',
     fields: clientFields('DRIBBBLE_CLIENT_ID', 'DRIBBBLE_CLIENT_SECRET'),
+    notes: [serverRuntimeNote],
   },
   {
     identifier: 'kick',
     name: 'Kick',
     group: 'Community',
     fields: clientFields('KICK_CLIENT_ID', 'KICK_SECRET', 'Client ID', 'Secret'),
+    notes: [serverRuntimeNote],
   },
   {
     identifier: 'twitch',
     name: 'Twitch',
     group: 'Community',
     fields: clientFields('TWITCH_CLIENT_ID', 'TWITCH_CLIENT_SECRET'),
+    notes: [serverRuntimeNote],
   },
   {
     identifier: 'vk',
@@ -206,12 +215,14 @@ export const PROVIDER_CREDENTIAL_DEFINITIONS: ProviderCredentialDefinition[] = [
         placeholder: 'vk-app-id',
       },
     ],
+    notes: [serverRuntimeNote],
   },
   {
     identifier: 'wrapcast',
     name: 'Farcaster / Warpcast',
     group: 'Web3',
     fields: clientFields('NEYNAR_CLIENT_ID', 'NEYNAR_SECRET_KEY', 'Neynar Client ID', 'Neynar Secret Key'),
+    notes: [serverRuntimeNote],
   },
   {
     identifier: 'telegram',
@@ -235,6 +246,7 @@ export const PROVIDER_CREDENTIAL_DEFINITIONS: ProviderCredentialDefinition[] = [
         placeholder: 'acadepost_bot',
       },
     ],
+    notes: [serverRuntimeNote],
   },
   {
     identifier: 'mewe',
@@ -251,6 +263,7 @@ export const PROVIDER_CREDENTIAL_DEFINITIONS: ProviderCredentialDefinition[] = [
       },
       ...clientFields('MEWE_APP_ID', 'MEWE_API_KEY', 'App ID', 'API Key'),
     ],
+    notes: [serverRuntimeNote],
   },
   {
     identifier: 'whop',
@@ -266,6 +279,7 @@ export const PROVIDER_CREDENTIAL_DEFINITIONS: ProviderCredentialDefinition[] = [
         placeholder: 'whop-client-id',
       },
     ],
+    notes: [serverRuntimeNote],
   },
 ];
 

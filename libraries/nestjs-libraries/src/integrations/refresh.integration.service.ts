@@ -40,7 +40,13 @@ export class RefreshIntegrationService {
       integration.providerIdentifier,
       refresh.accessToken,
       refresh.refreshToken,
-      refresh.expiresIn
+      refresh.expiresIn,
+      undefined,
+      false,
+      undefined,
+      undefined,
+      undefined,
+      integration.providerCredentialId || undefined
     );
 
     return refresh;
@@ -75,11 +81,16 @@ export class RefreshIntegrationService {
     socialProvider: SocialProvider,
     cause = ''
   ): Promise<AuthTokenDetails | false> {
-    const clientInformation =
-      await this._providerCredentialsService.resolveClientInformation(
-        integration.organizationId,
-        integration.providerIdentifier
-      );
+    const clientInformation = integration.providerCredentialId
+      ? await this._providerCredentialsService.resolveClientInformationByCredentialId(
+          integration.organizationId,
+          integration.providerIdentifier,
+          integration.providerCredentialId
+        )
+      : await this._providerCredentialsService.resolveClientInformation(
+          integration.organizationId,
+          integration.providerIdentifier
+        );
     const refresh: false | AuthTokenDetails = await socialProvider
       .refreshToken(integration.refreshToken, clientInformation)
       .catch((err) => false);

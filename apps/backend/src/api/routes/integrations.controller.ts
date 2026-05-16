@@ -223,11 +223,19 @@ export class IntegrationsController {
             instanceUrl: externalUrl,
           }
         : undefined;
-      const runtimeClientInformation =
-        await this._providerCredentialsService.resolveClientInformation(
-          org.id,
-          integration
-        );
+      const existingIntegration = refresh
+        ? await this._integrationService.getIntegrationById(org.id, refresh)
+        : undefined;
+      const runtimeClientInformation = existingIntegration?.providerCredentialId
+        ? await this._providerCredentialsService.resolveClientInformationByCredentialId(
+            org.id,
+            integration,
+            existingIntegration.providerCredentialId
+          )
+        : await this._providerCredentialsService.resolveClientInformation(
+            org.id,
+            integration
+          );
       const clientInformation = {
         ...(runtimeClientInformation || {}),
         ...(getExternalUrl || {}),
@@ -252,6 +260,14 @@ export class IntegrationsController {
 
       await ioRedis.set(`organization:${state}`, org.id, 'EX', 3600);
       await ioRedis.set(`login:${state}`, codeVerifier, 'EX', 3600);
+      if (runtimeClientInformation?.credentialId) {
+        await ioRedis.set(
+          `credential:${state}`,
+          runtimeClientInformation.credentialId,
+          'EX',
+          3600
+        );
+      }
       await ioRedis.set(
         `external:${state}`,
         JSON.stringify(getExternalUrl || {}),

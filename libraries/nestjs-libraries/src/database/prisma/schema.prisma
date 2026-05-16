@@ -339,9 +339,11 @@ model Integration {
   customerId            String?
   rootInternalId        String?
   additionalSettings    String?                @default("[]")
+  providerCredentialId  String?
   exisingPlugData       ExisingPlugData[]
   customer              Customer?              @relation(fields: [customerId], references: [id])
   organization          Organization           @relation(fields: [organizationId], references: [id])
+  providerCredential    ProviderCredential?    @relation(fields: [providerCredentialId], references: [id])
   webhooks              IntegrationsWebhooks[]
   orderItems            OrderItems[]
   plugs                 Plugs[]
@@ -355,6 +357,7 @@ model Integration {
   @@index([createdAt])
   @@index([deletedAt])
   @@index([customerId])
+  @@index([providerCredentialId])
   @@index([inBetweenSteps])
   @@index([refreshNeeded])
   @@index([disabled])
@@ -706,6 +709,7 @@ model ProviderCredential {
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt
   organization       Organization @relation(fields: [organizationId], references: [id])
+  integrations        Integration[]
 
   @@index([organizationId])
   @@index([providerIdentifier])

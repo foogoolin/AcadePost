@@ -16,6 +16,11 @@ import {
   RunExternalAgentDto,
   UpdateExternalAgentDto,
 } from '@gitroom/nestjs-libraries/dtos/external-agents/external.agents.dto';
+import { CheckPolicies } from '@gitroom/backend/services/auth/permissions/permissions.ability';
+import {
+  AuthorizationActions,
+  Sections,
+} from '@gitroom/backend/services/auth/permissions/permission.exception.class';
 
 @ApiTags('Agent Webhooks')
 @Controller('/agent-webhooks')
@@ -28,6 +33,7 @@ export class AgentWebhooksController {
   }
 
   @Post('/')
+  @CheckPolicies([AuthorizationActions.Create, Sections.ADMIN])
   create(
     @GetOrgFromRequest() org: Organization,
     @Body() body: ExternalAgentDto
@@ -36,6 +42,7 @@ export class AgentWebhooksController {
   }
 
   @Put('/:id')
+  @CheckPolicies([AuthorizationActions.Update, Sections.ADMIN])
   update(
     @GetOrgFromRequest() org: Organization,
     @Param('id') id: string,
@@ -45,6 +52,7 @@ export class AgentWebhooksController {
   }
 
   @Delete('/:id')
+  @CheckPolicies([AuthorizationActions.Delete, Sections.ADMIN])
   delete(@GetOrgFromRequest() org: Organization, @Param('id') id: string) {
     return this._externalAgentsService.delete(org.id, id);
   }

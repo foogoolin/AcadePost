@@ -23,6 +23,7 @@ import Link from 'next/link';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { useToaster } from '@gitroom/react/toaster/toaster';
+import { useUser } from '@gitroom/frontend/components/layout/user.context';
 
 const agentScopes = [
   'media:write',
@@ -291,6 +292,8 @@ const ExternalAgentPanel: FC = () => {
   const fetch = useFetch();
   const toaster = useToaster();
   const t = useT();
+  const user = useUser();
+  const canManageAgents = ['ADMIN', 'SUPERADMIN'].includes(user?.role || '');
   const [draft, setDraft] = useState({
     id: '',
     name: 'Agent n8n',
@@ -394,6 +397,7 @@ const ExternalAgentPanel: FC = () => {
         </div>
       </div>
 
+      {canManageAgents ? (
       <div className="flex flex-col gap-2">
         <input
           className="acadepost-agent-input"
@@ -459,6 +463,12 @@ const ExternalAgentPanel: FC = () => {
           Enregistrer
         </button>
       </div>
+      ) : (
+        <div className="text-[11px] leading-4 text-newTableText">
+          Vous pouvez utiliser les agents de ce projet. La configuration des
+          webhooks et du Full Access est réservée aux administrateurs.
+        </div>
+      )}
 
       <div className="mt-4 flex flex-col gap-2">
         {data?.map((agent: any) => (
@@ -466,14 +476,16 @@ const ExternalAgentPanel: FC = () => {
             <button
               className="min-w-0 flex-1 text-left"
               onClick={() =>
-                setDraft({
-                  id: agent.id,
-                  name: agent.name,
-                  webhookUrl: agent.webhookUrl,
-                  accessMode: agent.accessMode,
-                  enabled: agent.enabled,
-                  scopes: agent.scopes || [],
-                })
+                canManageAgents
+                  ? setDraft({
+                      id: agent.id,
+                      name: agent.name,
+                      webhookUrl: agent.webhookUrl,
+                      accessMode: agent.accessMode,
+                      enabled: agent.enabled,
+                      scopes: agent.scopes || [],
+                    })
+                  : undefined
               }
             >
               <span className="block truncate text-[12px] font-[800]">
@@ -486,7 +498,9 @@ const ExternalAgentPanel: FC = () => {
               </span>
             </button>
             <button onClick={() => testAgent(agent.id)}>Test</button>
-            <button onClick={() => deleteAgent(agent.id)}>×</button>
+            {canManageAgents && (
+              <button onClick={() => deleteAgent(agent.id)}>×</button>
+            )}
           </div>
         ))}
       </div>
