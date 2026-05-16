@@ -48,6 +48,8 @@ import { ExternalAgentsRepository } from '@gitroom/nestjs-libraries/database/pri
 import { ExternalAgentsService } from '@gitroom/nestjs-libraries/database/prisma/external-agents/external.agents.service';
 import { AgentRunsRepository } from '@gitroom/nestjs-libraries/database/prisma/agent-runs/agent.runs.repository';
 import { AgentRunsService } from '@gitroom/nestjs-libraries/database/prisma/agent-runs/agent.runs.service';
+import { ProviderCredentialsRepository } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.repository';
+import { ProviderCredentialsService } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.service';
 
 @Global()
 @Module({
@@ -105,6 +107,8 @@ import { AgentRunsService } from '@gitroom/nestjs-libraries/database/prisma/agen
     ExternalAgentsService,
     AgentRunsRepository,
     AgentRunsService,
+    ProviderCredentialsRepository,
+    ProviderCredentialsService,
   ],
   get exports() {
     return this.providers;

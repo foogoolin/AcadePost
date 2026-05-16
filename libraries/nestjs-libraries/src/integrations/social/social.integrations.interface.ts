@@ -1,9 +1,10 @@
 import { Integration } from '@prisma/client';
 
 export interface ClientInformation {
-  client_id: string;
-  client_secret: string;
-  instanceUrl: string;
+  client_id?: string;
+  client_secret?: string;
+  instanceUrl?: string;
+  [key: string]: string | undefined;
 }
 export interface IAuthenticator {
   authenticate(
@@ -14,7 +15,10 @@ export interface IAuthenticator {
     },
     clientInformation?: ClientInformation
   ): Promise<AuthTokenDetails | string>;
-  refreshToken(refreshToken: string): Promise<AuthTokenDetails>;
+  refreshToken(
+    refreshToken: string,
+    clientInformation?: ClientInformation
+  ): Promise<AuthTokenDetails>;
   reConnect?(
     id: string,
     requiredId: string,

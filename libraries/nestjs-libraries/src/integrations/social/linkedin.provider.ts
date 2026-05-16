@@ -1,5 +1,6 @@
 import {
   AuthTokenDetails,
+  ClientInformation,
   PostDetails,
   PostResponse,
   SocialProvider,
@@ -63,7 +64,14 @@ export class LinkedinProvider extends SocialAbstract implements SocialProvider {
     return undefined;
   }
 
-  async refreshToken(refresh_token: string): Promise<AuthTokenDetails> {
+  async refreshToken(
+    refresh_token: string,
+    clientInformation?: ClientInformation
+  ): Promise<AuthTokenDetails> {
+    const clientId =
+      clientInformation?.client_id || process.env.LINKEDIN_CLIENT_ID!;
+    const clientSecret =
+      clientInformation?.client_secret || process.env.LINKEDIN_CLIENT_SECRET!;
     const {
       access_token: accessToken,
       refresh_token: refreshToken,
@@ -77,8 +85,8 @@ export class LinkedinProvider extends SocialAbstract implements SocialProvider {
         body: new URLSearchParams({
           grant_type: 'refresh_token',
           refresh_token,
-          client_id: process.env.LINKEDIN_CLIENT_ID!,
-          client_secret: process.env.LINKEDIN_CLIENT_SECRET!,
+          client_id: clientId,
+          client_secret: clientSecret,
         }),
       })
     ).json();
@@ -114,11 +122,13 @@ export class LinkedinProvider extends SocialAbstract implements SocialProvider {
     };
   }
 
-  async generateAuthUrl() {
+  async generateAuthUrl(clientInformation?: ClientInformation) {
     const state = makeId(6);
     const codeVerifier = makeId(30);
+    const clientId =
+      clientInformation?.client_id || process.env.LINKEDIN_CLIENT_ID;
     const url = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${
-      process.env.LINKEDIN_CLIENT_ID
+      clientId
     }&prompt=none&redirect_uri=${encodeURIComponent(
       `${process.env.FRONTEND_URL}/integrations/social/linkedin`
     )}&state=${state}&scope=${encodeURIComponent(this.scopes.join(' '))}`;
@@ -129,11 +139,18 @@ export class LinkedinProvider extends SocialAbstract implements SocialProvider {
     };
   }
 
-  async authenticate(params: {
-    code: string;
-    codeVerifier: string;
-    refresh?: string;
-  }) {
+  async authenticate(
+    params: {
+      code: string;
+      codeVerifier: string;
+      refresh?: string;
+    },
+    clientInformation?: ClientInformation
+  ) {
+    const clientId =
+      clientInformation?.client_id || process.env.LINKEDIN_CLIENT_ID!;
+    const clientSecret =
+      clientInformation?.client_secret || process.env.LINKEDIN_CLIENT_SECRET!;
     const body = new URLSearchParams();
     body.append('grant_type', 'authorization_code');
     body.append('code', params.code);
@@ -143,8 +160,8 @@ export class LinkedinProvider extends SocialAbstract implements SocialProvider {
         params.refresh ? `?refresh=${params.refresh}` : ''
       }`
     );
-    body.append('client_id', process.env.LINKEDIN_CLIENT_ID!);
-    body.append('client_secret', process.env.LINKEDIN_CLIENT_SECRET!);
+    body.append('client_id', clientId);
+    body.append('client_secret', clientSecret);
 
     const {
       access_token: accessToken,

@@ -67,6 +67,10 @@ if grep -q "change-this-demo-jwt-secret-use-a-long-random-string" "${ENV_FILE}";
   replace_env_value "JWT_SECRET" "$(random_secret)" "${ENV_FILE}"
 fi
 
+if grep -q "change-this-demo-credentials-encryption-key-use-hex-64" "${ENV_FILE}"; then
+  replace_env_value "ACADEPOST_CREDENTIALS_ENCRYPTION_KEY" "$(random_secret)" "${ENV_FILE}"
+fi
+
 echo "Validating ${COMPOSE_FILE}..."
 docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" config --quiet
 

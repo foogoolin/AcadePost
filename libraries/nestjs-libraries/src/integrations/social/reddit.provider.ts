@@ -1,5 +1,6 @@
 import {
   AuthTokenDetails,
+  ClientInformation,
   PostDetails,
   PostResponse,
   SocialProvider,
@@ -31,15 +32,22 @@ export class RedditProvider extends SocialAbstract implements SocialProvider {
     return 10000;
   }
 
-  async refreshToken(refreshToken: string): Promise<AuthTokenDetails> {
+  async refreshToken(
+    refreshToken: string,
+    clientInformation?: ClientInformation
+  ): Promise<AuthTokenDetails> {
+    const clientId =
+      clientInformation?.client_id || process.env.REDDIT_CLIENT_ID!;
+    const clientSecret =
+      clientInformation?.client_secret || process.env.REDDIT_CLIENT_SECRET!;
     const { access_token: accessToken, expires_in: expiresIn } = await (
       await this.fetch('https://www.reddit.com/api/v1/access_token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${Buffer.from(
-            `${process.env.REDDIT_CLIENT_ID}:${process.env.REDDIT_CLIENT_SECRET}`
-          ).toString('base64')}`,
+          Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString(
+            'base64'
+          )}`,
         },
         body: new URLSearchParams({
           grant_type: 'refresh_token',
@@ -67,11 +75,13 @@ export class RedditProvider extends SocialAbstract implements SocialProvider {
     };
   }
 
-  async generateAuthUrl() {
+  async generateAuthUrl(clientInformation?: ClientInformation) {
     const state = makeId(6);
     const codeVerifier = makeId(30);
+    const clientId =
+      clientInformation?.client_id || process.env.REDDIT_CLIENT_ID;
     const url = `https://www.reddit.com/api/v1/authorize?client_id=${
-      process.env.REDDIT_CLIENT_ID
+      clientId
     }&response_type=code&state=${state}&redirect_uri=${encodeURIComponent(
       `${process.env.FRONTEND_URL}/integrations/social/reddit`
     )}&duration=permanent&scope=${encodeURIComponent(this.scopes.join(' '))}`;
@@ -82,7 +92,14 @@ export class RedditProvider extends SocialAbstract implements SocialProvider {
     };
   }
 
-  async authenticate(params: { code: string; codeVerifier: string }) {
+  async authenticate(
+    params: { code: string; codeVerifier: string },
+    clientInformation?: ClientInformation
+  ) {
+    const clientId =
+      clientInformation?.client_id || process.env.REDDIT_CLIENT_ID!;
+    const clientSecret =
+      clientInformation?.client_secret || process.env.REDDIT_CLIENT_SECRET!;
     const {
       access_token: accessToken,
       refresh_token: refreshToken,
@@ -93,9 +110,9 @@ export class RedditProvider extends SocialAbstract implements SocialProvider {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${Buffer.from(
-            `${process.env.REDDIT_CLIENT_ID}:${process.env.REDDIT_CLIENT_SECRET}`
-          ).toString('base64')}`,
+          Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString(
+            'base64'
+          )}`,
         },
         body: new URLSearchParams({
           grant_type: 'authorization_code',

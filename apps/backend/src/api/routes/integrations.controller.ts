@@ -32,6 +32,7 @@ import {
 } from '@gitroom/backend/services/auth/permissions/permission.exception.class';
 import { uniqBy } from 'lodash';
 import { RefreshIntegrationService } from '@gitroom/nestjs-libraries/integrations/refresh.integration.service';
+import { ProviderCredentialsService } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.service';
 
 @ApiTags('Integrations')
 @Controller('/integrations')
@@ -40,7 +41,8 @@ export class IntegrationsController {
     private _integrationManager: IntegrationManager,
     private _integrationService: IntegrationService,
     private _postService: PostsService,
-    private _refreshIntegrationService: RefreshIntegrationService
+    private _refreshIntegrationService: RefreshIntegrationService,
+    private _providerCredentialsService: ProviderCredentialsService
   ) {}
 
   @Post('/provider/:id/connect')
@@ -221,9 +223,20 @@ export class IntegrationsController {
             instanceUrl: externalUrl,
           }
         : undefined;
+      const runtimeClientInformation =
+        await this._providerCredentialsService.resolveClientInformation(
+          org.id,
+          integration
+        );
+      const clientInformation = {
+        ...(runtimeClientInformation || {}),
+        ...(getExternalUrl || {}),
+      };
 
       const { codeVerifier, state, url } =
-        await integrationProvider.generateAuthUrl(getExternalUrl);
+        await integrationProvider.generateAuthUrl(
+          Object.keys(clientInformation).length ? clientInformation : undefined
+        );
 
       if (refresh) {
         await ioRedis.set(`refresh:${state}`, refresh, 'EX', 3600);
@@ -241,7 +254,7 @@ export class IntegrationsController {
       await ioRedis.set(`login:${state}`, codeVerifier, 'EX', 3600);
       await ioRedis.set(
         `external:${state}`,
-        JSON.stringify(getExternalUrl),
+        JSON.stringify(getExternalUrl || {}),
         'EX',
         3600
       );

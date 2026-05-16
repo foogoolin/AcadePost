@@ -85,6 +85,10 @@ if grep -q "CHANGE_ME_LONG_RANDOM_JWT_SECRET" "${ENV_FILE}"; then
   replace_env_value "JWT_SECRET" "$(random_secret)" "${ENV_FILE}"
 fi
 
+if grep -q "CHANGE_ME_CREDENTIALS_ENCRYPTION_KEY" "${ENV_FILE}"; then
+  replace_env_value "ACADEPOST_CREDENTIALS_ENCRYPTION_KEY" "$(random_secret)" "${ENV_FILE}"
+fi
+
 if grep -q "CHANGE_ME_APP_DB_PASSWORD" "${ENV_FILE}"; then
   echo "DATABASE_URL still contains CHANGE_ME_APP_DB_PASSWORD. Create the shared Postgres DB/user and set DATABASE_URL first." >&2
   exit 1

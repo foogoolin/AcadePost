@@ -1,6 +1,7 @@
 import {
   AnalyticsData,
   AuthTokenDetails,
+  ClientInformation,
   PostDetails,
   PostResponse,
   SocialProvider,
@@ -14,11 +15,16 @@ import dayjs from 'dayjs';
 import { Rules } from '@gitroom/nestjs-libraries/chat/rules.description.decorator';
 import { GmbSettingsDto } from '@gitroom/nestjs-libraries/dtos/posts/providers-settings/gmb.settings.dto';
 
-const clientAndGmb = () => {
+const clientAndGmb = (clientInformation?: ClientInformation) => {
   const client = new google.auth.OAuth2({
-    clientId: process.env.GOOGLE_GMB_CLIENT_ID || process.env.YOUTUBE_CLIENT_ID,
+    clientId:
+      clientInformation?.client_id ||
+      process.env.GOOGLE_GMB_CLIENT_ID ||
+      process.env.YOUTUBE_CLIENT_ID,
     clientSecret:
-      process.env.GOOGLE_GMB_CLIENT_SECRET || process.env.YOUTUBE_CLIENT_SECRET,
+      clientInformation?.client_secret ||
+      process.env.GOOGLE_GMB_CLIENT_SECRET ||
+      process.env.YOUTUBE_CLIENT_SECRET,
     redirectUri: `${process.env.FRONTEND_URL}/integrations/social/gmb`,
   });
 
@@ -104,8 +110,11 @@ export class GmbProvider extends SocialAbstract implements SocialProvider {
     return undefined;
   }
 
-  async refreshToken(refresh_token: string): Promise<AuthTokenDetails> {
-    const { client, oauth2 } = clientAndGmb();
+  async refreshToken(
+    refresh_token: string,
+    clientInformation?: ClientInformation
+  ): Promise<AuthTokenDetails> {
+    const { client, oauth2 } = clientAndGmb(clientInformation);
     client.setCredentials({ refresh_token });
     const { credentials } = await client.refreshAccessToken();
     const user = oauth2(client);
@@ -127,9 +136,9 @@ export class GmbProvider extends SocialAbstract implements SocialProvider {
     };
   }
 
-  async generateAuthUrl() {
+  async generateAuthUrl(clientInformation?: ClientInformation) {
     const state = makeId(7);
-    const { client } = clientAndGmb();
+    const { client } = clientAndGmb(clientInformation);
     return {
       url: client.generateAuthUrl({
         access_type: 'offline',
@@ -143,12 +152,15 @@ export class GmbProvider extends SocialAbstract implements SocialProvider {
     };
   }
 
-  async authenticate(params: {
-    code: string;
-    codeVerifier: string;
-    refresh?: string;
-  }) {
-    const { client, oauth2 } = clientAndGmb();
+  async authenticate(
+    params: {
+      code: string;
+      codeVerifier: string;
+      refresh?: string;
+    },
+    clientInformation?: ClientInformation
+  ) {
+    const { client, oauth2 } = clientAndGmb(clientInformation);
     const { tokens } = await client.getToken(params.code);
     client.setCredentials(tokens);
     const { scopes } = await client.getTokenInfo(tokens.access_token!);

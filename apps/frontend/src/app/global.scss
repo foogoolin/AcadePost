@@ -1527,6 +1527,280 @@ html[dir='rtl'] [dir='ltr'] {
   padding: 5px 7px;
 }
 
+.acadepost-credentials-shell {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 16px;
+  color: rgb(var(--new-textColor));
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.acadepost-credentials-header,
+.acadepost-credentials-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.acadepost-credentials-header h2,
+.acadepost-credentials-card h3 {
+  margin: 0;
+  color: rgb(var(--new-textColor));
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+.acadepost-credentials-header p {
+  margin-top: 6px;
+  max-width: 680px;
+  color: var(--new-table-text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.acadepost-credentials-kicker,
+.acadepost-credentials-group {
+  color: var(--new-table-text);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.acadepost-credentials-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(340px, 1fr) minmax(
+      280px,
+      360px
+    );
+  gap: 14px;
+}
+
+.acadepost-credentials-card {
+  border: 1px solid var(--new-bgLineColor);
+  border-radius: 8px;
+  background: var(--new-bgColorInner);
+  padding: 16px;
+}
+
+.acadepost-credentials-provider,
+.acadepost-credentials-copy,
+.acadepost-credentials-row {
+  border: 1px solid var(--new-bgLineColor);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--new-bgColor) 86%, transparent);
+  color: rgb(var(--new-textColor));
+}
+
+.acadepost-credentials-provider {
+  display: flex;
+  min-height: 54px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 10px;
+  text-align: left;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.acadepost-credentials-provider:hover,
+.acadepost-credentials-provider.is-active {
+  border-color: #292929;
+  background: color-mix(in srgb, var(--new-bgColor) 72%, #4cccb8 12%);
+}
+
+.acadepost-credentials-provider span {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.acadepost-credentials-provider small,
+.acadepost-credentials-row span {
+  color: var(--new-table-text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.acadepost-credentials-warning {
+  max-width: 360px;
+  border: 1px solid rgba(253, 161, 0, 0.45);
+  border-radius: 6px;
+  background: rgba(253, 161, 0, 0.12);
+  color: rgb(var(--new-textColor));
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.45;
+  padding: 10px 12px;
+}
+
+.acadepost-credentials-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: rgb(var(--new-textColor));
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.acadepost-credentials-fields {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.acadepost-credentials-field input {
+  min-height: 42px;
+  width: 100%;
+  border: 1px solid var(--new-bgLineColor);
+  border-radius: 6px;
+  background: var(--new-bgColor);
+  color: rgb(var(--new-textColor));
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  padding: 0 11px;
+}
+
+.acadepost-credentials-field input:focus {
+  border-color: #292929;
+}
+
+.acadepost-credentials-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--new-table-text);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.acadepost-credentials-toggle input {
+  accent-color: #292929;
+}
+
+.acadepost-credentials-button,
+.acadepost-credentials-row-actions button {
+  min-height: 38px;
+  border-radius: 6px;
+  background: #292929;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 0 13px;
+}
+
+.acadepost-credentials-button.secondary,
+.acadepost-credentials-row-actions button:not(:first-child) {
+  border: 1px solid var(--new-bgLineColor);
+  background: transparent;
+  color: rgb(var(--new-textColor));
+}
+
+.acadepost-credentials-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.acadepost-credentials-notes,
+.acadepost-credentials-muted,
+.acadepost-credentials-empty {
+  border: 1px solid var(--new-bgLineColor);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--new-bgColor) 88%, transparent);
+  color: var(--new-table-text);
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 10px;
+}
+
+.acadepost-credentials-notes {
+  margin-top: 14px;
+}
+
+.acadepost-credentials-copy {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+  overflow: hidden;
+  padding: 10px;
+  text-align: left;
+}
+
+.acadepost-credentials-copy span {
+  color: var(--new-table-text);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.acadepost-credentials-copy strong {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.acadepost-credentials-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.acadepost-credentials-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.9fr) minmax(180px, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+}
+
+.acadepost-credentials-row strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.acadepost-credentials-secrets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.acadepost-credentials-secrets span {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--new-bgColorInner) 86%, #4cccb8 10%);
+  padding: 4px 8px;
+}
+
+.acadepost-credentials-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+@media (max-width: 1180px) {
+  .acadepost-credentials-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .acadepost-credentials-row {
+    grid-template-columns: 1fr;
+  }
+
+  .acadepost-credentials-row-actions {
+    justify-content: flex-start;
+  }
+}
+
 .text-shadow-tags {
   text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black,
     1px 1px 0 black;

@@ -46,6 +46,7 @@ model Organization {
   webhooks            Webhooks[]
   oauthApp            OAuthApp[]
   oauthAuthorizations OAuthAuthorization[]
+  providerCredentials ProviderCredential[]
 
   @@index([apiKey])
   @@index([streakSince])
@@ -686,6 +687,28 @@ model ExternalAgent {
 
   @@index([organizationId])
   @@index([accessMode])
+  @@index([enabled])
+  @@index([deletedAt])
+}
+
+model ProviderCredential {
+  id                 String       @id @default(uuid())
+  organizationId     String
+  providerIdentifier String
+  name               String
+  encryptedData      String
+  maskedData         Json
+  status             String       @default("active")
+  enabled            Boolean      @default(true)
+  lastUsedAt         DateTime?
+  lastTestedAt       DateTime?
+  deletedAt          DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  organization       Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([providerIdentifier])
   @@index([enabled])
   @@index([deletedAt])
 }

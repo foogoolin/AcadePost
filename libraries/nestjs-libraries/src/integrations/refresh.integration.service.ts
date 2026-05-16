@@ -7,6 +7,7 @@ import {
   SocialProvider,
 } from '@gitroom/nestjs-libraries/integrations/social/social.integrations.interface';
 import { TemporalService } from 'nestjs-temporal-core';
+import { ProviderCredentialsService } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.service';
 
 @Injectable()
 export class RefreshIntegrationService {
@@ -14,7 +15,8 @@ export class RefreshIntegrationService {
     private _integrationManager: IntegrationManager,
     @Inject(forwardRef(() => IntegrationService))
     private _integrationService: IntegrationService,
-    private _temporalService: TemporalService
+    private _temporalService: TemporalService,
+    private _providerCredentialsService: ProviderCredentialsService
   ) {}
   async refresh(integration: Integration, cause = ''): Promise<false | AuthTokenDetails> {
     const socialProvider = this._integrationManager.getSocialIntegration(
@@ -73,8 +75,13 @@ export class RefreshIntegrationService {
     socialProvider: SocialProvider,
     cause = ''
   ): Promise<AuthTokenDetails | false> {
+    const clientInformation =
+      await this._providerCredentialsService.resolveClientInformation(
+        integration.organizationId,
+        integration.providerIdentifier
+      );
     const refresh: false | AuthTokenDetails = await socialProvider
-      .refreshToken(integration.refreshToken)
+      .refreshToken(integration.refreshToken, clientInformation)
       .catch((err) => false);
 
     if (!refresh || !refresh.accessToken) {

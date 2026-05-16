@@ -23,6 +23,7 @@ import {
   postId as postIdSearchParam,
 } from '@gitroom/nestjs-libraries/temporal/temporal.search.attribute';
 import { SubscriptionService } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/subscription.service';
+import { ProviderCredentialsService } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.service';
 
 // Drops fields the workflow and downstream activities never read — biggest wins are `error` (grows per retry) and `childrenPost` (Prisma side-loads it on every recursive row).
 function slimPost(post: any) {
@@ -62,7 +63,8 @@ export class PostActivity {
     private _refreshIntegrationService: RefreshIntegrationService,
     private _webhookService: WebhooksService,
     private _temporalService: TemporalService,
-    private _subscriptionService: SubscriptionService
+    private _subscriptionService: SubscriptionService,
+    private _providerCredentialsService: ProviderCredentialsService
   ) {}
 
   @ActivityMethod()
@@ -150,39 +152,56 @@ export class PostActivity {
     const getIntegration = this._integrationManager.getSocialIntegration(
       integration.providerIdentifier
     );
+    const clientInformation =
+      await this._providerCredentialsService.resolveClientInformation(
+        integration.organizationId,
+        integration.providerIdentifier
+      );
 
     const newPosts = await this._postService.updateTags(
       integration.organizationId,
       posts
     );
 
-    return getIntegration.comment(
-      integration.internalId,
-      postId,
-      lastPostId,
-      integration.token,
-      await Promise.all(
-        (newPosts || []).map(async (p) => ({
-          id: p.id,
-          message: stripHtmlValidation(
-            getIntegration.editor,
-            p.content,
-            true,
-            false,
-            !/<\/?[a-z][\s\S]*>/i.test(p.content),
-            getIntegration.mentionFormat
-          ),
-          settings: JSON.parse(p.settings || '{}'),
-          media: await this._postService.updateMedia(
-            integration.organizationId,
-            p.id,
-            JSON.parse(p.image || '[]'),
-            getIntegration?.convertToJPEG || false
-          ),
-        }))
-      ),
-      integration
+    const postDetails = await Promise.all(
+      (newPosts || []).map(async (p) => ({
+        id: p.id,
+        message: stripHtmlValidation(
+          getIntegration.editor,
+          p.content,
+          true,
+          false,
+          !/<\/?[a-z][\s\S]*>/i.test(p.content),
+          getIntegration.mentionFormat
+        ),
+        settings: JSON.parse(p.settings || '{}'),
+        media: await this._postService.updateMedia(
+          integration.organizationId,
+          p.id,
+          JSON.parse(p.image || '[]'),
+          getIntegration?.convertToJPEG || false
+        ),
+      }))
     );
+
+    return integration.providerIdentifier === 'x'
+      ? (getIntegration as any).comment(
+          integration.internalId,
+          postId,
+          lastPostId,
+          integration.token,
+          postDetails,
+          integration,
+          clientInformation
+        )
+      : getIntegration.comment(
+          integration.internalId,
+          postId,
+          lastPostId,
+          integration.token,
+          postDetails,
+          integration
+        );
   }
 
   @ActivityMethod()
@@ -190,37 +209,53 @@ export class PostActivity {
     const getIntegration = this._integrationManager.getSocialIntegration(
       integration.providerIdentifier
     );
+    const clientInformation =
+      await this._providerCredentialsService.resolveClientInformation(
+        integration.organizationId,
+        integration.providerIdentifier
+      );
 
     const newPosts = await this._postService.updateTags(
       integration.organizationId,
       posts
     );
 
-    const postNow = await getIntegration.post(
-      integration.internalId,
-      integration.token,
-      await Promise.all(
-        (newPosts || []).map(async (p) => ({
-          id: p.id,
-          message: stripHtmlValidation(
-            getIntegration.editor,
-            p.content,
-            true,
-            false,
-            !/<\/?[a-z][\s\S]*>/i.test(p.content),
-            getIntegration.mentionFormat
-          ),
-          settings: JSON.parse(p.settings || '{}'),
-          media: await this._postService.updateMedia(
-            integration.organizationId,
-            p.id,
-            JSON.parse(p.image || '[]'),
-            getIntegration?.convertToJPEG || false
-          ),
-        }))
-      ),
-      integration
+    const postDetails = await Promise.all(
+      (newPosts || []).map(async (p) => ({
+        id: p.id,
+        message: stripHtmlValidation(
+          getIntegration.editor,
+          p.content,
+          true,
+          false,
+          !/<\/?[a-z][\s\S]*>/i.test(p.content),
+          getIntegration.mentionFormat
+        ),
+        settings: JSON.parse(p.settings || '{}'),
+        media: await this._postService.updateMedia(
+          integration.organizationId,
+          p.id,
+          JSON.parse(p.image || '[]'),
+          getIntegration?.convertToJPEG || false
+        ),
+      }))
     );
+
+    const postNow =
+      integration.providerIdentifier === 'x'
+        ? await (getIntegration as any).post(
+            integration.internalId,
+            integration.token,
+            postDetails,
+            integration,
+            clientInformation
+          )
+        : await getIntegration.post(
+            integration.internalId,
+            integration.token,
+            postDetails,
+            integration
+          );
 
     await this._temporalService.client
       .getRawClient()

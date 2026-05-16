@@ -1,6 +1,7 @@
 import {
   AnalyticsData,
   AuthTokenDetails,
+  ClientInformation,
   PostDetails,
   PostResponse,
   SocialProvider,
@@ -61,15 +62,22 @@ export class PinterestProvider
     return undefined;
   }
 
-  async refreshToken(refreshToken: string): Promise<AuthTokenDetails> {
+  async refreshToken(
+    refreshToken: string,
+    clientInformation?: ClientInformation
+  ): Promise<AuthTokenDetails> {
+    const clientId =
+      clientInformation?.client_id || process.env.PINTEREST_CLIENT_ID!;
+    const clientSecret =
+      clientInformation?.client_secret || process.env.PINTEREST_CLIENT_SECRET!;
     const { access_token, expires_in } = await (
       await fetch('https://api.pinterest.com/v5/oauth/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${Buffer.from(
-            `${process.env.PINTEREST_CLIENT_ID}:${process.env.PINTEREST_CLIENT_SECRET}`
-          ).toString('base64')}`,
+          Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString(
+            'base64'
+          )}`,
         },
         body: new URLSearchParams({
           grant_type: 'refresh_token',
@@ -100,11 +108,13 @@ export class PinterestProvider
     };
   }
 
-  async generateAuthUrl() {
+  async generateAuthUrl(clientInformation?: ClientInformation) {
     const state = makeId(6);
+    const clientId =
+      clientInformation?.client_id || process.env.PINTEREST_CLIENT_ID;
     return {
       url: `https://www.pinterest.com/oauth/?client_id=${
-        process.env.PINTEREST_CLIENT_ID
+        clientId
       }&redirect_uri=${encodeURIComponent(
         `${process.env.FRONTEND_URL}/integrations/social/pinterest`
       )}&response_type=code&scope=${encodeURIComponent(
@@ -115,19 +125,26 @@ export class PinterestProvider
     };
   }
 
-  async authenticate(params: {
-    code: string;
-    codeVerifier: string;
-    refresh: string;
-  }) {
+  async authenticate(
+    params: {
+      code: string;
+      codeVerifier: string;
+      refresh: string;
+    },
+    clientInformation?: ClientInformation
+  ) {
+    const clientId =
+      clientInformation?.client_id || process.env.PINTEREST_CLIENT_ID!;
+    const clientSecret =
+      clientInformation?.client_secret || process.env.PINTEREST_CLIENT_SECRET!;
     const { access_token, refresh_token, expires_in, scope } = await (
       await fetch('https://api.pinterest.com/v5/oauth/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${Buffer.from(
-            `${process.env.PINTEREST_CLIENT_ID}:${process.env.PINTEREST_CLIENT_SECRET}`
-          ).toString('base64')}`,
+          Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString(
+            'base64'
+          )}`,
         },
         body: new URLSearchParams({
           grant_type: 'authorization_code',

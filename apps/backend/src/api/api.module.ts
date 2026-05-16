@@ -40,6 +40,7 @@ import { AnnouncementsController } from '@gitroom/backend/api/routes/announcemen
 import { AdminController } from '@gitroom/backend/api/routes/admin.controller';
 import { PostTemplatesController } from '@gitroom/backend/api/routes/post-templates.controller';
 import { AgentWebhooksController } from '@gitroom/backend/api/routes/agent-webhooks.controller';
+import { ProviderCredentialsController } from '@gitroom/backend/api/routes/provider-credentials.controller';
 import { AuthProviderManager } from '@gitroom/backend/services/auth/providers/providers.manager';
 import { GithubProvider } from '@gitroom/backend/services/auth/providers/github.provider';
 import { GoogleProvider } from '@gitroom/backend/services/auth/providers/google.provider';
@@ -69,6 +70,7 @@ const authenticatedController = [
   AdminController,
   PostTemplatesController,
   AgentWebhooksController,
+  ProviderCredentialsController,
 ];
 @Module({
   imports: [UploadModule],

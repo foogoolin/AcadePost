@@ -1,6 +1,7 @@
 import {
   AnalyticsData,
   AuthTokenDetails,
+  ClientInformation,
   PostDetails,
   PostResponse,
   SocialProvider,
@@ -182,12 +183,13 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
     };
   }
 
-  async generateAuthUrl() {
+  async generateAuthUrl(clientInformation?: ClientInformation) {
     const state = makeId(6);
+    const appId = clientInformation?.client_id || process.env.FACEBOOK_APP_ID;
     return {
       url:
         'https://www.facebook.com/v20.0/dialog/oauth' +
-        `?client_id=${process.env.FACEBOOK_APP_ID}` +
+        `?client_id=${appId}` +
         `&redirect_uri=${encodeURIComponent(
           `${process.env.FRONTEND_URL}/integrations/social/facebook`
         )}` +
@@ -216,21 +218,27 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
     };
   }
 
-  async authenticate(params: {
-    code: string;
-    codeVerifier: string;
-    refresh?: string;
-  }) {
+  async authenticate(
+    params: {
+      code: string;
+      codeVerifier: string;
+      refresh?: string;
+    },
+    clientInformation?: ClientInformation
+  ) {
+    const appId = clientInformation?.client_id || process.env.FACEBOOK_APP_ID;
+    const appSecret =
+      clientInformation?.client_secret || process.env.FACEBOOK_APP_SECRET;
     const getAccessToken = await (
       await fetch(
         'https://graph.facebook.com/v20.0/oauth/access_token' +
-          `?client_id=${process.env.FACEBOOK_APP_ID}` +
+          `?client_id=${appId}` +
           `&redirect_uri=${encodeURIComponent(
             `${process.env.FRONTEND_URL}/integrations/social/facebook${
               params.refresh ? `?refresh=${params.refresh}` : ''
             }`
           )}` +
-          `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
+          `&client_secret=${appSecret}` +
           `&code=${params.code}`
       )
     ).json();
@@ -239,8 +247,8 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
       await fetch(
         'https://graph.facebook.com/v20.0/oauth/access_token' +
           '?grant_type=fb_exchange_token' +
-          `&client_id=${process.env.FACEBOOK_APP_ID}` +
-          `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
+          `&client_id=${appId}` +
+          `&client_secret=${appSecret}` +
           `&fb_exchange_token=${getAccessToken.access_token}&fields=access_token,expires_in`
       )
     ).json();

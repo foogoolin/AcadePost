@@ -236,6 +236,20 @@ The first workflow should classify content into one of these groups, make the ma
 - Corrections integration: parsing callback MeWe unifie et suppression du log Telegram contenant l'objet chat.
 - Risques suivis: `wrapcast` ne correspond pas au nom public `warpcast` de la doc Postiz, Dribbble contient encore un `refreshToken()` avec endpoints Pinterest, Skool depend d'une extension non disponible dans le build demo.
 
+## Provider Credentials Manager - 2026-05-16
+
+- Decision confirmee: les pages legal/security/policies sont reportees; ce passage implemente uniquement la configuration technique des credentials et URLs de callback.
+- BYAN Marc a valide l'architecture `Credentials` type n8n: secrets chiffres en base par projet, definitions de champs non secretes, fallback `.env` preserve pour demo/deploiement.
+- BYAN Skeptic a impose les garde-fous MVP: cle de chiffrement serveur separee, pas de retour plaintext API, admin-only, pas de log des secrets, et scopes/tenant boundary conserves.
+- Nouveau modele Prisma `ProviderCredential` rattache a `Organization` pour stocker les credentials OAuth/API par projet.
+- Nouveaux endpoints authentifies admin: `GET /provider-credentials/providers`, `GET /provider-credentials`, `GET /provider-credentials/:id`, `POST /provider-credentials`, `PUT /provider-credentials/:id`, `POST /provider-credentials/:id/test`, `DELETE /provider-credentials/:id`.
+- Nouvel ecran Settings `Identifiants`: selection fournisseur, champs dynamiques, valeurs masquees, test de champs requis, URLs techniques a declarer dans les portails developpeurs.
+- Les URLs techniques affichees incluent domaine app, site web, redirect URI, API base, deauthorize callback et data deletion callback; les pages policy/legal correspondantes restent a traiter plus tard.
+- Le flow connect OAuth cherche maintenant d'abord les credentials du projet, puis retombe sur `.env`.
+- Runtime credentials connectes pour les principaux providers demo: X, Meta/Facebook, Instagram Business, Instagram Standalone, Threads, YouTube, Google Business Profile, TikTok, Pinterest, LinkedIn, LinkedIn Page et Reddit.
+- L'orchestrator et le refresh workflow resolvent aussi les credentials projet pour les providers qui en ont besoin pendant publication ou refresh token.
+- Docker demo expose et genere `ACADEPOST_CREDENTIALS_ENCRYPTION_KEY`; le domaine reste configurable par `.env`, jamais encode dans l'image.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?

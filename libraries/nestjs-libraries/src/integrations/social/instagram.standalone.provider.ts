@@ -1,5 +1,6 @@
 import {
   AuthTokenDetails,
+  ClientInformation,
   PostDetails,
   PostResponse,
   SocialProvider,
@@ -77,12 +78,14 @@ export class InstagramStandaloneProvider
     };
   }
 
-  async generateAuthUrl() {
+  async generateAuthUrl(clientInformation?: ClientInformation) {
     const state = makeId(6);
+    const appId =
+      clientInformation?.client_id || process.env.INSTAGRAM_APP_ID;
     return {
       url:
         `https://www.instagram.com/oauth/authorize?enable_fb_login=0&client_id=${
-          process.env.INSTAGRAM_APP_ID
+          appId
         }&redirect_uri=${encodeURIComponent(
           `${
             process?.env.FRONTEND_URL?.indexOf('https') == -1
@@ -97,14 +100,21 @@ export class InstagramStandaloneProvider
     };
   }
 
-  async authenticate(params: {
-    code: string;
-    codeVerifier: string;
-    refresh: string;
-  }) {
+  async authenticate(
+    params: {
+      code: string;
+      codeVerifier: string;
+      refresh: string;
+    },
+    clientInformation?: ClientInformation
+  ) {
+    const appId =
+      clientInformation?.client_id || process.env.INSTAGRAM_APP_ID!;
+    const appSecret =
+      clientInformation?.client_secret || process.env.INSTAGRAM_APP_SECRET!;
     const formData = new FormData();
-    formData.append('client_id', process.env.INSTAGRAM_APP_ID!);
-    formData.append('client_secret', process.env.INSTAGRAM_APP_SECRET!);
+    formData.append('client_id', appId);
+    formData.append('client_secret', appSecret);
     formData.append('grant_type', 'authorization_code');
     formData.append(
       'redirect_uri',
@@ -127,8 +137,8 @@ export class InstagramStandaloneProvider
       await fetch(
         'https://graph.instagram.com/access_token' +
           '?grant_type=ig_exchange_token' +
-          `&client_id=${process.env.INSTAGRAM_APP_ID}` +
-          `&client_secret=${process.env.INSTAGRAM_APP_SECRET}` +
+          `&client_id=${appId}` +
+          `&client_secret=${appSecret}` +
           `&access_token=${getAccessToken.access_token}`
       )
     ).json();
