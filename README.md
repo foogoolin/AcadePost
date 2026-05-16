@@ -16,7 +16,7 @@ AcadéPost provides a team workspace for social publishing:
 - n8n/webhook agent integration.
 - Human-in-the-loop and full-access agent workflows.
 - Editor presets for reusable post and carousel visuals.
-- Docker-based self-hosted demo deployment.
+- Docker-based self-hosted deployment.
 
 The product is currently an MVP. Provider code can exist before a platform is fully verified with real developer credentials, app review and live publishing smoke tests.
 
@@ -37,13 +37,23 @@ Credentials are configured per project from the AcadéPost UI. Facebook, Instagr
 
 ## Deployment
 
-AcadéPost publishes a demo Docker image to GitHub Container Registry:
+AcadéPost publishes Docker images to GitHub Container Registry.
+
+Recommended pinned release image:
+
+```text
+ghcr.io/foogoolin/acadepost:v1.1.0
+```
+
+A moving image tag is also available for the latest MVP build from `main`:
 
 ```text
 ghcr.io/foogoolin/acadepost:demo
 ```
 
-Versioned images are also published for releases, for example:
+For stable installs, prefer the versioned image. Use `:demo` only when you intentionally want the newest build from `main`.
+
+Versioned images are published for releases, for example:
 
 ```text
 ghcr.io/foogoolin/acadepost:v1.1.0
@@ -80,7 +90,7 @@ Important runtime values are supplied through `.env`:
 
 ```env
 ACADEPOST_PUBLIC_URL=https://your-domain.example
-ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:demo
+ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:v1.1.0
 DATABASE_URL=postgresql://user:password@postgres:5432/acadepost
 JWT_SECRET=change-me
 ACADEPOST_CREDENTIALS_ENCRYPTION_KEY=change-me
