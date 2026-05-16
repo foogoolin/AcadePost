@@ -270,6 +270,15 @@ The first workflow should classify content into one of these groups, make the ma
 - Les providers encore non relies au runtime credentials UI sont marques dans les notes de configuration: Discord, Slack, Mastodon, Dribbble, Kick, Twitch, VK, Farcaster/Warpcast, Telegram, MeWe et Whop restent dependants des variables serveur `.env` pour le MVP.
 - Verification locale: `prisma generate`, backend build, orchestrator build, frontend build, `docker compose config --quiet` pour clean-VPS et shared-infra, recherche mojibake hors memoire dediee et `git diff --check` passent. Avertissement connu: Node local `v24.13.0` au lieu de la plage cible Node 22.x.
 
+## Postiz Feature Benchmark - 2026-05-16
+
+- Audit officiel Postiz effectue depuis le site produit, pricing, documentation, Public API, MCP tools, providers overview, docs index et repository GitHub.
+- Rapport ajoute: `docs/product/postiz-feature-comparison-2026-05-16.md`.
+- Conclusion produit: Postiz couvre scheduling multi-canal, calendrier, 30+ canaux, Public API/OAuth2/MCP/CLI/n8n, webhooks, media upload, AI image/video, analytics, teams, customer groups, plugs, repeated posts, RSS auto-post, posting sets et signatures.
+- Conclusion AcadéPost: le fork contient une grande partie du moteur, mais une fonctionnalite ne doit etre declaree "prete client" qu'apres OAuth, credentials, callback domain et smoke test reel par provider.
+- Difference strategique AcadéPost: credentials par projet dans l'UI, projets/roles adaptes a AcadéNice, templates Editor pour agents, n8n agents `Human in the loop` / `Full Access`, et Docker update par GHCR.
+- Prochain gate prioritaire: matrice provider `ready / blocked / needs app review`, puis smoke test reel de publication sur YouTube, TikTok, Instagram, Facebook Page, Threads, X, LinkedIn et Pinterest.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?
