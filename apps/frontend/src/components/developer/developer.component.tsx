@@ -210,7 +210,7 @@ export const DeveloperComponent: FC = () => {
     return null;
   }
 
-  // No app yet — show create prompt
+  // No app yet - show create prompt
   if (!app && !creating) {
     return (
       <div className="flex flex-col gap-[40px]">
@@ -222,7 +222,7 @@ export const DeveloperComponent: FC = () => {
           <br />
           {t(
             'oauth_app_note_line2',
-            'After a user completes the OAuth2 flow, you receive a pos_ prefixed token that works everywhere an API Key does - API and MCP.'
+            'Dans cette demo, le Public API utilise une API key projet. Les tokens OAuth pos_ restent desactives par defaut cote serveur.'
           )}
         </div>
         <div className="bg-newBgColorInner rounded-[12px] border border-newBorder overflow-hidden">
@@ -265,7 +265,7 @@ export const DeveloperComponent: FC = () => {
           <br />
           {t(
             'oauth_app_note_line2',
-            'After a user completes the OAuth2 flow, you receive a pos_ prefixed token that works everywhere an API Key does - API and MCP.'
+            'Dans cette demo, le Public API utilise une API key projet. Les tokens OAuth pos_ restent desactives par defaut cote serveur.'
           )}
         </div>
         <div className="bg-newBgColorInner rounded-[12px] border border-newBorder overflow-hidden">
@@ -363,7 +363,7 @@ export const DeveloperComponent: FC = () => {
     );
   }
 
-  // App exists — show details
+  // App exists - show details
   return (
     <div className="flex flex-col gap-[40px]">
       <div className="text-[14px] text-textColor leading-[1.7]">
@@ -374,7 +374,7 @@ export const DeveloperComponent: FC = () => {
         <br />
         {t(
           'oauth_app_note_line2',
-          'After a user completes the OAuth2 flow, you receive a pos_ prefixed token that works everywhere an API Key does - API and MCP.'
+          'Dans cette demo, le Public API utilise une API key projet. Les tokens OAuth pos_ restent desactives par defaut cote serveur.'
         )}
       </div>
       {/* App details / edit */}

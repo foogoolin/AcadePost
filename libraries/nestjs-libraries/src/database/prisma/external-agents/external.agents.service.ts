@@ -141,16 +141,30 @@ export class ExternalAgentsService {
   }
 
   private async callWebhook(agent: ExternalAgent, payload: Record<string, any>) {
-    const response = await fetch(agent.webhookUrl, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-acadepost-agent-id': agent.id,
-      },
-      body: JSON.stringify(payload),
-      // @ts-ignore undici dispatcher is not part of lib.dom fetch types.
-      dispatcher: ssrfSafeDispatcher,
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
+    let response: Response;
+    try {
+      response = await fetch(agent.webhookUrl, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-acadepost-agent-id': agent.id,
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+        // @ts-ignore undici dispatcher is not part of lib.dom fetch types.
+        dispatcher: ssrfSafeDispatcher,
+      });
+    } catch (error: any) {
+      if (error?.name === 'AbortError') {
+        throw new Error('Webhook request timed out');
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
 
     const text = await response.text();
     let body: any = text;

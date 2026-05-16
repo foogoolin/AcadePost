@@ -1,10 +1,10 @@
-# Deploiement demo AcadéPost
+# Deploiement demo AcadePost
 
 Ce document decrit un deploiement brut pour demo client. Ce n'est pas une procedure production.
 
 ## Objectif
 
-- Lancer AcadéPost sur un seul serveur Linux.
+- Lancer AcadePost sur un seul serveur Linux.
 - Exposer uniquement l'application sur le port `4007`.
 - Garder PostgreSQL, Redis et Temporal dans Docker Compose.
 - Utiliser le stockage local `/uploads` pour une demo rapide.
@@ -55,12 +55,14 @@ ACADEPOST_PUBLIC_URL=http://SERVER_IP:4007
 POSTGRES_PASSWORD=change-this
 TEMPORAL_POSTGRES_PASSWORD=change-this
 JWT_SECRET=change-this-long-random-string
+PUBLIC_API_ALLOW_OAUTH=false
 ```
 
 Si un domaine HTTPS est deja configure par reverse proxy, utiliser :
 
 ```env
 ACADEPOST_PUBLIC_URL=https://demo.example.com
+TRUST_PROXY=true
 ```
 
 ## Lancement
@@ -102,26 +104,39 @@ docker compose --env-file .env.demo -f docker-compose.demo.yaml exec acadepost-p
 docker compose --env-file .env.demo -f docker-compose.demo.yaml exec acadepost-redis redis-cli ping
 ```
 
+`/api/monitor/ready` retourne un statut minimal, sans exposer les hosts internes des dependances.
+
 ## Smoke demo
 
 1. Ouvrir la page d'authentification.
 2. Creer un compte proprietaire.
-3. Creer deux projets : `Démo Alpha` et `Démo Bêta`.
+3. Creer deux projets : `Demo Alpha` et `Demo Beta`.
 4. Inviter un membre `Admin`.
-5. Inviter un membre `Éditeur`.
+5. Inviter un membre `Editeur`.
 6. Verifier que le switch de projet change les posts, medias et integrations visibles.
-7. Verifier qu'un `Éditeur` ne peut pas acceder aux actions admin.
+7. Verifier qu'un `Editeur` ne peut pas acceder aux actions admin.
 8. Uploader une image et verifier que `/uploads/...` la sert correctement.
+
+## Debug Temporal UI
+
+Le profil debug Temporal UI est local-only par defaut :
+
+```env
+TEMPORAL_UI_BIND=127.0.0.1
+TEMPORAL_UI_PORT=8080
+```
+
+Ne pas binder Temporal UI sur `0.0.0.0` sur un VPS public.
 
 ## Mise a jour image demo
 
-Pour mettre a jour AcadéPost sans build sur le VPS :
+Pour mettre a jour AcadePost sans build sur le VPS :
 
 ```bash
 bash deploy/demo/update.sh --env .env.demo --compose docker-compose.demo.yaml
 ```
 
-Voir aussi `docs/demo-docker-update.md`. Le script tire `ACADEPOST_IMAGE` depuis `.env`, recrée uniquement le service `acadepost` avec `--no-build`, puis attend `/api/monitor/ready`.
+Voir aussi `docs/demo-docker-update.md`. Le script tire `ACADEPOST_IMAGE` depuis `.env`, recree uniquement le service `acadepost` avec `--no-build`, puis attend `/api/monitor/ready`.
 
 ## Mise a jour du code et des scripts
 

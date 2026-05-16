@@ -79,6 +79,7 @@ Prepare env:
    - `TEMPORAL_VISIBILITY_DB=temporal_visibility`
    - `JWT_SECRET=GENERATE_LONG_RANDOM_SECRET`
    - `TRUST_PROXY=true`
+   - `PUBLIC_API_ALLOW_OAUTH=false`
    - `ACADEPOST_DEMO_DB_PUSH=false` by default
 
 First demo schema bootstrap:
@@ -113,6 +114,7 @@ docker compose --env-file .env.demo.shared-infra -f docker-compose.demo.shared-i
 Expected:
 - No public port 4007 exposure.
 - App reachable only through Caddy HTTPS.
+- `/api/monitor/ready` returns only minimal status, not internal dependency hostnames.
 - PostgreSQL is external/shared.
 - Redis is local to the AcadePost stack.
 - Temporal is local to the AcadePost stack but uses external/shared PostgreSQL.

@@ -22,6 +22,13 @@ export class PublicAuthMiddleware implements NestMiddleware {
     }
     try {
       if (auth.startsWith('pos_')) {
+        if (process.env.PUBLIC_API_ALLOW_OAUTH !== 'true') {
+          res
+            .status(HttpStatus.UNAUTHORIZED)
+            .json({ msg: 'OAuth tokens are disabled for the public API' });
+          return;
+        }
+
         const authorization = await this._oauthService.getOrgByOAuthToken(auth);
         if (!authorization) {
           res

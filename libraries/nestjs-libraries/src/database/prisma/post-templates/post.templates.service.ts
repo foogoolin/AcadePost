@@ -17,6 +17,7 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   carousel_1_1: { width: 1080, height: 1080 },
   carousel_3_4: { width: 1080, height: 1440 },
 };
+const TEMPLATE_MAX_SOURCE_IMAGE_BYTES = 10 * 1024 * 1024;
 
 @Injectable()
 export class PostTemplatesService {
@@ -118,16 +119,23 @@ export class PostTemplatesService {
       throw new BadRequestException('imageUrl must be a safe public HTTPS URL');
     }
 
-    const response = await fetch(url, {
-      // @ts-ignore undici dispatcher is not part of lib.dom fetch types.
-      dispatcher: ssrfSafeDispatcher,
-    });
+    const response = await this.fetchPublicImage(url);
 
     if (!response.ok) {
       throw new BadRequestException('Failed to load source image');
     }
 
-    return Buffer.from(await response.arrayBuffer());
+    const contentLength = Number(response.headers.get('content-length') || 0);
+    if (contentLength > TEMPLATE_MAX_SOURCE_IMAGE_BYTES) {
+      throw new BadRequestException('Source image is too large');
+    }
+
+    const buffer = Buffer.from(await response.arrayBuffer());
+    if (buffer.length > TEMPLATE_MAX_SOURCE_IMAGE_BYTES) {
+      throw new BadRequestException('Source image is too large');
+    }
+
+    return buffer;
   }
 
   private createOverlaySvg(
@@ -177,6 +185,25 @@ export class PostTemplatesService {
       return { x1: '0%', y1: '0%', x2: '100%', y2: '100%' };
     }
     return { x1: '0%', y1: '100%', x2: '100%', y2: '0%' };
+  }
+
+  private async fetchPublicImage(url: string) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
+    try {
+      return await fetch(url, {
+        signal: controller.signal,
+        dispatcher: ssrfSafeDispatcher,
+      } as any);
+    } catch (error: any) {
+      if (error?.name === 'AbortError') {
+        throw new BadRequestException('Timed out while loading source image');
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 
   private normalizeHex(value: string) {

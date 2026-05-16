@@ -30,17 +30,16 @@ export class MonitorController {
     };
 
     const failed = Object.values(checks).some((check) => check.status !== 'ok');
-    const payload = {
+    const publicPayload = {
       status: failed ? 'error' : 'ok',
       service: 'backend',
-      checks,
     };
 
     if (failed) {
-      throw new ServiceUnavailableException(payload);
+      throw new ServiceUnavailableException(publicPayload);
     }
 
-    return payload;
+    return publicPayload;
   }
 
   private async checkUrl(envName: string, fallbackPort: number) {

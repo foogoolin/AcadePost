@@ -49,6 +49,8 @@ const PUBLIC_API_ALLOWED_MIME = new Set<string>([
   'image/tiff',
   'video/mp4',
 ]);
+const PUBLIC_API_MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const PUBLIC_API_MAX_VIDEO_BYTES = 1024 * 1024 * 1024;
 import * as Sentry from '@sentry/nestjs';
 import {
   socialIntegrationList,
@@ -108,18 +110,17 @@ export class PublicIntegrationsController {
     @Body() body: UploadDto
   ) {
     Sentry.metrics.count('public_api-request', 1);
-    const response = await fetch(body.url, {
-      // @ts-ignore — undici option, not in lib.dom fetch types
-      dispatcher: ssrfSafeDispatcher,
-    });
+    const response = await this.fetchPublicUrl(body.url);
     if (!response.ok) {
       throw new HttpException({ msg: 'Failed to fetch URL' }, 400);
     }
+    this.assertRemoteContentLength(response, PUBLIC_API_MAX_VIDEO_BYTES);
     const buffer = Buffer.from(await response.arrayBuffer());
     const detected = await fromBuffer(buffer);
     if (!detected || !PUBLIC_API_ALLOWED_MIME.has(detected.mime)) {
       throw new HttpException({ msg: 'Unsupported file type.' }, 400);
     }
+    this.assertBufferSize(buffer.length, detected.mime);
     const mimetype = detected.mime;
     const ext = detected.ext;
 
@@ -207,8 +208,8 @@ export class PublicIntegrationsController {
     if (externalAgentId || body?.externalAgentId) {
       await this._externalAgentsService.verify(
         org.id,
-        body.externalAgentId || externalAgentId,
-        body.secret || headerSecret,
+        externalAgentId || body.externalAgentId,
+        headerSecret,
         ['templates:render']
       );
     }
@@ -219,19 +220,25 @@ export class PublicIntegrationsController {
   @Post('/agent-runs')
   async createAgentRun(
     @GetOrgFromRequest() org: Organization,
+    @Headers('x-acadepost-agent-id') externalAgentId: string | undefined,
     @Headers('x-acadepost-agent-secret') headerSecret: string | undefined,
     @Body() body: PublicAgentRunDto
   ) {
     Sentry.metrics.count('public_api-request', 1);
     const mode = body.mode || 'proposal';
-    const externalAgent = body.externalAgentId
-      ? await this._externalAgentsService.verify(
-          org.id,
-          body.externalAgentId,
-          body.secret || headerSecret,
-          this._externalAgentsService.scopesForMode(mode)
-        )
-      : undefined;
+    const agentId = externalAgentId || body.externalAgentId;
+    if (!agentId) {
+      throw new HttpException(
+        { msg: 'x-acadepost-agent-id is required for agent runs' },
+        400
+      );
+    }
+    const externalAgent = await this._externalAgentsService.verify(
+      org.id,
+      agentId,
+      headerSecret,
+      this._externalAgentsService.scopesForMode(mode)
+    );
 
     if (
       externalAgent &&
@@ -248,7 +255,7 @@ export class PublicIntegrationsController {
       externalAgentId: externalAgent?.id,
       mode,
       status: 'running',
-      input: body as any,
+      input: this.sanitizeAgentRunInput(body),
     });
 
     if (!body.integrationIds?.length) {
@@ -324,6 +331,32 @@ export class PublicIntegrationsController {
     return this._agentRunsService.get(org.id, agentRun.id);
   }
 
+  private sanitizeAgentRunInput(body: PublicAgentRunDto) {
+    const { secret: _secret, ...safeBody } = body as PublicAgentRunDto & {
+      secret?: string;
+    };
+    return safeBody as any;
+  }
+
+  private async fetchPublicUrl(url: string) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
+    try {
+      return await fetch(url, {
+        signal: controller.signal,
+        dispatcher: ssrfSafeDispatcher,
+      } as any);
+    } catch (error: any) {
+      if (error?.name === 'AbortError') {
+        throw new HttpException({ msg: 'URL fetch timed out' }, 408);
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
   @Get('/agent-runs/:id')
   async getAgentRun(
     @GetOrgFromRequest() org: Organization,
@@ -365,8 +398,24 @@ export class PublicIntegrationsController {
       );
     }
 
-    console.log(JSON.stringify(body, null, 2));
     return this._postsService.createPost(org.id, body);
+  }
+
+  private assertRemoteContentLength(response: Response, maxBytes: number) {
+    const contentLength = Number(response.headers.get('content-length') || 0);
+    if (contentLength > maxBytes) {
+      throw new HttpException({ msg: 'Remote file is too large' }, 413);
+    }
+  }
+
+  private assertBufferSize(size: number, mime: string) {
+    const maxBytes = mime.startsWith('image/')
+      ? PUBLIC_API_MAX_IMAGE_BYTES
+      : PUBLIC_API_MAX_VIDEO_BYTES;
+
+    if (size > maxBytes) {
+      throw new HttpException({ msg: 'Remote file is too large' }, 413);
+    }
   }
 
   @Delete('/posts/:id')

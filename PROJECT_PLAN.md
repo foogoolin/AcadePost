@@ -214,6 +214,17 @@ The first workflow should classify content into one of these groups, make the ma
 - Verification locale: `prisma generate`, backend build, frontend build, orchestrator build, `docker compose config --quiet` pour clean-VPS et shared-infra, `git diff --check`, recherche mojibake hors `docs/codex-project-memory.md`.
 - Caveat local inchangé: Node local `v24.13.0` est hors plage cible repo `>=22.12.0 <23.0.0`; les builds passent quand même avec l'avertissement.
 
+## Security Pass n8n/Docker - 2026-05-16
+
+- BYAN workflow utilise: Skeptic a audite le modele agent/scopes et Rachid a audite Docker/GHCR/update path.
+- Public API durci: les tokens OAuth `pos_` ne sont plus acceptes par defaut (`PUBLIC_API_ALLOW_OAUTH=false`); l'API key projet reste le credential server-to-server.
+- `/public/v1/agent-runs` exige maintenant un agent explicite via `x-acadepost-agent-id` ou `externalAgentId` et le secret via `x-acadepost-agent-secret`; le bypass sans agent est ferme.
+- Les secrets agent ne sont plus acceptes dans le body de `PublicAgentRunDto` et ne sont plus persistables dans `AgentRun.input`.
+- SSRF hardening: les IPv4-mapped IPv6 en forme hex (`::ffff:7f00:1`) sont traites comme IPv4, les fetch publics gardent le dispatcher SSRF-safe et ont un timeout de 15s.
+- Upload/render hardening: les remote uploads et rendus template ont des limites de taille et ne loggent plus les payloads de posts publics.
+- Docker hardening: Temporal UI debug bind sur `127.0.0.1` par defaut, shared-infra garde `ACADEPOST_DEMO_DB_PUSH=false` par defaut, `update.sh` avertit sur le tag mutable `:demo` et affiche le digest precedent si disponible.
+- `/api/monitor/ready` retourne un statut minimal sans exposer hosts/ports internes des dependances.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?

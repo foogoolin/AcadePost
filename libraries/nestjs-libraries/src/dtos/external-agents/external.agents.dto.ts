@@ -72,10 +72,6 @@ export class PublicAgentRunDto {
 
   @IsOptional()
   @IsString()
-  secret?: string;
-
-  @IsOptional()
-  @IsString()
   @IsIn(['draft', 'proposal', 'schedule', 'now'])
   mode?: 'draft' | 'proposal' | 'schedule' | 'now';
 

@@ -45,8 +45,22 @@ set +a
 PUBLIC_URL="${ACADEPOST_PUBLIC_URL:-http://127.0.0.1:4007}"
 PUBLIC_URL="${PUBLIC_URL%/}"
 
+previous_container_id="$(docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps -q "$SERVICE" 2>/dev/null || true)"
+previous_image=""
+previous_digest=""
+if [[ -n "$previous_container_id" ]]; then
+  previous_image="$(docker inspect --format '{{.Config.Image}}' "$previous_container_id" 2>/dev/null || true)"
+  if [[ -n "$previous_image" ]]; then
+    previous_digest="$(docker image inspect --format '{{range .RepoDigests}}{{println .}}{{end}}' "$previous_image" 2>/dev/null | head -n 1 || true)"
+  fi
+fi
+
 echo "Validating Compose..."
 docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" config --quiet
+
+if [[ "${ACADEPOST_IMAGE:-}" == *":demo" ]]; then
+  echo "Warning: ACADEPOST_IMAGE uses mutable :demo tag. Use a SHA tag or digest for pinned production rollback."
+fi
 
 echo "Pulling image for service: $SERVICE"
 docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull "$SERVICE"
@@ -57,7 +71,7 @@ docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --no-build --forc
 echo "Waiting for health: $PUBLIC_URL$HEALTH_PATH"
 for attempt in $(seq 1 60); do
   if curl -fsS "$PUBLIC_URL$HEALTH_PATH" >/dev/null 2>&1; then
-    echo "AcadéPost is ready."
+    echo "AcadePost is ready."
     break
   fi
 
@@ -85,7 +99,9 @@ fi
 cat <<EOF
 
 Rollback:
-  1. Set ACADEPOST_IMAGE in $ENV_FILE to a previous GHCR sha tag.
+  1. Set ACADEPOST_IMAGE in $ENV_FILE to a previous GHCR sha tag or digest.
+     Previous image: ${previous_image:-unknown}
+     Previous digest: ${previous_digest:-unknown}
   2. Run:
      bash deploy/demo/update.sh --env "$ENV_FILE" --compose "$COMPOSE_FILE"
 

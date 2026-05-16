@@ -40,16 +40,48 @@ export function isBlockedIPv6(ip: string): boolean {
   );
 }
 
+function getMappedIPv4(ip: string): string | undefined {
+  const normalized = ip.toLowerCase();
+  if (!normalized.startsWith('::ffff:')) {
+    return undefined;
+  }
+
+  const tail = normalized.slice('::ffff:'.length);
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(tail)) {
+    return tail;
+  }
+
+  const hexParts = tail.split(':');
+  if (
+    hexParts.length === 2 &&
+    hexParts.every((part) => /^[0-9a-f]{1,4}$/.test(part))
+  ) {
+    const high = Number.parseInt(hexParts[0], 16);
+    const low = Number.parseInt(hexParts[1], 16);
+    return [
+      (high >> 8) & 255,
+      high & 255,
+      (low >> 8) & 255,
+      low & 255,
+    ].join('.');
+  }
+
+  return undefined;
+}
+
 export function isBlockedIp(ip: string): boolean {
   const version = net.isIP(ip);
   if (version === 4) {
     return isBlockedIPv4(ip);
   }
   if (version === 6) {
-    // IPv4-mapped IPv6 (::ffff:a.b.c.d) — extract and check as IPv4
-    const mapped = ip.toLowerCase().match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
+    // IPv4-mapped IPv6 (::ffff:a.b.c.d) - extract and check as IPv4
+    const mapped = getMappedIPv4(ip);
     if (mapped) {
-      return isBlockedIPv4(mapped[1]);
+      return isBlockedIPv4(mapped);
+    }
+    if (ip.toLowerCase().startsWith('::ffff:')) {
+      return true;
     }
     return isBlockedIPv6(ip);
   }

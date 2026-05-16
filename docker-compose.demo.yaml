@@ -18,6 +18,7 @@ services:
       IS_GENERAL: "true"
       DISABLE_REGISTRATION: ${DISABLE_REGISTRATION:-false}
       TRUST_PROXY: ${TRUST_PROXY:-false}
+      PUBLIC_API_ALLOW_OAUTH: ${PUBLIC_API_ALLOW_OAUTH:-false}
       ACADEPOST_DEMO_DB_PUSH: ${ACADEPOST_DEMO_DB_PUSH:-true}
       JWT_SECRET: ${JWT_SECRET:-change-this-demo-jwt-secret-use-a-long-random-string}
       API_LIMIT: ${API_LIMIT:-30}
@@ -183,7 +184,7 @@ services:
     networks:
       - temporal-network
     ports:
-      - "${TEMPORAL_UI_PORT:-8080}:8080"
+      - "${TEMPORAL_UI_BIND:-127.0.0.1}:${TEMPORAL_UI_PORT:-8080}:8080"
 
 volumes:
   postgres-volume:
