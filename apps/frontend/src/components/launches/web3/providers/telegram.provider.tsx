@@ -19,6 +19,9 @@ export const TelegramProvider: FC<Web3ProviderInterface> = (props) => {
   const word = useRef(makeId(4));
   const stop = useRef(false);
   const [step, setStep] = useState(false);
+  const [botName, setBotName] = useState(telegramBotName || '');
+  const [telegramConfigured, setTelegramConfigured] = useState(false);
+  const [configLoading, setConfigLoading] = useState(true);
   const toaster = useToaster();
   async function* load() {
     let id = '';
@@ -27,9 +30,13 @@ export const TelegramProvider: FC<Web3ProviderInterface> = (props) => {
         await fetch(
           `/integrations/telegram/updates?word=${word.current}${
             id ? `&id=${id}` : ''
-          }`
+          }&state=${nonce}`
         )
       ).json();
+      if (data.error) {
+        yield data;
+        return;
+      }
       if (data.lastChatId) {
         id = data.lastChatId;
       }
@@ -39,11 +46,33 @@ export const TelegramProvider: FC<Web3ProviderInterface> = (props) => {
   const t = useT();
 
   const loadAll = async () => {
+    if (!telegramConfigured) {
+      toaster.show(
+        t(
+          'telegram_credentials_missing',
+          'Configurez d’abord l’identifiant Telegram dans Paramètres > Identifiants.'
+        ),
+        'warning'
+      );
+      return;
+    }
+
     stop.current = false;
     setStep(true);
     const generator = load();
     for await (const data of generator) {
       if (stop.current) {
+        return;
+      }
+      if (data.error) {
+        toaster.show(
+          t(
+            'telegram_credentials_missing',
+            'Configurez d’abord l’identifiant Telegram dans Paramètres > Identifiants.'
+          ),
+          'warning'
+        );
+        setStep(false);
         return;
       }
       if (data.chatId) {
@@ -55,8 +84,47 @@ export const TelegramProvider: FC<Web3ProviderInterface> = (props) => {
   };
   const copyText = useCallback(() => {
     copy(`/connect ${word.current}`);
-    toaster.show('Copied to clipboard', 'success');
-  }, []);
+    toaster.show(
+      t('copied_to_clipboard', 'Copié dans le presse-papiers'),
+      'success'
+    );
+  }, [t, toaster]);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadConfig = async () => {
+      try {
+        const response = await fetch(
+          `/integrations/telegram/config?state=${nonce}`
+        );
+        const data = await response.json();
+
+        if (!active) {
+          return;
+        }
+
+        setTelegramConfigured(Boolean(data.configured));
+        setBotName(data.botName || telegramBotName || '');
+      } catch (err) {
+        if (active) {
+          setTelegramConfigured(false);
+          setBotName(telegramBotName || '');
+        }
+      } finally {
+        if (active) {
+          setConfigLoading(false);
+        }
+      }
+    };
+
+    loadConfig();
+
+    return () => {
+      active = false;
+    };
+  }, [fetch, telegramBotName]);
+
   useEffect(() => {
     return () => {
       stop.current = true;
@@ -66,16 +134,29 @@ export const TelegramProvider: FC<Web3ProviderInterface> = (props) => {
     <>
       <div className="justify-center items-center flex flex-col pt-[16px]">
         <div>
-          {t('please_add', 'Please add')} <strong>@{telegramBotName}</strong>{' '}
-          {t(
-            'to_your_telegram_group_channel_and_click_here',
-            'to your\n          telegram group / channel and click here:'
+          {telegramConfigured && botName ? (
+            <>
+              {t('please_add', 'Ajoutez')} <strong>@{botName}</strong>{' '}
+              {t(
+                'to_your_telegram_group_channel_and_click_here',
+                'à votre groupe ou canal Telegram, puis cliquez ici :'
+              )}
+            </>
+          ) : (
+            t(
+              'telegram_credentials_missing',
+              'Configurez d’abord l’identifiant Telegram dans Paramètres > Identifiants.'
+            )
           )}
         </div>
         {!step ? (
           <div className="w-full mt-[16px]" onClick={loadAll}>
             <div
-              className={`cursor-pointer bg-[#2EA6DD] h-[44px] rounded-[4px] flex justify-center items-center text-white gap-[4px]`}
+              className={`${
+                telegramConfigured && !configLoading
+                  ? 'cursor-pointer bg-[#2EA6DD]'
+                  : 'cursor-not-allowed bg-[#53636b]'
+              } h-[44px] rounded-[4px] flex justify-center items-center text-white gap-[4px]`}
             >
               <svg
                 width="51"
@@ -97,7 +178,7 @@ export const TelegramProvider: FC<Web3ProviderInterface> = (props) => {
                   fill="#CFD8DC"
                 />
               </svg>
-              <div>{t('connect_telegram', 'Connect Telegram')}</div>
+              <div>{t('connect_telegram', 'Connecter Telegram')}</div>
             </div>
           </div>
         ) : (

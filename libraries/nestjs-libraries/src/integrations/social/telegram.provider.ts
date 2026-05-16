@@ -1,5 +1,6 @@
 import {
   AuthTokenDetails,
+  ClientInformation,
   PostDetails,
   PostResponse,
   SocialProvider,
@@ -13,7 +14,6 @@ import TelegramBot from 'node-telegram-bot-api';
 import { Integration } from '@prisma/client';
 import striptags from 'striptags';
 
-const telegramBot = new TelegramBot(process.env.TELEGRAM_TOKEN!);
 // Added to support local storage posting
 const frontendURL = process.env.FRONTEND_URL || 'http://localhost:5000';
 const mediaStorage = process.env.STORAGE_PROVIDER || 'local';
@@ -51,11 +51,41 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
     };
   }
 
-  async authenticate(params: {
-    code: string;
-    codeVerifier: string;
-    refresh?: string;
-  }) {
+  private botToken(clientInformation?: ClientInformation) {
+    return clientInformation?.botToken || process.env.TELEGRAM_TOKEN || '';
+  }
+
+  private getBot(clientInformation?: ClientInformation) {
+    const token = this.botToken(clientInformation);
+    if (!token) {
+      throw new Error('Telegram bot token is not configured');
+    }
+
+    return new TelegramBot(token, { polling: false });
+  }
+
+  async getBotConfiguration(clientInformation?: ClientInformation) {
+    const bot = this.getBot(clientInformation);
+    const me = await bot.getMe();
+    return {
+      botName:
+        clientInformation?.botName ||
+        process.env.TELEGRAM_BOT_NAME ||
+        me.username ||
+        '',
+      botId: me.id,
+    };
+  }
+
+  async authenticate(
+    params: {
+      code: string;
+      codeVerifier: string;
+      refresh?: string;
+    },
+    clientInformation?: ClientInformation
+  ) {
+    const telegramBot = this.getBot(clientInformation);
     const chat = await telegramBot.getChat(params.code);
 
     if (!chat?.id) {
@@ -78,7 +108,11 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
     };
   }
 
-  async getBotId(query: { id?: number; word: string }) {
+  async getBotId(
+    query: { id?: number; word: string },
+    clientInformation?: ClientInformation
+  ) {
+    const telegramBot = this.getBot(clientInformation);
     // Added allowed_updates Ensure only necessary updates are fetched
     const res = await telegramBot.getUpdates({
       ...(query.id ? { offset: query.id } : {}),
@@ -100,7 +134,7 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
       //get the numberic ID of the bot
       const botId = (await telegramBot.getMe()).id;
       // check if the bot is an admin in the chat
-      const isAdmin = await this.botIsAdmin(chatId, botId);
+      const isAdmin = await this.botIsAdmin(telegramBot, chatId, botId);
       // get the messageId of the message that triggered the connection
       const connectMessageId =
         match?.message?.message_id || match?.channel_post?.message_id;
@@ -120,9 +154,10 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
           'Connection Successful. Message will be deleted in 10 seconds.'
         );
         // Delete the success message after 10 seconds
-        setTimeout(async () => {
-          await telegramBot.deleteMessage(chatId, successMessage.message_id);
-          console.log('Success message deleted.');
+        setTimeout(() => {
+          telegramBot
+            .deleteMessage(chatId, successMessage.message_id)
+            .catch(() => {});
         }, 10000);
       }
     }
@@ -168,6 +203,7 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
   }
 
   private async sendMessage(
+    telegramBot: TelegramBot,
     accessToken: string,
     message: PostDetails,
     replyToMessageId?: number
@@ -179,7 +215,6 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
       .replace(/<\/strong>/g, '</b>')
       .replace(/<p>(.*?)<\/p>/g, '$1\n');
 
-    console.log(text);
     const processedMedia = this.processMedia(mediaFiles);
 
     // if there's no media, bot sends a text message only
@@ -253,11 +288,17 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
   async post(
     id: string,
     accessToken: string,
-    postDetails: PostDetails[]
+    postDetails: PostDetails[],
+    integration: Integration,
+    clientInformation?: ClientInformation
   ): Promise<PostResponse[]> {
     const [firstPost] = postDetails;
 
-    const messageId = await this.sendMessage(accessToken, firstPost);
+    const messageId = await this.sendMessage(
+      this.getBot(clientInformation),
+      accessToken,
+      firstPost
+    );
 
     // for private groups/channels message.id is undefined so the generated link will be unusable "https://t.me/c/undefined/16"
     // to avoid that, we use accessToken instead of message.id and we generate the link manually removing the -100 from the start.
@@ -283,12 +324,18 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
     lastCommentId: string | undefined,
     accessToken: string,
     postDetails: PostDetails[],
-    integration: Integration
+    integration: Integration,
+    clientInformation?: ClientInformation
   ): Promise<PostResponse[]> {
     const [commentPost] = postDetails;
     const replyToId = Number(lastCommentId || postId);
 
-    const messageId = await this.sendMessage(accessToken, commentPost, replyToId);
+    const messageId = await this.sendMessage(
+      this.getBot(clientInformation),
+      accessToken,
+      commentPost,
+      replyToId
+    );
 
     if (messageId) {
       return [
@@ -314,7 +361,11 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
     return result;
   }
 
-  async botIsAdmin(chatId: number, botId: number): Promise<boolean> {
+  async botIsAdmin(
+    telegramBot: TelegramBot,
+    chatId: number,
+    botId: number
+  ): Promise<boolean> {
     try {
       const chatMember = await telegramBot.getChatMember(chatId, botId);
 

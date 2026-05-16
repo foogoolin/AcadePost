@@ -476,9 +476,49 @@ export class IntegrationsController {
     return this._integrationService.changePlugActivation(org.id, id, status);
   }
 
+  @Get('/telegram/config')
+  @CheckPolicies([AuthorizationActions.Create, Sections.CHANNEL])
+  async getTelegramConfig(
+    @GetOrgFromRequest() org: Organization,
+    @Query('state') state?: string
+  ) {
+    try {
+      const clientInformation = await this.resolveTelegramClientInformation(
+        org,
+        state
+      );
+      const config = await new TelegramProvider().getBotConfiguration(
+        clientInformation
+      );
+
+      return {
+        configured: true,
+        ...config,
+      };
+    } catch (err) {
+      return {
+        configured: false,
+        botName: '',
+      };
+    }
+  }
+
   @Get('/telegram/updates')
-  async getUpdates(@Query() query: { word: string; id?: number }) {
-    return new TelegramProvider().getBotId(query);
+  @CheckPolicies([AuthorizationActions.Create, Sections.CHANNEL])
+  async getUpdates(
+    @GetOrgFromRequest() org: Organization,
+    @Query() query: { word: string; id?: number; state?: string }
+  ) {
+    try {
+      const clientInformation = await this.resolveTelegramClientInformation(
+        org,
+        query.state
+      );
+
+      return new TelegramProvider().getBotId(query, clientInformation);
+    } catch (err) {
+      return { error: 'telegram_credentials_missing' };
+    }
   }
 
   @Post('/moltbook/register')
@@ -505,5 +545,25 @@ export class IntegrationsController {
     } catch (err) {
       return { claimed: false };
     }
+  }
+
+  private async resolveTelegramClientInformation(
+    org: Organization,
+    state?: string
+  ) {
+    const providerCredentialId = state
+      ? await ioRedis.get(`credential:${state}`)
+      : undefined;
+
+    return providerCredentialId
+      ? this._providerCredentialsService.resolveClientInformationByCredentialId(
+          org.id,
+          'telegram',
+          providerCredentialId
+        )
+      : this._providerCredentialsService.resolveClientInformation(
+          org.id,
+          'telegram'
+        );
   }
 }

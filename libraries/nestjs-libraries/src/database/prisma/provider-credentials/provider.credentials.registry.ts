@@ -87,27 +87,54 @@ export const PROVIDER_CREDENTIAL_DEFINITIONS: ProviderCredentialDefinition[] = [
     identifier: 'facebook',
     name: 'Meta Business - Facebook Pages',
     group: 'Meta',
-    fields: clientFields('FACEBOOK_APP_ID', 'FACEBOOK_APP_SECRET', 'App ID', 'App Secret'),
-    notes: ['Can also be reused by the Instagram Facebook Business provider.'],
+    fields: clientFields(
+      'FACEBOOK_APP_ID',
+      'FACEBOOK_APP_SECRET',
+      'App ID',
+      'App Secret'
+    ),
+    notes: [
+      'Identifiant séparé pour Facebook Pages. Vous pouvez réutiliser les mêmes valeurs qu’une app Meta, mais AcadéPost ne les partage pas automatiquement.',
+    ],
   },
   {
     identifier: 'instagram',
-    name: 'Instagram Facebook Business',
+    name: 'Instagram Business',
     group: 'Meta',
-    fields: clientFields('FACEBOOK_APP_ID', 'FACEBOOK_APP_SECRET', 'App ID', 'App Secret'),
-    notes: ['Requires an Instagram professional account connected to a Facebook Page.'],
+    fields: clientFields(
+      'FACEBOOK_APP_ID',
+      'FACEBOOK_APP_SECRET',
+      'App ID',
+      'App Secret'
+    ),
+    notes: [
+      'Identifiant séparé pour Instagram Business. Nécessite un compte Instagram professionnel relié à une Page Facebook.',
+    ],
   },
   {
     identifier: 'instagram-standalone',
     name: 'Instagram Standalone',
     group: 'Meta',
-    fields: clientFields('INSTAGRAM_APP_ID', 'INSTAGRAM_APP_SECRET', 'Instagram App ID', 'Instagram App Secret'),
+    fields: clientFields(
+      'INSTAGRAM_APP_ID',
+      'INSTAGRAM_APP_SECRET',
+      'Instagram App ID',
+      'Instagram App Secret'
+    ),
   },
   {
     identifier: 'threads',
     name: 'Threads',
     group: 'Meta',
-    fields: clientFields('THREADS_APP_ID', 'THREADS_APP_SECRET', 'Threads App ID', 'Threads App Secret'),
+    fields: clientFields(
+      'THREADS_APP_ID',
+      'THREADS_APP_SECRET',
+      'Threads App ID',
+      'Threads App Secret'
+    ),
+    notes: [
+      'Identifiant séparé pour Threads. Ne dépend pas automatiquement de l’identifiant Facebook ou Instagram.',
+    ],
   },
   {
     identifier: 'youtube',
@@ -125,7 +152,12 @@ export const PROVIDER_CREDENTIAL_DEFINITIONS: ProviderCredentialDefinition[] = [
     identifier: 'tiktok',
     name: 'TikTok',
     group: 'Core social',
-    fields: clientFields('TIKTOK_CLIENT_ID', 'TIKTOK_CLIENT_SECRET', 'Client Key', 'Client Secret'),
+    fields: clientFields(
+      'TIKTOK_CLIENT_ID',
+      'TIKTOK_CLIENT_SECRET',
+      'Client Key',
+      'Client Secret'
+    ),
   },
   {
     identifier: 'pinterest',
@@ -160,7 +192,12 @@ export const PROVIDER_CREDENTIAL_DEFINITIONS: ProviderCredentialDefinition[] = [
     identifier: 'slack',
     name: 'Slack',
     group: 'Community',
-    fields: clientFields('SLACK_ID', 'SLACK_SECRET', 'Client ID', 'Client Secret'),
+    fields: clientFields(
+      'SLACK_ID',
+      'SLACK_SECRET',
+      'Client ID',
+      'Client Secret'
+    ),
     notes: [serverRuntimeNote],
   },
   {
@@ -191,7 +228,12 @@ export const PROVIDER_CREDENTIAL_DEFINITIONS: ProviderCredentialDefinition[] = [
     identifier: 'kick',
     name: 'Kick',
     group: 'Community',
-    fields: clientFields('KICK_CLIENT_ID', 'KICK_SECRET', 'Client ID', 'Secret'),
+    fields: clientFields(
+      'KICK_CLIENT_ID',
+      'KICK_SECRET',
+      'Client ID',
+      'Secret'
+    ),
     notes: [serverRuntimeNote],
   },
   {
@@ -221,7 +263,12 @@ export const PROVIDER_CREDENTIAL_DEFINITIONS: ProviderCredentialDefinition[] = [
     identifier: 'wrapcast',
     name: 'Farcaster / Warpcast',
     group: 'Web3',
-    fields: clientFields('NEYNAR_CLIENT_ID', 'NEYNAR_SECRET_KEY', 'Neynar Client ID', 'Neynar Secret Key'),
+    fields: clientFields(
+      'NEYNAR_CLIENT_ID',
+      'NEYNAR_SECRET_KEY',
+      'Neynar Client ID',
+      'Neynar Secret Key'
+    ),
     notes: [serverRuntimeNote],
   },
   {
@@ -246,7 +293,9 @@ export const PROVIDER_CREDENTIAL_DEFINITIONS: ProviderCredentialDefinition[] = [
         placeholder: 'acadepost_bot',
       },
     ],
-    notes: [serverRuntimeNote],
+    notes: [
+      'Publie via Telegram Bot API. Ajoutez le bot au groupe ou canal, puis utilisez la commande de connexion affichée par AcadéPost.',
+    ],
   },
   {
     identifier: 'mewe',
@@ -298,5 +347,5 @@ export const PROVIDER_CREDENTIAL_LOOKUP: Record<
   return acc;
 }, {} as Record<ProviderCredentialIdentifier, ProviderCredentialIdentifier[]>);
 
-PROVIDER_CREDENTIAL_LOOKUP.instagram = ['instagram', 'facebook'];
-PROVIDER_CREDENTIAL_LOOKUP.facebook = ['facebook', 'instagram'];
+PROVIDER_CREDENTIAL_LOOKUP.instagram = ['instagram'];
+PROVIDER_CREDENTIAL_LOOKUP.facebook = ['facebook'];

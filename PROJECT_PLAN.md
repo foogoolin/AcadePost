@@ -279,6 +279,20 @@ The first workflow should classify content into one of these groups, make the ma
 - Difference strategique AcadéPost: credentials par projet dans l'UI, projets/roles adaptes a AcadéNice, templates Editor pour agents, n8n agents `Human in the loop` / `Full Access`, et Docker update par GHCR.
 - Prochain gate prioritaire: matrice provider `ready / blocked / needs app review`, puis smoke test reel de publication sur YouTube, TikTok, Instagram, Facebook Page, Threads, X, LinkedIn et Pinterest.
 
+## MVP Provider Credentials Gate - 2026-05-16
+
+- Scope implemente directement dans `main`: Telegram, Facebook Pages, Instagram Business, Threads, YouTube et Pinterest.
+- Source de checklist: documentation Postiz providers pour champs requis, redirect URIs, permissions/scopes et caveats tester/app-review; l'architecture `.env` Postiz n'est pas reprise comme modele principal.
+- BYAN workflow: Rachid a valide que Docker/GHCR/update path reste `pull` + `up --no-build`; Marc a audite le contrat credentials/API; Skeptic a audite les risques security et a bloque toute promesse de fonctionnement sans smoke test reel.
+- Facebook, Instagram et Threads restent des credentials separes cote AcadéPost. Le fallback automatique Instagram vers Facebook et Facebook vers Instagram a ete retire.
+- Telegram utilise maintenant le `botToken` et le `botName` du credential projet pour `/integrations/telegram/config`, `/integrations/telegram/updates`, connect et publication; pendant le connect, ces endpoints resolvent aussi le credential lie au `state` Redis; `.env` reste seulement fallback legacy/demo.
+- Le provider Telegram ne cree plus de bot global au demarrage backend et ne logge plus le contenu texte des posts.
+- La publication planifiee et les commentaires passent le `clientInformation` resolu depuis `Integration.providerCredentialId` au provider social.
+- Le refresh batch historique passe par `RefreshIntegrationService`, afin de conserver le credential lie au canal au lieu de rafraichir avec les seules variables serveur.
+- CORS autorise maintenant `x-acadepost-agent-id` et `x-acadepost-agent-secret` pour les clients Public API/agent dans un navigateur; n8n server-to-server n'etait pas bloque par CORS.
+- Documentation mise a jour: `docs/integrations/social-provider-readiness-2026-05-16.md` et `docs/product/postiz-feature-comparison-2026-05-16.md`.
+- Gaps explicites avant promesse client: vrais smoke tests provider avec credentials reels, choix manuel du credential dans Add Channel quand plusieurs credentials du meme provider existent, reduction du pouvoir de la project API key si elle est donnee a un agent, et masquage/controle plus fin des webhook URLs n8n pour les non-admins.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?

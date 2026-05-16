@@ -30,6 +30,8 @@ async function start() {
         'auth',
         'showorg',
         'impersonate',
+        'x-acadepost-agent-id',
+        'x-acadepost-agent-secret',
         'x-copilotkit-runtime-client-gql-version',
       ],
       exposedHeaders: [

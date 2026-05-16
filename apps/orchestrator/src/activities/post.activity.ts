@@ -115,7 +115,9 @@ export class PostActivity {
   @ActivityMethod()
   async getPostsList(orgId: string, postId: string) {
     if (process.env.STRIPE_SECRET_KEY) {
-      const subscription = await this._subscriptionService.getSubscription(orgId);
+      const subscription = await this._subscriptionService.getSubscription(
+        orgId
+      );
       if (!subscription) {
         return [];
       }
@@ -180,24 +182,15 @@ export class PostActivity {
       }))
     );
 
-    return integration.providerIdentifier === 'x'
-      ? (getIntegration as any).comment(
-          integration.internalId,
-          postId,
-          lastPostId,
-          integration.token,
-          postDetails,
-          integration,
-          clientInformation
-        )
-      : getIntegration.comment(
-          integration.internalId,
-          postId,
-          lastPostId,
-          integration.token,
-          postDetails,
-          integration
-        );
+    return (getIntegration as any).comment(
+      integration.internalId,
+      postId,
+      lastPostId,
+      integration.token,
+      postDetails,
+      integration,
+      clientInformation
+    );
   }
 
   @ActivityMethod()
@@ -233,21 +226,13 @@ export class PostActivity {
       }))
     );
 
-    const postNow =
-      integration.providerIdentifier === 'x'
-        ? await (getIntegration as any).post(
-            integration.internalId,
-            integration.token,
-            postDetails,
-            integration,
-            clientInformation
-          )
-        : await getIntegration.post(
-            integration.internalId,
-            integration.token,
-            postDetails,
-            integration
-          );
+    const postNow = await (getIntegration as any).post(
+      integration.internalId,
+      integration.token,
+      postDetails,
+      integration,
+      clientInformation
+    );
 
     await this._temporalService.client
       .getRawClient()
@@ -426,10 +411,7 @@ export class PostActivity {
 
       return refresh;
     } catch (err) {
-      await this._refreshIntegrationService.setBetweenSteps(
-        integration,
-        cause
-      );
+      await this._refreshIntegrationService.setBetweenSteps(integration, cause);
       return false;
     }
   }

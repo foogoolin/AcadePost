@@ -65,7 +65,7 @@ AcadéPost reprend une grande partie du moteur Postiz par le fork, mais le statu
 | Collaboration | Team members | Present; roles retraduits Propriétaire/Admin/Éditeur |
 | Collaboration | Customer groups | Present dans schema; AcadéPost les traite comme projets pour MVP |
 | Collaboration | Role Admin/Member | Present; AcadéPost renforce Admin/Éditeur |
-| Credentials | Providers config via `.env` | Herite |
+| Credentials | Providers config via `.env` | En transition: credentials projet dans l'UI pour les providers MVP, `.env` garde le fallback demo/legacy |
 | Credentials | Credentials par projet type n8n | Ajoute dans AcadéPost pour providers principaux |
 | Deployment | Docker self-host | Present; AcadéPost a ajoute GHCR image + update script |
 | Deployment | Reverse proxy Caddy/Nginx/Traefik | Postiz documente; AcadéPost shared-infra Caddy ajoute |
@@ -85,25 +85,25 @@ Statuts:
 | X / Twitter | `x` | Oui | Oui | Oui | App X, callback, limites API et plan X a verifier |
 | LinkedIn | `linkedin` | Oui | Oui | Non direct | OAuth + publication texte/media/commentaires a tester |
 | LinkedIn Page | `linkedin-page` | Oui | Oui | Oui | Pages/company permissions a tester |
-| Facebook | `facebook` | Oui | Oui | Oui | Meta app review, Pages permissions, policy URLs |
-| Instagram Business | `instagram` | Oui | Oui | Oui | Meta app review, compte FB-linked, post/reel/carousel |
+| Facebook | `facebook` | Oui | Oui | Oui | Credential projet separe; Meta app review, Pages permissions, policy URLs |
+| Instagram Business | `instagram` | Oui | Oui | Oui | Credential projet separe; Meta app review, compte FB-linked, post/reel/carousel |
 | Instagram Standalone | `instagram-standalone` | Oui | Oui | Oui via provider IG | Necessite flow specifique Instagram standalone |
-| Threads | `threads` | Oui | Oui | Oui | Meta/Threads scopes + media status polling |
+| Threads | `threads` | Oui | Oui | Oui | Credential projet separe; Meta/Threads scopes + media status polling |
 | Bluesky | `bluesky` | Oui | Fallback/env/custom fields | Non | App password / custom fields; smoke simple prioritaire |
 | Mastodon | `mastodon` | Oui | Non runtime UI | Non | Provider principal present; custom instance desactive |
 | Warpcast / Farcaster | `warpcast` | Partiel: code `wrapcast` | Non runtime UI | Non | Bug de nom: docs `warpcast`, code `wrapcast` |
 | Nostr | `nostr` | Oui | Fallback/custom fields | Non | Cle privee / flow a auditer securite |
 | VK | `vk` | Oui | Non runtime UI | Non | Credentials serveur `.env`; smoke requis |
-| YouTube | `youtube` | Oui | Oui | Oui | Quotas upload, madeForKids, thumbnails/tags |
+| YouTube | `youtube` | Oui | Oui | Oui | Credential projet dans l'UI; quotas upload, madeForKids, thumbnails/tags |
 | TikTok | `tiktok` | Oui | Oui | Oui + missing | Content Posting API, privacy settings, quota TikTok |
 | Reddit | `reddit` | Oui | Oui | Non | Subreddit/flair/title flow a tester |
 | Lemmy | `lemmy` | Oui | Fallback/custom fields | Non | Instance URL/login; federation differences |
 | Discord | `discord` | Oui | Non runtime UI | Non | Uses server/env; channel tool present |
 | Slack | `slack` | Oui | Non runtime UI | Non | Uses server/env; channel tool present |
-| Telegram | `telegram` | Oui | Non runtime UI | Non | Bot token/chat auth; code nettoye d'un log sensible |
+| Telegram | `telegram` | Oui | Oui runtime UI | Non | Bot token/chat auth depuis credential projet; smoke reel bot requis |
 | Kick | `kick` | Oui | Non runtime UI | Non | Credentials serveur `.env`; chat/post semantics |
 | Twitch | `twitch` | Oui | Non runtime UI | Non | Chat/announcement semantics; OAuth smoke |
-| Pinterest | `pinterest` | Oui | Oui | Oui | Boards, images, links; smoke prioritaire pour carrousels |
+| Pinterest | `pinterest` | Oui | Oui | Oui | Credential projet dans l'UI; boards, images, links; smoke prioritaire pour carrousels |
 | Dribbble | `dribbble` | Oui | Non runtime UI | Oui | Risque code: refreshToken suspect mentionne dans plan |
 | Medium | `medium` | Oui | Fallback/custom fields | Non | Markdown editor; publications/tags |
 | Dev.to | `devto` | Oui | Fallback/custom fields | Non | API key/custom fields; org/tag tools |
@@ -166,22 +166,23 @@ AcadéPost contient le code MCP herite et doit le verifier en runtime apres rebr
 ## Points ou AcadéPost peut etre meilleur que Postiz pour le client
 
 1. Credentials par projet dans l'UI, au lieu de forcer uniquement `.env`.
-2. Projet comme frontiere d'acces visible pour ecole/agence: chaque client/etudiant/equipe travaille dans son espace.
-3. `Éditeur` templates pour creer des presets visuels reutilisables par agents n8n.
-4. Agents n8n avec modes `Human in the loop` et `Full Access` scopes.
-5. Docker/GHCR update path: serveur tire une image preconstruite, ne build pas le projet.
-6. Positionnement AcadéNice/formation: workflow pedagogique + validation marketing, pas seulement scheduler SaaS generaliste.
+2. Separation explicite des credentials Facebook, Instagram et Threads: AcadéPost ne remplace plus automatiquement un credential Meta par un autre.
+3. Projet comme frontiere d'acces visible pour ecole/agence: chaque client/etudiant/equipe travaille dans son espace.
+4. `Éditeur` templates pour creer des presets visuels reutilisables par agents n8n.
+5. Agents n8n avec modes `Human in the loop` et `Full Access` scopes.
+6. Docker/GHCR update path: serveur tire une image preconstruite, ne build pas le projet.
+7. Positionnement AcadéNice/formation: workflow pedagogique + validation marketing, pas seulement scheduler SaaS generaliste.
 
 ## Gaps prioritaires avant promesse client
 
 1. Smoke-test reel de publication pour les providers de demo: YouTube, TikTok, Instagram, Facebook Page, Threads, X, LinkedIn, Pinterest.
 2. Verifier OAuth callback domain pour Meta/Google/TikTok/LinkedIn/Pinterest sur le domaine client.
-3. Corriger/decider `wrapcast` vs `warpcast`.
-4. Clarifier providers qui restent `.env` seulement dans l'UI credentials.
-5. Verifier MCP runtime ou retirer les promesses MCP visibles si non prioritaire.
-6. Tester Public API avec un agent n8n reel: upload -> template render -> proposal -> calendrier -> validation -> publication.
-7. Tester analytics post-publication sur au moins 3 reseaux majeurs.
-8. Verifier short links et click analytics avec domaine public.
-9. Verifier repeated posts/RSS/posting sets/signatures en UI.
-10. Produire une matrice "Provider ready / blocked / needs app review" pour demo client.
-
+3. Ajouter un choix explicite de credential dans le flow Add Channel si un meme projet contient plusieurs credentials pour le meme provider.
+4. Corriger/decider `wrapcast` vs `warpcast`.
+5. Clarifier providers qui restent `.env` seulement dans l'UI credentials.
+6. Verifier MCP runtime ou retirer les promesses MCP visibles si non prioritaire.
+7. Tester Public API avec un agent n8n reel: upload -> template render -> proposal -> calendrier -> validation -> publication.
+8. Tester analytics post-publication sur au moins 3 reseaux majeurs.
+9. Verifier short links et click analytics avec domaine public.
+10. Verifier repeated posts/RSS/posting sets/signatures en UI.
+11. Produire une matrice "Provider ready / blocked / needs app review" pour demo client.
