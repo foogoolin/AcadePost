@@ -2,6 +2,7 @@
 
 ## v1.1.0 - 2026-05-16
 
+- Updated product package metadata to `1.1.0`.
 - Added the MVP Provider Credentials Gate for Telegram, Facebook Pages, Instagram Business, Threads, YouTube and Pinterest.
 - Kept Facebook, Instagram and Threads as separate AcadéPost credentials; removed automatic Facebook/Instagram credential fallback.
 - Moved Telegram connect and publish paths to project credentials, with `.env` as legacy/demo fallback only.
