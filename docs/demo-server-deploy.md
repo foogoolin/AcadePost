@@ -113,7 +113,17 @@ docker compose --env-file .env.demo -f docker-compose.demo.yaml exec acadepost-r
 7. Verifier qu'un `Éditeur` ne peut pas acceder aux actions admin.
 8. Uploader une image et verifier que `/uploads/...` la sert correctement.
 
-## Mise a jour du code
+## Mise a jour image demo
+
+Pour mettre a jour AcadéPost sans build sur le VPS :
+
+```bash
+bash deploy/demo/update.sh --env .env.demo --compose docker-compose.demo.yaml
+```
+
+Voir aussi `docs/demo-docker-update.md`. Le script tire `ACADEPOST_IMAGE` depuis `.env`, recrée uniquement le service `acadepost` avec `--no-build`, puis attend `/api/monitor/ready`.
+
+## Mise a jour du code et des scripts
 
 ```bash
 git pull

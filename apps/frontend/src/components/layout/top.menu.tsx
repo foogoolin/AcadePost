@@ -80,6 +80,27 @@ export const useMenuItem = () => {
       path: '/content-routing',
     },
     {
+      name: 'Éditeur',
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+        >
+          <path
+            d="M4 19.5H20M14.5 4.5L19.5 9.5M6.5 17.5L8.25 12.25L16.75 3.75C17.5784 2.92157 18.9216 2.92157 19.75 3.75C20.5784 4.57843 20.5784 5.92157 19.75 6.75L11.25 15.25L6.5 17.5Z"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ),
+      path: '/editor',
+    },
+    {
       name: 'Agent',
       icon: (
         <svg

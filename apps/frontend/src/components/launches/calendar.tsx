@@ -1013,6 +1013,9 @@ const CalendarItem: FC<{
   showTime?: boolean;
   post: Post & {
     integration: Integration;
+    agentStatus?: string | null;
+    source?: string | null;
+    requiresApproval?: boolean;
     tags: {
       tag: Tags;
     }[];
@@ -1037,6 +1040,16 @@ const CalendarItem: FC<{
   const preview = useCallback(() => {
     window.open(`/p/` + post.id + '?share=true', '_blank');
   }, [post]);
+  const agentLabel =
+    post.agentStatus === 'needs_approval'
+      ? t('agent_to_validate', 'À valider')
+      : post.agentStatus === 'scheduled'
+      ? t('agent_scheduled', 'Planifié')
+      : post.agentStatus === 'publishing'
+      ? t('agent_generated', 'Généré par agent')
+      : post.source === 'external_agent'
+      ? t('agent_generated', 'Généré par agent')
+      : '';
   const [{ opacity }, dragRef] = useDrag(
     () => ({
       type: 'post',
@@ -1176,7 +1189,8 @@ const CalendarItem: FC<{
         </div>
         <div className="w-full flex-1 flex flex-col min-h-[40px]">
           <div className="text-start">
-            {state === 'DRAFT' ? t('draft', 'Draft') + ': ' : ''}
+            {agentLabel ? `${agentLabel}: ` : ''}
+            {state === 'DRAFT' && !agentLabel ? t('draft', 'Draft') + ': ' : ''}
           </div>
           <div className="w-full relative">
             <div className="absolute top-0 start-0 w-full text-ellipsis break-words line-clamp-1 text-start">

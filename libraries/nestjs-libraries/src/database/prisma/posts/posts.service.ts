@@ -129,6 +129,19 @@ export class PostsService {
     return this._postRepository.updateReleaseId(postId, orgId, releaseId);
   }
 
+  markAgentPosts(
+    orgId: string,
+    postIds: string[],
+    data: {
+      agentRunId?: string;
+      requiresApproval?: boolean;
+      agentStatus?: string;
+      source?: string;
+    }
+  ) {
+    return this._postRepository.markAgentPosts(orgId, postIds, data);
+  }
+
   async checkPostAnalytics(
     orgId: string,
     postId: string,

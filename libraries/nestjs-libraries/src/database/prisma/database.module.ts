@@ -42,6 +42,12 @@ import { AnnouncementsRepository } from '@gitroom/nestjs-libraries/database/pris
 import { AnnouncementsService } from '@gitroom/nestjs-libraries/database/prisma/announcements/announcements.service';
 import { ErrorsRepository } from '@gitroom/nestjs-libraries/database/prisma/errors/errors.repository';
 import { ErrorsService } from '@gitroom/nestjs-libraries/database/prisma/errors/errors.service';
+import { PostTemplatesRepository } from '@gitroom/nestjs-libraries/database/prisma/post-templates/post.templates.repository';
+import { PostTemplatesService } from '@gitroom/nestjs-libraries/database/prisma/post-templates/post.templates.service';
+import { ExternalAgentsRepository } from '@gitroom/nestjs-libraries/database/prisma/external-agents/external.agents.repository';
+import { ExternalAgentsService } from '@gitroom/nestjs-libraries/database/prisma/external-agents/external.agents.service';
+import { AgentRunsRepository } from '@gitroom/nestjs-libraries/database/prisma/agent-runs/agent.runs.repository';
+import { AgentRunsService } from '@gitroom/nestjs-libraries/database/prisma/agent-runs/agent.runs.service';
 
 @Global()
 @Module({
@@ -93,6 +99,12 @@ import { ErrorsService } from '@gitroom/nestjs-libraries/database/prisma/errors/
     AnnouncementsService,
     ErrorsRepository,
     ErrorsService,
+    PostTemplatesRepository,
+    PostTemplatesService,
+    ExternalAgentsRepository,
+    ExternalAgentsService,
+    AgentRunsRepository,
+    AgentRunsService,
   ],
   get exports() {
     return this.providers;

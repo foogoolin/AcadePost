@@ -128,6 +128,16 @@ docker compose --env-file .env.demo.shared-infra -f docker-compose.demo.shared-i
 
 `/api/monitor/ready` verifie un TCP connect vers PostgreSQL, Redis et Temporal.
 
+## Mise a jour image demo
+
+Pour mettre a jour AcadéPost sans build sur le VPS :
+
+```bash
+bash deploy/demo/update.sh --env .env.demo.shared-infra --compose docker-compose.demo.shared-infra.yaml
+```
+
+Voir aussi `docs/demo-docker-update.md`. Le script tire `ACADEPOST_IMAGE` depuis `.env`, recrée uniquement le service `acadepost` avec `--no-build`, puis attend `/api/monitor/ready`.
+
 ## Donnees et backups
 
 Le compose shared-infra utilise des bind mounts sous :

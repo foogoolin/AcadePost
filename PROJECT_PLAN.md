@@ -186,6 +186,34 @@ The first workflow should classify content into one of these groups, make the ma
 - Les surfaces visibles billing, public API/developer et OAuth authorization ont perdu les principaux CTA purple et mojibake détectés.
 - Vérification locale: `corepack pnpm --filter ./apps/frontend run build` passe avec l'avertissement connu Node `v24.13.0` vs cible repo `>=22.12.0 <23.0.0`.
 
+## BYAN Codex Agent Bridge - 2026-05-15
+
+- Ajout d'un pont explicite entre les agents markdown BYAN et les prompts Codex.
+- Les agents sources restent dans `_byan/agents/*.md`; ils ne sont pas dupliqués ni réécrits.
+- Les stubs Codex sont maintenant disponibles sous `.codex/prompts/byan-*.md`: `byan-byan`, `byan-skeptic`, `byan-rachid`, `byan-marc`, `byan-jimmy`, `byan-mike`, `byan-tao`, `byan-turbo-whisper`, `byan-yanstaller`.
+- Le fichier `.codex/prompts/byan-agent-bridge.md` définit le contrat d'exécution: charger `_byan/config.yaml`, charger l'agent BYAN complet, charger les fichiers `*-soul.md` et `*-tao.md` si présents, puis reporter le rôle BYAN plutôt que le nickname technique du subagent Codex.
+- Le skill `.claude/skills/byan-codex/SKILL.md` a été mis à jour pour imposer ce mode de délégation.
+- Limite connue: Codex Desktop génère toujours ses propres nicknames de subagents; le pont garantit le rôle et la source BYAN, pas le renommage interne du runtime Codex.
+
+## Editor, n8n Agents et Docker Update - 2026-05-15
+
+- BYAN workflow utilise pour ce passage: Rachid a audite le chemin Docker/GHCR/update, Marc a audite le contrat API n8n, Skeptic a bloque le Full Access non scope.
+- Decision architecture: n8n reste une couche externe d'automatisation au-dessus du Public REST API; `/copilot/agent` reste reserve au chat UI.
+- Ajout des modeles Prisma `PostTemplate`, `ExternalAgent` et `AgentRun`.
+- Les posts peuvent maintenant porter les metadonnees demo `agentRunId`, `requiresApproval`, `agentStatus` et `source` pour afficher les propositions agent dans le calendrier.
+- Nouvelle page `/editor` avec label `Éditeur`: creation de modeles `Post 1:1`, `Post 3:4`, `Carrousel 1:1`, `Carrousel 3:4`, choix image, position overlay, label site, texte, couleur HEX, opacite, preview live et rendu PNG vers la Media Library.
+- Style `/editor` applique selon `C:\Users\my\Documents\byan-test\DESIGN.md`: densite SaaS, cellules/controles carres 6-8px, Inter/system, base near-black/white, pas de purple actif.
+- Nouvelle gestion n8n dans `/agents`: creation de webhook-agent, mode `Human in the loop` par defaut, mode `Full Access` explicite, scopes visibles et test webhook.
+- Securite MVP: les agents `human_in_the_loop` ne peuvent pas creer `schedule` ou `now`; `Full Access` exige les scopes demandes par le mode, et les secrets agent sont verifies separement.
+- Nouveaux endpoints app: `/agent-webhooks`, `/agent-webhooks/:id/test`, `/post-templates`, `/post-templates/:id/render-preview`.
+- Nouveaux endpoints public/n8n: `/public/v1/post-templates`, `/public/v1/post-templates/:id/render`, `/public/v1/agent-runs`, `/public/v1/agent-runs/:id`, et `PUT /public/v1/posts/:id` pour status/date/releaseId.
+- Public auth accepte maintenant aussi le format `Authorization: Bearer <token>` en plus du format historique direct.
+- Le calendrier affiche les posts agent avec labels `Généré par agent`, `À valider` ou `Planifié` selon `agentStatus`.
+- Docker update normalise: `deploy/demo/update.sh` valide Compose, fait `docker compose pull acadepost`, recrée le service avec `--no-build --force-recreate`, attend `/api/monitor/ready` et affiche l'image active.
+- Documentation ajoutee: `docs/demo-docker-update.md`; les runbooks clean-VPS et shared-infra pointent vers le nouveau script.
+- Verification locale: `prisma generate`, backend build, frontend build, orchestrator build, `docker compose config --quiet` pour clean-VPS et shared-infra, `git diff --check`, recherche mojibake hors `docs/codex-project-memory.md`.
+- Caveat local inchangé: Node local `v24.13.0` est hors plage cible repo `>=22.12.0 <23.0.0`; les builds passent quand même avec l'avertissement.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?

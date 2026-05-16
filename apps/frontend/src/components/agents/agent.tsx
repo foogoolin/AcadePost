@@ -22,6 +22,18 @@ import { Integration } from '@prisma/client';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
+import { useToaster } from '@gitroom/react/toaster/toaster';
+
+const agentScopes = [
+  'media:write',
+  'templates:read',
+  'templates:render',
+  'posts:write',
+  'posts:schedule',
+  'posts:publish',
+  'calendar:read',
+  'calendar:write',
+];
 
 export const MediaPortal: FC<{
   media: { path: string; id: string }[];
@@ -255,6 +267,7 @@ const Threads: FC = () => {
             </div>
           </Link>
         </div>
+        <ExternalAgentPanel />
         <div className="flex flex-col gap-[1px]">
           {data?.threads?.map((p: any) => (
             <Link
@@ -269,6 +282,213 @@ const Threads: FC = () => {
             </Link>
           ))}
         </div>
+      </div>
+    </div>
+  );
+};
+
+const ExternalAgentPanel: FC = () => {
+  const fetch = useFetch();
+  const toaster = useToaster();
+  const t = useT();
+  const [draft, setDraft] = useState({
+    id: '',
+    name: 'Agent n8n',
+    webhookUrl: '',
+    accessMode: 'human_in_the_loop',
+    enabled: true,
+    scopes: ['posts:write', 'templates:read'],
+  });
+
+  const loadAgents = useCallback(async () => {
+    return (await fetch('/agent-webhooks')).json();
+  }, [fetch]);
+
+  const { data, mutate } = useSWR('agent-webhooks', loadAgents, {
+    fallbackData: [],
+    revalidateOnFocus: false,
+  });
+
+  const saveAgent = useCallback(async () => {
+    if (!draft.name.trim() || !draft.webhookUrl.trim()) {
+      toaster.show('Nom et webhook sont requis', 'warning');
+      return;
+    }
+
+    const response = await fetch(
+      draft.id ? `/agent-webhooks/${draft.id}` : '/agent-webhooks',
+      {
+        method: draft.id ? 'PUT' : 'POST',
+        body: JSON.stringify({
+          name: draft.name,
+          webhookUrl: draft.webhookUrl,
+          accessMode: draft.accessMode,
+          enabled: draft.enabled,
+          scopes: draft.scopes,
+        }),
+      }
+    );
+    const saved = await response.json();
+    await mutate();
+    setDraft((current) => ({
+      ...current,
+      id: saved.id,
+    }));
+    toaster.show(
+      saved.secret
+        ? `Agent enregistré. Secret: ${saved.secret}`
+        : 'Agent enregistré',
+      'success'
+    );
+  }, [draft, fetch, mutate, toaster]);
+
+  const testAgent = useCallback(
+    async (id: string) => {
+      const response = await fetch(`/agent-webhooks/${id}/test`, {
+        method: 'POST',
+        body: JSON.stringify({
+          payload: {
+            source: 'AcadéPost',
+            message: 'Test de webhook n8n',
+          },
+        }),
+      });
+      if (!response.ok) {
+        toaster.show('Le test webhook a échoué', 'warning');
+        return;
+      }
+      toaster.show('Webhook testé avec succès', 'success');
+    },
+    [fetch, toaster]
+  );
+
+  const deleteAgent = useCallback(
+    async (id: string) => {
+      await fetch(`/agent-webhooks/${id}`, { method: 'DELETE' });
+      await mutate();
+      toaster.show('Agent supprimé', 'success');
+    },
+    [fetch, mutate, toaster]
+  );
+
+  const toggleScope = useCallback((scope: string) => {
+    setDraft((current) => ({
+      ...current,
+      scopes: current.scopes.includes(scope)
+        ? current.scopes.filter((item) => item !== scope)
+        : [...current.scopes, scope],
+    }));
+  }, []);
+
+  return (
+    <div className="acadepost-agent-panel mb-[18px]">
+      <div className="mb-3">
+        <div className="text-[13px] font-[800] text-textColor">
+          Agents n8n
+        </div>
+        <div className="mt-1 text-[11px] leading-4 text-newTableText">
+          {t(
+            'n8n_agents_description',
+            'Connectez un webhook externe pour créer des propositions à valider.'
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <input
+          className="acadepost-agent-input"
+          value={draft.name}
+          onChange={(event) =>
+            setDraft((current) => ({ ...current, name: event.target.value }))
+          }
+          placeholder="Nom"
+        />
+        <input
+          className="acadepost-agent-input"
+          value={draft.webhookUrl}
+          onChange={(event) =>
+            setDraft((current) => ({
+              ...current,
+              webhookUrl: event.target.value,
+            }))
+          }
+          placeholder="https://n8n.example/webhook/..."
+        />
+        <select
+          className="acadepost-agent-input"
+          value={draft.accessMode}
+          onChange={(event) =>
+            setDraft((current) => ({
+              ...current,
+              accessMode: event.target.value,
+              scopes:
+                event.target.value === 'human_in_the_loop'
+                  ? current.scopes.filter(
+                      (scope) =>
+                        scope !== 'posts:schedule' &&
+                        scope !== 'posts:publish'
+                    )
+                  : current.scopes,
+            }))
+          }
+        >
+          <option value="human_in_the_loop">Human in the loop</option>
+          <option value="full_access">Full Access</option>
+        </select>
+        <div className="grid grid-cols-2 gap-1">
+          {agentScopes.map((scope) => {
+            const disabled =
+              draft.accessMode === 'human_in_the_loop' &&
+              ['posts:schedule', 'posts:publish'].includes(scope);
+            return (
+              <button
+                key={scope}
+                disabled={disabled}
+                onClick={() => toggleScope(scope)}
+                className={clsx(
+                  'acadepost-agent-scope',
+                  draft.scopes.includes(scope) && 'is-active'
+                )}
+              >
+                {scope}
+              </button>
+            );
+          })}
+        </div>
+        <button className="acadepost-agent-button" onClick={saveAgent}>
+          Enregistrer
+        </button>
+      </div>
+
+      <div className="mt-4 flex flex-col gap-2">
+        {data?.map((agent: any) => (
+          <div key={agent.id} className="acadepost-agent-row">
+            <button
+              className="min-w-0 flex-1 text-left"
+              onClick={() =>
+                setDraft({
+                  id: agent.id,
+                  name: agent.name,
+                  webhookUrl: agent.webhookUrl,
+                  accessMode: agent.accessMode,
+                  enabled: agent.enabled,
+                  scopes: agent.scopes || [],
+                })
+              }
+            >
+              <span className="block truncate text-[12px] font-[800]">
+                {agent.name}
+              </span>
+              <span className="block truncate text-[10px] text-newTableText">
+                {agent.accessMode === 'full_access'
+                  ? 'Full Access'
+                  : 'À valider'}
+              </span>
+            </button>
+            <button onClick={() => testAgent(agent.id)}>Test</button>
+            <button onClick={() => deleteAgent(agent.id)}>×</button>
+          </div>
+        ))}
       </div>
     </div>
   );

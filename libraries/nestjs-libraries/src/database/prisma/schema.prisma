@@ -33,6 +33,9 @@ model Organization {
   plugs               Plugs[]
   post                Post[]               @relation("organization")
   submittedPost       Post[]               @relation("submittedForOrg")
+  postTemplates       PostTemplate[]
+  externalAgents      ExternalAgent[]
+  agentRuns           AgentRun[]
   sets                Sets[]
   signatures          Signatures[]
   subscription        Subscription?
@@ -224,6 +227,7 @@ model Media {
   agencies           SocialMediaAgency[]
   userPicture        User[]
   oauthApps          OAuthApp[]
+  postTemplatePreviews PostTemplate[]       @relation("PostTemplatePreview")
 
   @@index([name])
   @@index([organizationId])
@@ -404,6 +408,10 @@ model Post {
   parentPostId               String?
   releaseId                  String?
   releaseURL                 String?
+  agentRunId                 String?
+  requiresApproval           Boolean                   @default(false)
+  agentStatus                String?
+  source                     String?
   settings                   String?
   image                      String?
   submittedForOrderId        String?
@@ -419,6 +427,7 @@ model Post {
   errors                     Errors[]
   payoutProblems             PayoutProblems[]
   integration                Integration               @relation(fields: [integrationId], references: [id])
+  agentRun                   AgentRun?                 @relation(fields: [agentRunId], references: [id])
   lastMessage                Messages?                 @relation(fields: [lastMessageId], references: [id])
   organization               Organization              @relation("organization", fields: [organizationId], references: [id])
   parentPost                 Post?                     @relation("parentPostId", fields: [parentPostId], references: [id])
@@ -441,6 +450,9 @@ model Post {
   @@index([updatedAt])
   @@index([releaseURL])
   @@index([integrationId])
+  @@index([agentRunId])
+  @@index([requiresApproval])
+  @@index([agentStatus])
 }
 
 model Notifications {
@@ -636,6 +648,67 @@ model Sets {
   organization   Organization @relation(fields: [organizationId], references: [id])
 
   @@index([organizationId])
+}
+
+model PostTemplate {
+  id             String       @id @default(uuid())
+  organizationId String
+  name           String
+  type           String
+  config         Json
+  previewMediaId String?
+  deletedAt      DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  previewMedia   Media?       @relation("PostTemplatePreview", fields: [previewMediaId], references: [id])
+
+  @@index([organizationId])
+  @@index([type])
+  @@index([deletedAt])
+  @@index([previewMediaId])
+}
+
+model ExternalAgent {
+  id             String       @id @default(uuid())
+  organizationId String
+  name           String
+  webhookUrl     String
+  secret         String
+  accessMode     String       @default("human_in_the_loop")
+  scopes         Json
+  enabled        Boolean      @default(true)
+  deletedAt      DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  runs           AgentRun[]
+
+  @@index([organizationId])
+  @@index([accessMode])
+  @@index([enabled])
+  @@index([deletedAt])
+}
+
+model AgentRun {
+  id              String         @id @default(uuid())
+  organizationId  String
+  externalAgentId String?
+  mode            String
+  status          String         @default("created")
+  input           Json?
+  output          Json?
+  error           String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  organization    Organization   @relation(fields: [organizationId], references: [id])
+  externalAgent   ExternalAgent? @relation(fields: [externalAgentId], references: [id])
+  posts           Post[]
+
+  @@index([organizationId])
+  @@index([externalAgentId])
+  @@index([status])
+  @@index([mode])
 }
 
 model ThirdParty {

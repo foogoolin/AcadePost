@@ -66,16 +66,16 @@ export const AgentChat: FC = () => {
           <CopilotChat
             className="w-full h-full"
             labels={{
-              title: t('your_assistant', 'Your Assistant'),
-              initial: t('agent_welcome_message', `Hello, I am your AcadéPost assistant.
+              title: t('your_assistant', 'Assistant AcadéPost'),
+              initial: t('agent_welcome_message', `Bonjour, je suis votre assistant AcadéPost.
               
-I can schedule a post or multiple posts to multiple channels and generate pictures and videos.
+Je peux préparer une publication, organiser les médias et créer des propositions à valider dans le calendrier.
 
-You can select the channels you want to use from the left menu.
+Sélectionnez les canaux à gauche pour cadrer la génération.
 
-You can see your previous conversations from the right menu.
+Vos conversations précédentes restent disponibles à droite.
 
-You can also use me as an MCP Server, check Settings >> Public API
+Vous pouvez aussi connecter AcadéPost via MCP ou API publique depuis les paramètres.
 `),
             }}
             UserMessage={Message}

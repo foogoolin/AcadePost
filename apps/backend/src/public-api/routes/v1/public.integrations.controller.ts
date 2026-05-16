@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpException,
   Param,
   Post,
@@ -58,6 +59,11 @@ import { RefreshIntegrationService } from '@gitroom/nestjs-libraries/integration
 import { RefreshToken } from '@gitroom/nestjs-libraries/integrations/social.abstract';
 import { timer } from '@gitroom/helpers/utils/timer';
 import { ioRedis } from '@gitroom/nestjs-libraries/redis/redis.service';
+import { PostTemplatesService } from '@gitroom/nestjs-libraries/database/prisma/post-templates/post.templates.service';
+import { AgentRunsService } from '@gitroom/nestjs-libraries/database/prisma/agent-runs/agent.runs.service';
+import { ExternalAgentsService } from '@gitroom/nestjs-libraries/database/prisma/external-agents/external.agents.service';
+import { PublicAgentRunDto } from '@gitroom/nestjs-libraries/dtos/external-agents/external.agents.dto';
+import { makeId } from '@gitroom/nestjs-libraries/services/make.is';
 
 @ApiTags('Public API')
 @Controller('/public/v1')
@@ -70,7 +76,10 @@ export class PublicIntegrationsController {
     private _mediaService: MediaService,
     private _notificationService: NotificationService,
     private _integrationManager: IntegrationManager,
-    private _refreshIntegrationService: RefreshIntegrationService
+    private _refreshIntegrationService: RefreshIntegrationService,
+    private _postTemplatesService: PostTemplatesService,
+    private _agentRunsService: AgentRunsService,
+    private _externalAgentsService: ExternalAgentsService
   ) {}
 
   @Post('/upload')
@@ -154,6 +163,174 @@ export class PublicIntegrationsController {
       posts,
       // comments,
     };
+  }
+
+  @Put('/posts/:id')
+  async updatePost(
+    @GetOrgFromRequest() org: Organization,
+    @Param('id') id: string,
+    @Body() body: { status?: 'draft' | 'schedule'; publishDate?: string; releaseId?: string }
+  ) {
+    Sentry.metrics.count('public_api-request', 1);
+
+    if (body.publishDate) {
+      await this._postsService.changeDate(org.id, id, body.publishDate, 'update');
+    }
+
+    if (body.status) {
+      await this._postsService.changePostStatus(org.id, id, body.status);
+    }
+
+    if (body.releaseId) {
+      await this._postsService.updateReleaseId(org.id, id, body.releaseId);
+    }
+
+    return this._postsService.getPost(org.id, id);
+  }
+
+  @Get('/post-templates')
+  async getPostTemplates(@GetOrgFromRequest() org: Organization) {
+    Sentry.metrics.count('public_api-request', 1);
+    return this._postTemplatesService.list(org.id);
+  }
+
+  @Post('/post-templates/:id/render')
+  async renderPostTemplate(
+    @GetOrgFromRequest() org: Organization,
+    @Param('id') id: string,
+    @Headers('x-acadepost-agent-id') externalAgentId: string | undefined,
+    @Headers('x-acadepost-agent-secret') headerSecret: string | undefined,
+    @Body() body: any
+  ) {
+    Sentry.metrics.count('public_api-request', 1);
+
+    if (externalAgentId || body?.externalAgentId) {
+      await this._externalAgentsService.verify(
+        org.id,
+        body.externalAgentId || externalAgentId,
+        body.secret || headerSecret,
+        ['templates:render']
+      );
+    }
+
+    return this._postTemplatesService.render(org.id, id, body);
+  }
+
+  @Post('/agent-runs')
+  async createAgentRun(
+    @GetOrgFromRequest() org: Organization,
+    @Headers('x-acadepost-agent-secret') headerSecret: string | undefined,
+    @Body() body: PublicAgentRunDto
+  ) {
+    Sentry.metrics.count('public_api-request', 1);
+    const mode = body.mode || 'proposal';
+    const externalAgent = body.externalAgentId
+      ? await this._externalAgentsService.verify(
+          org.id,
+          body.externalAgentId,
+          body.secret || headerSecret,
+          this._externalAgentsService.scopesForMode(mode)
+        )
+      : undefined;
+
+    if (
+      externalAgent &&
+      externalAgent.accessMode !== 'full_access' &&
+      (mode === 'schedule' || mode === 'now')
+    ) {
+      throw new HttpException(
+        { msg: 'Human-in-the-loop agents can only create draft/proposal runs' },
+        403
+      );
+    }
+
+    const agentRun = await this._agentRunsService.create(org.id, {
+      externalAgentId: externalAgent?.id,
+      mode,
+      status: 'running',
+      input: body as any,
+    });
+
+    if (!body.integrationIds?.length) {
+      await this._agentRunsService.update(org.id, agentRun.id, {
+        status: 'proposal',
+      });
+      return this._agentRunsService.get(org.id, agentRun.id);
+    }
+
+    const media = await Promise.all(
+      (body.media || []).map(async (item) => {
+        if (item.id && !item.path) {
+          const saved = await this._mediaService.getMediaById(org.id, item.id);
+          if (!saved) {
+            throw new HttpException({ msg: 'Media not found' }, 404);
+          }
+          return { id: saved.id, path: saved.path };
+        }
+        return item;
+      })
+    );
+
+    const postType = mode === 'draft' || mode === 'proposal' ? 'draft' : mode;
+    const group = makeId(10);
+    const createBody = {
+      type: postType,
+      shortLink: false,
+      date: body.publishDate || new Date().toISOString(),
+      tags: [],
+      posts: body.integrationIds.map((integrationId) => ({
+        group,
+        integration: { id: integrationId },
+        settings: {},
+        value: [
+          {
+            content: body.content || '',
+            image: media,
+            delay: 0,
+          },
+        ],
+      })),
+    };
+
+    const mapped = await this._postsService.mapTypeToPost(
+      createBody as any,
+      org.id,
+      postType === 'draft'
+    );
+    mapped.type = postType;
+    const createdPosts = await this._postsService.createPost(org.id, mapped);
+    const postIds = createdPosts.map((post) => post.postId).filter(Boolean);
+
+    const needsApproval =
+      mode === 'proposal' || postType === 'draft' || body.requiresApproval === true;
+
+    await this._postsService.markAgentPosts(org.id, postIds, {
+      agentRunId: agentRun.id,
+      requiresApproval: needsApproval,
+      agentStatus:
+        needsApproval
+          ? 'needs_approval'
+          : mode === 'now'
+          ? 'publishing'
+          : 'scheduled',
+      source: 'external_agent',
+    });
+
+    await this._agentRunsService.update(org.id, agentRun.id, {
+      status: mode === 'proposal' ? 'needs_approval' : 'created_posts',
+      output: { posts: createdPosts },
+    });
+
+    return this._agentRunsService.get(org.id, agentRun.id);
+  }
+
+  @Get('/agent-runs/:id')
+  async getAgentRun(
+    @GetOrgFromRequest() org: Organization,
+    @Param('id') id: string
+  ) {
+    Sentry.metrics.count('public_api-request', 1);
+    return this._agentRunsService.get(org.id, id);
   }
 
   @Post('/posts')

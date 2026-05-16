@@ -170,6 +170,10 @@ export class PostsRepository {
         publishDate: true,
         releaseURL: true,
         releaseId: true,
+        requiresApproval: true,
+        agentStatus: true,
+        source: true,
+        agentRunId: true,
         state: true,
         intervalInDays: true,
         group: true,
@@ -258,6 +262,10 @@ export class PostsRepository {
           publishDate: true,
           releaseURL: true,
           releaseId: true,
+          requiresApproval: true,
+          agentStatus: true,
+          source: true,
+          agentRunId: true,
           state: true,
           group: true,
           tags: {
@@ -378,6 +386,32 @@ export class PostsRepository {
       },
       data: {
         releaseId: String(releaseId),
+      },
+    });
+  }
+
+  markAgentPosts(
+    orgId: string,
+    postIds: string[],
+    data: {
+      agentRunId?: string;
+      requiresApproval?: boolean;
+      agentStatus?: string;
+      source?: string;
+    }
+  ) {
+    return this._post.model.post.updateMany({
+      where: {
+        id: {
+          in: postIds,
+        },
+        organizationId: orgId,
+      },
+      data: {
+        agentRunId: data.agentRunId || null,
+        requiresApproval: data.requiresApproval ?? false,
+        agentStatus: data.agentStatus || null,
+        source: data.source || null,
       },
     });
   }
