@@ -346,6 +346,17 @@ The first workflow should classify content into one of these groups, make the ma
 - Le workflow scheduled `stale.yml` upstream est supprime; les templates GitHub issue/PR et les workflows extension ne pointent plus vers les URLs Postiz.
 - Le workflow `Build demo image` publie toujours `latest`, `demo`, `vX.Y.Z` et SHA, puis verifie la taille compressee linux/amd64 contre une limite CI.
 
+## Mobile Launches Layout Fix - 2026-05-17
+
+- Version produit preparee: `v1.1.4`.
+- Scope: frontend-only mobile fix for the app shell and `/launches` calendar. No backend, Prisma, Docker or server changes.
+- The main app frame now prevents page-level horizontal overflow while keeping the sidebar fixed-width and the main panel shrink-safe.
+- The protected layout switches its content area to a vertical stack on narrow screens, so secondary panels sit above the main view instead of squeezing side-by-side.
+- The launches channel panel gets a stable mobile height, while the calendar panel owns its internal horizontal scroll.
+- Week and month calendar grids use `acadepost-week-grid` and `acadepost-month-grid` CSS classes with mobile minimum column widths to prevent day-cell overlap.
+- Filter controls now shrink/truncate safely on narrow screens instead of forcing the viewport wider.
+- Verification locale: frontend build passes; browser smoke on mobile `390x667` and desktop `1280x720` shows no body overflow and no relevant console errors.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?

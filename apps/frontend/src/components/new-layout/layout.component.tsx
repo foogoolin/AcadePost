@@ -88,7 +88,7 @@ export const LayoutComponent = ({ children }: { children: ReactNode }) => {
             <ContinueProvider />
             <div
               className={clsx(
-                'acadepost-app-frame flex flex-col min-h-screen min-w-screen text-newTextColor p-[12px]',
+                'acadepost-app-frame flex h-screen w-full flex-col overflow-hidden text-newTextColor p-[12px]',
                 jakartaSans.className
               )}
             >
@@ -98,9 +98,9 @@ export const LayoutComponent = ({ children }: { children: ReactNode }) => {
               ) : (
                 <>
                   <AnnouncementBanner />
-                  <div className="flex-1 flex gap-[8px]">
+                  <div className="flex min-h-0 min-w-0 flex-1 gap-[8px]">
                     <Support />
-                    <div className="acadepost-sidebar-rail flex flex-col w-[84px] rounded-[12px]">
+                    <div className="acadepost-sidebar-rail flex flex-col w-[84px] shrink-0 rounded-[12px]">
                       <div
                         id="left-menu"
                         className={clsx(
@@ -114,12 +114,12 @@ export const LayoutComponent = ({ children }: { children: ReactNode }) => {
                         </div>
                       </div>
                     </div>
-                    <div className="acadepost-main-panel flex-1 rounded-[12px] overflow-hidden flex flex-col gap-[1px] blurMe">
-                      <div className="acadepost-topbar flex h-[76px] px-[22px] items-center">
-                        <div className="text-[22px] font-[700] flex flex-1">
+                    <div className="acadepost-main-panel min-w-0 flex-1 rounded-[12px] overflow-hidden flex flex-col gap-[1px] blurMe">
+                      <div className="acadepost-topbar flex h-[64px] min-w-0 items-center px-[12px] md:h-[76px] md:px-[22px]">
+                        <div className="flex min-w-0 flex-1 truncate text-[18px] font-[700] md:text-[22px]">
                           <Title />
                         </div>
-                        <div className="acadepost-topbar-actions flex gap-[18px] text-textItemBlur items-center">
+                        <div className="acadepost-topbar-actions flex max-w-[44vw] shrink-0 items-center gap-[8px] overflow-x-auto text-textItemBlur md:max-w-none md:gap-[18px] md:overflow-visible">
                           <StreakComponent />
                           <div className="w-[1px] h-[20px] bg-blockSeparator" />
                           <OrganizationSelector />
@@ -134,7 +134,9 @@ export const LayoutComponent = ({ children }: { children: ReactNode }) => {
                           <NotificationComponent />
                         </div>
                       </div>
-                      <div className="flex flex-1 gap-[1px]">{children}</div>
+                      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[1px] overflow-x-hidden overflow-y-auto md:flex-row md:overflow-hidden">
+                        {children}
+                      </div>
                     </div>
                   </div>
                 </>

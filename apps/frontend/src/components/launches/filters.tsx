@@ -272,10 +272,10 @@ export const Filters = () => {
   }, [calendar]);
 
   return (
-    <div className="text-textColor flex flex-col md:flex-row gap-[8px] items-center select-none">
+    <div className="text-textColor flex flex-col md:flex-row gap-[8px] items-stretch md:items-center select-none">
       {!isListView && (
-        <div className="flex flex-grow flex-row items-center gap-[10px]">
-          <div className="border h-[42px] border-newTableBorder bg-newTableBorder gap-[1px] flex items-center rounded-[8px] overflow-hidden">
+        <div className="flex w-full min-w-0 flex-grow flex-row flex-wrap items-center gap-[10px]">
+          <div className="border h-[42px] min-w-0 border-newTableBorder bg-newTableBorder gap-[1px] flex flex-1 items-center rounded-[8px] overflow-hidden md:flex-none">
             <div
               onClick={previous}
               className="cursor-pointer text-textColor rtl:rotate-180 px-[9px] bg-newBgColorInner h-full flex items-center justify-center hover:text-textItemFocused hover:bg-boxFocused"
@@ -296,8 +296,8 @@ export const Filters = () => {
                 />
               </svg>
             </div>
-            <div className="min-w-[200px] text-center bg-newBgColorInner h-full flex items-center justify-center">
-              <div className="py-[3px] px-[9px] rounded-[5px] transition-all text-[14px]">
+            <div className="bg-newBgColorInner flex h-full min-w-0 flex-1 items-center justify-center text-center md:min-w-[200px]">
+              <div className="truncate py-[3px] px-[9px] rounded-[5px] transition-all text-[14px]">
                 {getDisplayText()}
               </div>
             </div>
@@ -322,7 +322,7 @@ export const Filters = () => {
               </svg>
             </div>
           </div>
-          <div className="flex-1 text-[14px] font-[500]">
+          <div className="text-[14px] font-[500] md:flex-1">
             <div className="text-center flex h-[42px]">
               <div
                 onClick={setToday}
@@ -335,8 +335,8 @@ export const Filters = () => {
         </div>
       )}
       {isListView && (
-        <div className="flex flex-grow flex-row items-center gap-[10px]">
-          <div className="border h-[42px] border-newTableBorder bg-newTableBorder gap-[1px] flex items-center rounded-[8px] overflow-hidden">
+        <div className="flex w-full min-w-0 flex-grow flex-row items-center gap-[10px]">
+          <div className="border h-[42px] min-w-0 flex-1 border-newTableBorder bg-newTableBorder gap-[1px] flex items-center rounded-[8px] overflow-hidden md:flex-none">
             <div
               onClick={previousPage}
               className={clsx(
@@ -362,8 +362,8 @@ export const Filters = () => {
                 />
               </svg>
             </div>
-            <div className="min-w-[200px] text-center bg-newBgColorInner h-full flex items-center justify-center">
-              <div className="py-[3px] px-[9px] rounded-[5px] transition-all text-[14px]">
+            <div className="bg-newBgColorInner flex h-full min-w-0 flex-1 items-center justify-center text-center md:min-w-[200px]">
+              <div className="truncate py-[3px] px-[9px] rounded-[5px] transition-all text-[14px]">
                 {t('page', 'Page')} {calendar.listPage + 1} {t('of', 'of')} {Math.max(1, calendar.listTotalPages)}
               </div>
             </div>

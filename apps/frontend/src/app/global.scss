@@ -877,6 +877,24 @@ html[dir='rtl'] [dir='ltr'] {
   opacity: 1;
 }
 
+.acadepost-week-grid {
+  grid-template-columns: 136px repeat(7, minmax(0, 1fr));
+}
+
+.acadepost-month-grid {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+@media (max-width: 768px) {
+  .acadepost-week-grid {
+    grid-template-columns: 72px repeat(7, minmax(116px, 1fr));
+  }
+
+  .acadepost-month-grid {
+    grid-template-columns: repeat(7, minmax(92px, 1fr));
+  }
+}
+
 .acadepost-menu-item {
   border: 1px solid transparent;
   color: rgb(var(--new-textColor) / 0.58);

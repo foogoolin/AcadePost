@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.4 - 2026-05-17
+
+- Fixed the mobile app shell and launches calendar so the sidebar, topbar, channel list and calendar grid no longer overlap on narrow screens.
+- Added mobile-safe calendar grid widths with horizontal scrolling inside the calendar area instead of page-level overflow.
+- Kept the desktop launches layout intact while improving mobile spacing and filter controls.
+
 ## v1.1.3 - 2026-05-17
 
 - Reworked `Dockerfile.demo` into a multi-stage build so normal server updates pull a prebuilt runtime image instead of shipping the full build workspace.

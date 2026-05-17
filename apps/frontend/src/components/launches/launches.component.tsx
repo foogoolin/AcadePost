@@ -499,13 +499,15 @@ export const LaunchesComponent = () => {
       <CalendarWeekProvider integrations={sortedIntegrations}>
         <div
           className={clsx(
-            'flex relative flex-col',
-            collapseMenu === '1' ? 'group sidebar w-[100px]' : 'w-[260px]'
+            'flex relative h-[260px] w-full flex-none flex-col shrink-0 md:h-auto',
+            collapseMenu === '1'
+              ? 'group sidebar md:w-[100px]'
+              : 'md:w-[260px]'
           )}
         >
           <div
             className={clsx(
-              'bg-newBgColorInner p-[20px] flex flex-col gap-[15px] transition-all absolute start-0 top-0 w-full h-full overflow-x-hidden overflow-y-auto scrollbar scrollbar-thumb-fifth scrollbar-track-newBgColor'
+              'bg-newBgColorInner absolute start-0 top-0 flex h-full w-full flex-col gap-[15px] overflow-x-hidden overflow-y-auto p-[14px] transition-all scrollbar scrollbar-thumb-fifth scrollbar-track-newBgColor md:p-[20px]'
             )}
           >
             <div className="flex items-center">
@@ -592,9 +594,9 @@ export const LaunchesComponent = () => {
             </div>
           </div>
         </div>
-        <div className="bg-newBgColorInner flex-1 flex-col flex p-[20px] gap-[12px]">
+        <div className="bg-newBgColorInner flex min-h-[520px] min-w-0 flex-1 flex-col gap-[12px] overflow-hidden p-[12px] md:min-h-0 md:p-[20px]">
           <Filters />
-          <div className="flex-1 flex">
+          <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
             <Calendar />
           </div>
         </div>
