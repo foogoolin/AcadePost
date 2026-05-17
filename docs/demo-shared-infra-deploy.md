@@ -16,11 +16,13 @@ Le compose shared-infra ne publie pas de port public. Caddy doit parler au conte
 
 ## Image preconstruite
 
-Le serveur ne construit pas l'application. Il tire l'image publiee par GitHub Actions :
+Le serveur ne construit pas l'application. Il tire l'image versionnee publiee par GitHub Actions :
 
 ```text
-ghcr.io/foogoolin/acadepost:demo
+ghcr.io/foogoolin/acadepost:v1.1.0
 ```
+
+Le tag `:demo` existe aussi comme tag mobile pour le dernier build MVP de `main`, mais une installation stable doit preferer un tag versionne.
 
 Si le pull echoue avec une erreur d'authentification, rendre le package GHCR public dans GitHub Packages ou faire un `docker login ghcr.io` avec un token autorise.
 

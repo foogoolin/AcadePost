@@ -1,6 +1,6 @@
-# Mise a jour Docker demo AcadePost
+# Mise a jour Docker AcadePost
 
-AcadePost doit etre mis a jour sur serveur en tirant l'image GHCR deja construite par GitHub Actions. Le serveur ne doit pas faire de `docker build` pour une mise a jour demo normale.
+AcadePost doit etre mis a jour sur serveur en tirant l'image GHCR deja construite par GitHub Actions. Le serveur ne doit pas faire de `docker build` pour une mise a jour normale.
 
 ## Clean VPS
 
@@ -31,7 +31,7 @@ Le domaine, le port, la base de donnees, les secrets, SMTP et OAuth restent en r
 
 Variables importantes :
 
-- `ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:demo`
+- `ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:v1.1.0`
 - `ACADEPOST_PUBLIC_URL=https://YOUR_DOMAIN`
 - `DATABASE_URL=postgresql://...`
 - `JWT_SECRET=...`

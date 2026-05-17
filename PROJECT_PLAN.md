@@ -297,6 +297,15 @@ The first workflow should classify content into one of these groups, make the ma
 - Documentation mise a jour: `docs/integrations/social-provider-readiness-2026-05-16.md` et `docs/product/postiz-feature-comparison-2026-05-16.md`.
 - Gaps explicites avant promesse client: vrais smoke tests provider avec credentials reels, choix manuel du credential dans Add Channel quand plusieurs credentials du meme provider existent, reduction du pouvoir de la project API key si elle est donnee a un agent, et masquage/controle plus fin des webhook URLs n8n pour les non-admins.
 
+## Docker Image Tag Clarification - 2026-05-17
+
+- README public clarifie que l'installation stable doit utiliser une image versionnee comme `ghcr.io/foogoolin/acadepost:v1.1.0`.
+- Le tag `ghcr.io/foogoolin/acadepost:demo` reste disponible uniquement comme tag mobile pour le dernier build MVP de `main`; il ne doit pas etre presente comme un "Docker demo" separe.
+- Les exemples `.env.demo*` et les valeurs fallback des compose demo pointent maintenant vers `v1.1.0` par defaut.
+- Les runbooks serveur, le prompt agent shared-infra, le rapport security et les guardrails owner-facing ont ete alignes sur la preference tag versionne.
+- Verification locale: `docker compose --env-file .env.demo.example -f docker-compose.demo.yaml config --quiet`, `docker compose --env-file .env.demo.shared-infra.example -f docker-compose.demo.shared-infra.yaml config --quiet`, recherche mojibake et `git diff --check` passent.
+- Limite BYAN tooling observee: le MCP BYAN cherche `bin/byan-v2-cli.js`, absent du depot; la validation BYAN interactive via MCP est donc bloquee tant que ce wrapper n'est pas restaure ou pointe vers le bon CLI.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?

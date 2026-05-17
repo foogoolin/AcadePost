@@ -85,7 +85,7 @@ Depuis le dossier du depot sur le serveur :
 ACADEPOST_PUBLIC_URL=http://SERVER_IP:4007 bash deploy/demo/server-up.sh
 ```
 
-Le script cree `.env.demo` si absent, remplace les secrets demo par des valeurs aleatoires, valide le compose, tire l'image `ghcr.io/foogoolin/acadepost:demo` et lance la stack.
+Le script cree `.env.demo` si absent, remplace les secrets demo par des valeurs aleatoires, valide le compose, tire l'image versionnee `ghcr.io/foogoolin/acadepost:v1.1.0` et lance la stack.
 
 ## Logs
 

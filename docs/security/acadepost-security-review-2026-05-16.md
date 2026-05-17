@@ -277,7 +277,7 @@ Known local caveat:
 
 ### Mutable GHCR tag
 
-`ghcr.io/foogoolin/acadepost:demo` удобен для demo, но mutable. Для production или важного client demo лучше pin по SHA tag или digest.
+`ghcr.io/foogoolin/acadepost:demo` удобен как moving tag для последней MVP-сборки, но mutable. Для production или важного client demo лучше использовать versioned tag вроде `ghcr.io/foogoolin/acadepost:v1.1.0`, SHA tag или digest.
 
 Recommendation:
 
@@ -334,4 +334,3 @@ Recommendation:
 4. Добавить pinned-image deployment option в docs.
 5. Разделить demo readiness `/health` и internal readiness details, если понадобится Caddy upstream check.
 6. Перед production убрать `db push` из runtime startup и заменить на controlled migrations.
-
