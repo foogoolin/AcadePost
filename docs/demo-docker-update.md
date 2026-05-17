@@ -31,7 +31,7 @@ Le domaine, le port, la base de donnees, les secrets, SMTP et OAuth restent en r
 
 Variables importantes :
 
-- `ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:v1.1.0`
+- `ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:v1.1.1`
 - `ACADEPOST_PUBLIC_URL=https://YOUR_DOMAIN`
 - `DATABASE_URL=postgresql://...`
 - `JWT_SECRET=...`

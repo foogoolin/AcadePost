@@ -25,7 +25,7 @@ const presets: {
   {
     type: 'post_1_1',
     label: 'Post 1:1',
-    description: 'Format carré 1080 x 1080',
+    description: 'Format carre 1080 x 1080',
     width: 1080,
     height: 1080,
   },
@@ -39,14 +39,14 @@ const presets: {
   {
     type: 'carousel_1_1',
     label: 'Carrousel 1:1',
-    description: 'Slide carré réutilisable',
+    description: 'Slide carre reutilisable',
     width: 1080,
     height: 1080,
   },
   {
     type: 'carousel_3_4',
     label: 'Carrousel 3:4',
-    description: 'Slide vertical réutilisable',
+    description: 'Slide vertical reutilisable',
     width: 1080,
     height: 1440,
   },
@@ -76,7 +76,7 @@ export const EditorPresets: FC = () => {
   const modals = useModals();
   const fileRef = useRef<HTMLInputElement>(null);
   const [templateId, setTemplateId] = useState<string | undefined>();
-  const [templateName, setTemplateName] = useState('Modèle AcadéNice');
+  const [templateName, setTemplateName] = useState('Modele AcadeNice');
   const [templateType, setTemplateType] = useState<TemplateType>('post_1_1');
   const [overlay, setOverlay] = useState(defaultOverlay);
   const [media, setMedia] = useState<{ id: string; path: string } | undefined>();
@@ -151,7 +151,7 @@ export const EditorPresets: FC = () => {
       const uploaded = await response.json();
       setMedia({ id: uploaded.id, path: uploaded.path });
       setPreviewMediaId(uploaded.id);
-      toaster.show('Image importée', 'success');
+      toaster.show('Image importee', 'success');
     },
     [fetch, toaster]
   );
@@ -175,7 +175,7 @@ export const EditorPresets: FC = () => {
       setTemplateId(saved.id);
       setPreviewMediaId(saved.previewMediaId || nextPreviewMediaId);
       await mutate();
-      toaster.show('Modèle enregistré', 'success');
+      toaster.show('Modele enregistre', 'success');
       return saved;
     },
     [
@@ -192,7 +192,7 @@ export const EditorPresets: FC = () => {
 
   const renderPreview = useCallback(async () => {
     if (!media?.path) {
-      toaster.show('Ajoutez une image avant de générer le rendu', 'warning');
+      toaster.show('Ajoutez une image avant de generer le rendu', 'warning');
       return;
     }
 
@@ -209,9 +209,9 @@ export const EditorPresets: FC = () => {
       ).json();
       setPreviewMediaId(uploaded.id);
       await saveTemplate(uploaded.id);
-      toaster.show('Rendu ajouté à la bibliothèque média', 'success');
+      toaster.show('Rendu ajoute a la bibliotheque media', 'success');
     } catch (error: any) {
-      toaster.show(error?.message || 'Impossible de générer le rendu', 'warning');
+      toaster.show(error?.message || 'Impossible de generer le rendu', 'warning');
     } finally {
       setIsRendering(false);
     }
@@ -231,17 +231,17 @@ export const EditorPresets: FC = () => {
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
               <h1 className="text-[20px] font-[700] text-textColor">
-                Éditeur
+                Editeur
               </h1>
               <p className="mt-1 text-[12px] text-newTableText">
-                Modèles visuels réutilisables
+                Modeles visuels reutilisables
               </p>
             </div>
             <button
               className="acadepost-editor-icon-button"
               onClick={() => {
                 setTemplateId(undefined);
-                setTemplateName('Modèle AcadéNice');
+                setTemplateName('Modele AcadeNice');
                 setTemplateType('post_1_1');
                 setOverlay(defaultOverlay);
                 setMedia(undefined);
@@ -272,7 +272,7 @@ export const EditorPresets: FC = () => {
             ))}
             {!templates?.length && (
               <div className="acadepost-editor-empty p-4 text-[13px] text-newTableText">
-                Aucun modèle enregistré.
+                Aucun modele enregistre.
               </div>
             )}
           </div>
@@ -285,7 +285,7 @@ export const EditorPresets: FC = () => {
                 Canvas
               </p>
               <h2 className="text-[22px] font-[700] text-textColor">
-                Aperçu du modèle
+                Apercu du modele
               </h2>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -293,7 +293,7 @@ export const EditorPresets: FC = () => {
                 className="acadepost-editor-button secondary"
                 onClick={openMediaLibrary}
               >
-                Bibliothèque média
+                Bibliotheque media
               </button>
               <button
                 className="acadepost-editor-button secondary"
@@ -335,7 +335,7 @@ export const EditorPresets: FC = () => {
             >
               {!media?.path && (
                 <div className="flex h-full w-full items-center justify-center text-center text-[14px] text-newTableText">
-                  Ajoutez une image pour préparer le template.
+                  Ajoutez une image pour preparer le template.
                 </div>
               )}
               <div
@@ -362,10 +362,10 @@ export const EditorPresets: FC = () => {
         <aside className="acadepost-editor-panel p-4">
           <div className="mb-4">
             <h2 className="text-[18px] font-[700] text-textColor">
-              Paramètres
+              Parametres
             </h2>
             <p className="mt-1 text-[12px] text-newTableText">
-              Style proche calendrier: dense, carré, lisible.
+              Style proche calendrier: dense, carre, lisible.
             </p>
           </div>
 
@@ -464,7 +464,7 @@ export const EditorPresets: FC = () => {
             </div>
 
             <label className="acadepost-editor-field">
-              <span>Opacité</span>
+              <span>Opacite</span>
               <input
                 type="range"
                 min="0"
@@ -481,7 +481,7 @@ export const EditorPresets: FC = () => {
               className="acadepost-editor-button"
               onClick={() => saveTemplate()}
             >
-              Enregistrer le modèle
+              Enregistrer le modele
             </button>
           </div>
         </aside>

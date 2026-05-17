@@ -19,7 +19,7 @@ Le compose shared-infra ne publie pas de port public. Caddy doit parler au conte
 Le serveur ne construit pas l'application. Il tire l'image versionnee publiee par GitHub Actions :
 
 ```text
-ghcr.io/foogoolin/acadepost:v1.1.0
+ghcr.io/foogoolin/acadepost:v1.1.1
 ```
 
 Le tag `:demo` existe aussi comme tag mobile pour le dernier build MVP de `main`, mais une installation stable doit preferer un tag versionne.

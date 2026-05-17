@@ -299,9 +299,9 @@ The first workflow should classify content into one of these groups, make the ma
 
 ## Docker Image Tag Clarification - 2026-05-17
 
-- README public clarifie que l'installation stable doit utiliser une image versionnee comme `ghcr.io/foogoolin/acadepost:v1.1.0`.
+- README public clarifie que l'installation stable doit utiliser une image versionnee comme `ghcr.io/foogoolin/acadepost:v1.1.1`.
 - Le tag `ghcr.io/foogoolin/acadepost:demo` reste disponible uniquement comme tag mobile pour le dernier build MVP de `main`; il ne doit pas etre presente comme un "Docker demo" separe.
-- Les exemples `.env.demo*` et les valeurs fallback des compose demo pointent maintenant vers `v1.1.0` par defaut.
+- Les exemples `.env.demo*` et les valeurs fallback des compose demo pointent maintenant vers `v1.1.1` par defaut.
 - Les runbooks serveur, le prompt agent shared-infra, le rapport security et les guardrails owner-facing ont ete alignes sur la preference tag versionne.
 - Verification locale: `docker compose --env-file .env.demo.example -f docker-compose.demo.yaml config --quiet`, `docker compose --env-file .env.demo.shared-infra.example -f docker-compose.demo.shared-infra.yaml config --quiet`, recherche mojibake et `git diff --check` passent.
 - Limite BYAN tooling observee avant correction: le MCP BYAN cherchait `bin/byan-v2-cli.js`, absent du depot; la validation BYAN interactive via MCP etait donc bloquee tant que ce wrapper n'etait pas restaure ou pointe vers le bon CLI.
@@ -313,6 +313,14 @@ The first workflow should classify content into one of these groups, make the ma
 - Le CLI lit et met a jour les memoires locales BYAN: `_byan/_memory/elo-profile.json` et `_byan/_memory/fact-graph.json`.
 - Verification locale: `node bin/byan-v2-cli.js elo summary`, `node bin/byan-v2-cli.js elo context security`, `node bin/byan-v2-cli.js fc parse ...` et `node bin/byan-v2-cli.js fc check ...` passent.
 - Verification MCP: les tools `byan_fc_parse`, `byan_elo_summary` et `byan_elo_context` repondent a nouveau via MCP sans erreur `MODULE_NOT_FOUND`.
+
+## Editor Navigation Fix - 2026-05-17
+
+- Version produit preparee: `v1.1.1`.
+- Le point d'entree sidebar de l'Editor utilise maintenant le label stable ASCII `Editeur`, sans dependre d'une traduction accentuee.
+- `/content-routing` ajoute un CTA direct `Ouvrir l'editeur` vers `/editor`, afin que le workflow demo ait un second chemin visible vers les presets.
+- Le workflow GHCR lit maintenant la version depuis `package.json` pour publier automatiquement le tag versionne correspondant, au lieu de garder un tag hard-code.
+- Les defaults Docker et la documentation deploiement pointent vers `ghcr.io/foogoolin/acadepost:v1.1.1`.
 
 ## Open Questions
 

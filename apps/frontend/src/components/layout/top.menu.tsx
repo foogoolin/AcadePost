@@ -80,7 +80,7 @@ export const useMenuItem = () => {
       path: '/content-routing',
     },
     {
-      name: 'Éditeur',
+      name: 'Editeur',
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -140,7 +140,7 @@ export const useMenuItem = () => {
       path: '/analytics',
     },
     {
-      name: t('media', 'Médias'),
+      name: 'Medias',
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -182,7 +182,7 @@ export const useMenuItem = () => {
       path: '/plugs',
     },
     {
-      name: t('integrations', 'Intégrations'),
+      name: 'Integrations',
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -320,7 +320,7 @@ export const useMenuItem = () => {
       requireBilling: true,
     },
     {
-      name: t('settings', 'Paramètres'),
+      name: 'Parametres',
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"

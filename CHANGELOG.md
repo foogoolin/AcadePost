@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.1 - 2026-05-17
+
+- Fixed the visible `Editeur` navigation entry and added a direct Editor action from `/content-routing`.
+- Updated Docker deployment defaults to use `ghcr.io/foogoolin/acadepost:v1.1.1`.
+- Made the GHCR workflow read the Docker version tag from `package.json` instead of hard-coding the release tag.
+
 ## v1.1.0 - 2026-05-16
 
 - Updated product package metadata to `1.1.0`.

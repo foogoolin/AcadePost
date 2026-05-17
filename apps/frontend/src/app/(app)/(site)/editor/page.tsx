@@ -4,9 +4,9 @@ import { EditorPresets } from '@gitroom/frontend/components/editor/editor-preset
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'AcadéPost - Éditeur',
+  title: 'AcadéPost - Editeur',
   description:
-    'Créez des modèles de posts et carrousels réutilisables pour les agents AcadéPost.',
+    'Creez des modeles de posts et carrousels reutilisables pour les agents AcadéPost.',
 };
 
 export default function EditorPage() {

@@ -2,7 +2,7 @@
 
 AcadéPost is a self-hostable social publishing workspace for planning, preparing, scheduling and publishing content across multiple social platforms.
 
-Current version: `v1.1.0`
+Current version: `v1.1.1`
 
 ## Overview
 
@@ -42,7 +42,7 @@ AcadéPost publishes Docker images to GitHub Container Registry.
 Recommended pinned release image:
 
 ```text
-ghcr.io/foogoolin/acadepost:v1.1.0
+ghcr.io/foogoolin/acadepost:v1.1.1
 ```
 
 A moving image tag is also available for the latest MVP build from `main`:
@@ -56,7 +56,7 @@ For stable installs, prefer the versioned image. Use `:demo` only when you inten
 Versioned images are published for releases, for example:
 
 ```text
-ghcr.io/foogoolin/acadepost:v1.1.0
+ghcr.io/foogoolin/acadepost:v1.1.1
 ```
 
 Two Compose modes are provided:
@@ -90,7 +90,7 @@ Important runtime values are supplied through `.env`:
 
 ```env
 ACADEPOST_PUBLIC_URL=https://your-domain.example
-ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:v1.1.0
+ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:v1.1.1
 DATABASE_URL=postgresql://user:password@postgres:5432/acadepost
 JWT_SECRET=change-me
 ACADEPOST_CREDENTIALS_ENCRYPTION_KEY=change-me

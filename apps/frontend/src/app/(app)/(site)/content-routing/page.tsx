@@ -6,16 +6,16 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'AcadéPost - Routage de contenu',
   description:
-    'Orientez les vidéos, textes courts et carrousels vers les bons canaux sociaux.',
+    'Orientez les videos, textes courts et carrousels vers les bons canaux sociaux.',
 };
 
 const routingGroups = [
   {
     type: 'video',
-    eyebrow: 'VIDÉO',
-    title: 'Vidéo',
+    eyebrow: 'VIDEO',
+    title: 'Video',
     description:
-      'Regroupez les formats courts et longs vers les canaux vidéo adaptés à la publication.',
+      'Regroupez les formats courts et longs vers les canaux video adaptes a la publication.',
     platforms: ['YouTube', 'TikTok', 'Instagram Reels'],
     signal: 'Formats courts, capsules, replays',
   },
@@ -24,23 +24,23 @@ const routingGroups = [
     eyebrow: 'TEXTE COURT',
     title: 'Texte court',
     description:
-      'Préparez les messages conversationnels pour les fils rapides et les annonces courtes.',
+      'Preparez les messages conversationnels pour les fils rapides et les annonces courtes.',
     platforms: ['Threads', 'X'],
-    signal: 'Idées, actualités, réactions',
+    signal: 'Idees, actualites, reactions',
   },
   {
     type: 'carousel',
     eyebrow: 'CARROUSEL',
     title: 'Carrousel',
     description:
-      'Structurez les séries visuelles pour les posts multi-images et la découverte.',
+      'Structurez les series visuelles pour les posts multi-images et la decouverte.',
     platforms: ['Meta', 'Pinterest'],
-    signal: 'Slides, visuels pédagogiques, portfolios',
+    signal: 'Slides, visuels pedagogiques, portfolios',
   },
 ];
 
 const workflow = [
-  'Importer ou rédiger le contenu',
+  'Importer ou rediger le contenu',
   'Choisir le format de publication',
   'Valider le groupe de plateformes',
   'Planifier dans le calendrier',
@@ -61,7 +61,7 @@ export default async function ContentRoutingPage() {
               </h1>
               <p className="max-w-[680px] text-[15px] leading-7 text-newTableText">
                 Classez chaque contenu par intention de publication, puis
-                préparez les plateformes recommandées avant le passage au
+                preparez les plateformes recommandees avant le passage au
                 calendrier.
               </p>
             </div>
@@ -126,7 +126,7 @@ export default async function ContentRoutingPage() {
         <section className="acadepost-routing-workflow flex flex-col gap-5 p-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-1 flex-col gap-4">
             <h2 className="text-[20px] font-[800] text-textColor">
-              Parcours de démonstration
+              Parcours de demonstration
             </h2>
             <ol className="grid gap-3 text-sm text-newTableText md:grid-cols-4">
               {workflow.map((step, index) => (
@@ -141,8 +141,14 @@ export default async function ContentRoutingPage() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/launches"
+              href="/editor"
               className="acadepost-routing-primary-action px-4 py-3 text-sm"
+            >
+              Ouvrir l'editeur
+            </Link>
+            <Link
+              href="/launches"
+              className="acadepost-routing-secondary-action px-4 py-3 text-sm font-[700]"
             >
               Ouvrir le calendrier
             </Link>
@@ -150,7 +156,7 @@ export default async function ContentRoutingPage() {
               href="/media"
               className="acadepost-routing-secondary-action px-4 py-3 text-sm font-[700]"
             >
-              Bibliothèque média
+              Bibliotheque media
             </Link>
           </div>
         </section>
