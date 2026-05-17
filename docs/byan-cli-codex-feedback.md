@@ -202,6 +202,25 @@ BYAN ajoute des centaines de fichiers d'un coup : `.claude`, `.codex`, `_byan`, 
 
 Pour l'instant, cette carte se reconstruit a la main.
 
+### 12. Le MCP BYAN depend d'un CLI absent
+
+Le serveur MCP installe dans `_byan/mcp/byan-mcp-server` appelle :
+
+```text
+node bin/byan-v2-cli.js ...
+```
+
+Mais l'installation courante n'avait pas cree `bin/byan-v2-cli.js`. Resultat : les tools MCP `byan_fc_parse`, `byan_elo_summary`, `byan_elo_context`, etc. etaient visibles par Codex, mais echouaient au runtime avec `MODULE_NOT_FOUND`.
+
+Correctif local applique dans AcadePost : ajout d'un entrypoint compatible `bin/byan-v2-cli.js` qui couvre les commandes ELO et fact-check attendues par le MCP.
+
+Comportement attendu cote BYAN CLI :
+
+- installer le CLI local quand le MCP est installe ;
+- ou configurer le MCP pour appeler le vrai chemin du CLI installe ;
+- verifier apres installation que `byan_fc_parse` et `byan_elo_summary` fonctionnent ;
+- ajouter ce controle a `byan doctor`.
+
 ## Ce qu'il faut ajouter a BYAN CLI
 
 Minimum pour que BYAN fonctionne correctement du premier coup :
@@ -216,6 +235,7 @@ Minimum pour que BYAN fonctionne correctement du premier coup :
 8. Generation d'un `.mcp.example.json` sans token.
 9. Rapport `BYAN_INSTALL_REPORT.md` apres installation.
 10. Modes d'installation separes : `minimal`, `codex-only`, `claude-only`, `full`.
+11. Installation et validation de `bin/byan-v2-cli.js` quand le serveur MCP est active.
 
 ## Scenario first-run ideal
 

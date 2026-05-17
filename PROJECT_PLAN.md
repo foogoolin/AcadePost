@@ -304,7 +304,15 @@ The first workflow should classify content into one of these groups, make the ma
 - Les exemples `.env.demo*` et les valeurs fallback des compose demo pointent maintenant vers `v1.1.0` par defaut.
 - Les runbooks serveur, le prompt agent shared-infra, le rapport security et les guardrails owner-facing ont ete alignes sur la preference tag versionne.
 - Verification locale: `docker compose --env-file .env.demo.example -f docker-compose.demo.yaml config --quiet`, `docker compose --env-file .env.demo.shared-infra.example -f docker-compose.demo.shared-infra.yaml config --quiet`, recherche mojibake et `git diff --check` passent.
-- Limite BYAN tooling observee: le MCP BYAN cherche `bin/byan-v2-cli.js`, absent du depot; la validation BYAN interactive via MCP est donc bloquee tant que ce wrapper n'est pas restaure ou pointe vers le bon CLI.
+- Limite BYAN tooling observee avant correction: le MCP BYAN cherchait `bin/byan-v2-cli.js`, absent du depot; la validation BYAN interactive via MCP etait donc bloquee tant que ce wrapper n'etait pas restaure ou pointe vers le bon CLI.
+
+## BYAN MCP CLI Repair - 2026-05-17
+
+- Cause racine: `_byan/mcp/byan-mcp-server/lib/cli.js` appelait `node bin/byan-v2-cli.js`, mais le fichier `bin/byan-v2-cli.js` n'etait pas installe dans le depot.
+- Ajout d'un entrypoint compatible `bin/byan-v2-cli.js` pour les commandes attendues par BYAN MCP et les agents: `elo summary`, `elo context`, `elo dashboard`, `elo record`, `elo declare`, `fc check`, `fc parse`, `fc verify`, `fc graph` et `fc sheet`.
+- Le CLI lit et met a jour les memoires locales BYAN: `_byan/_memory/elo-profile.json` et `_byan/_memory/fact-graph.json`.
+- Verification locale: `node bin/byan-v2-cli.js elo summary`, `node bin/byan-v2-cli.js elo context security`, `node bin/byan-v2-cli.js fc parse ...` et `node bin/byan-v2-cli.js fc check ...` passent.
+- Verification MCP: les tools `byan_fc_parse`, `byan_elo_summary` et `byan_elo_context` repondent a nouveau via MCP sans erreur `MODULE_NOT_FOUND`.
 
 ## Open Questions
 
