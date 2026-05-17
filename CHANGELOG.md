@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.1.3 - 2026-05-17
+
+- Reworked `Dockerfile.demo` into a multi-stage build so normal server updates pull a prebuilt runtime image instead of shipping the full build workspace.
+- Removed tracked BYAN/session outputs from Git and expanded ignore rules for local agent, report, cache and design scratch files.
+- Removed the old upstream container workflow that pushed `ghcr.io/gitroomhq/postiz-app`.
+- Removed upstream scheduled stale workflow and cleaned GitHub issue/PR/extension workflow templates.
+- Added a GHCR compressed image size gate for the AcadéPost demo image.
+- Removed the local BYAN API token from `.mcp.json`; future sessions must provide `BYAN_API_TOKEN` from the environment.
+
 ## v1.1.2 - 2026-05-17
 
 - Added `ghcr.io/foogoolin/acadepost:latest` to the GHCR publishing workflow.

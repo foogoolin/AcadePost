@@ -115,7 +115,7 @@ echo "Pulling AcadePost image..."
 docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" pull acadepost
 
 echo "Starting AcadePost shared-infra demo stack..."
-docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d
+docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d --no-build
 
 echo "Current stack status:"
 docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" ps

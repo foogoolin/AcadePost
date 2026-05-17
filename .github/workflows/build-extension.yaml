@@ -3,6 +3,9 @@ name: Build Extension
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   submit:
     runs-on: ubuntu-latest
@@ -20,8 +23,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Zip extensions
-        run: FRONTEND_URL=https://platform.postiz.com pnpm run build:extension
+      - name: Zip extension
+        run: FRONTEND_URL=https://your-domain.example pnpm run build:extension
 
       - name: Upload to Nextcloud
         env:

@@ -1,34 +1,44 @@
-# Mémoire Codex du projet
+# Codex Project Memory
 
-Ce fichier garde les problèmes récurrents que les prochaines sessions Codex/BYAN doivent connaître avant de modifier le projet.
+This file records recurring project issues that future Codex/BYAN sessions must check before editing AcadéPost.
 
-## Encodage UTF-8 et mojibake
+## Encoding And Mojibake
 
-Le projet utilise des textes visibles en français, donc les accents doivent rester en UTF-8. Une erreur déjà observée transforme les caractères UTF-8 en mojibake de type Windows code page, par exemple :
+Project files must stay UTF-8. A recurring failure mode is terminal or editor mojibake, where UTF-8 text is displayed or saved through the wrong Windows code page.
 
-- `AcadéPost` ou `AcadéPost` au lieu de `AcadéPost`.
-- `DГ©mo` ou `DÃ©mo` au lieu de `Démo`.
-- `Г‰diteur` ou `Ã‰diteur` au lieu de `Éditeur`.
-- `BГЄta` ou `BÃªta` au lieu de `Bêta`.
-- `franГ§ais` ou `franÃ§ais` au lieu de `français`.
+Known symptoms:
 
-Avant chaque commit qui touche les documents, traductions, labels UI ou prompts BYAN/Codex, lancer :
+- The product name displays as broken text instead of `AcadéPost`.
+- French labels show mixed Cyrillic/Latin garbage.
+- PowerShell output may look broken even when the file is still valid UTF-8.
+
+Before commits that touch docs, UI labels, translations, prompts, or deploy scripts, run:
 
 ```bash
-rg -n --glob '!docs/codex-project-memory.md' "AcadГ|AcadÃ|Г©|Г‰|ГÊ|ГÈ|ГЁ|Г§|Гґ|Г |ГЄ|Ã©|Ã¨|Ã§|Ã´|Ãª|Ã‰" AGENTS.md PROJECT_PLAN.md _byan-output docs README.md deploy apps libraries
+rg -n --glob '!docs/codex-project-memory.md' "AcadР|AcadГ|AcadÃ|DР|DГ|DÃ©|franР|franГ|franÃ|Р“|Гѓ" AGENTS.md PROJECT_PLAN.md docs README.md deploy apps libraries
 ```
 
-Si des résultats apparaissent, corriger les chaînes visibles et relancer la recherche jusqu'à obtenir zéro résultat.
+If this returns results:
 
-Corrections fréquentes :
+1. Open the file as UTF-8.
+2. Replace broken visible strings with correct UTF-8 text.
+3. Prefer ASCII labels while the project is unstable, except for the official product name `AcadéPost`.
+4. Re-run the search until only intentional technical examples remain.
 
-- `AcadéPost` / `AcadéPost` -> `AcadéPost`
-- `Г©` / `Ã©` -> `é`
-- `Г‰` / `Ã‰` -> `É`
-- `ГЁ` / `Ã¨` -> `è`
-- `ГÊ` / `ГЄ` / `Ãª` -> `ê`
-- `Г§` / `Ã§` -> `ç`
-- `Гґ` / `Ã´` -> `ô`
-- `Г ` / `Ã ` -> `à`
+## Docker And Deploy Guardrail
 
-Les fichiers du projet doivent rester enregistrés en UTF-8. `.editorconfig` fixe `charset = utf-8` pour aider les éditeurs, mais la vérification `rg` reste obligatoire.
+Do not touch the production server during Docker image work unless the owner explicitly asks for it in that turn.
+
+Normal update path:
+
+- GitHub Actions builds and publishes `ghcr.io/foogoolin/acadepost:latest`.
+- The server pulls the prebuilt image.
+- The server must not run `docker build` for normal updates.
+
+Domains, ports, database URLs, OAuth callbacks, and secrets belong in `.env` or reverse-proxy config, not inside the image.
+
+## BYAN Output
+
+`_byan/` is the local BYAN framework source. `_byan-output/` is generated session state and must not be committed.
+
+If `_byan-output/` or `reports/` appear in `git status` as tracked files, remove them from Git and keep them ignored.

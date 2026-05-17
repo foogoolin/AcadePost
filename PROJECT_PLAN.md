@@ -332,6 +332,20 @@ The first workflow should classify content into one of these groups, make the ma
 - Workflow GHCR publie maintenant `ghcr.io/foogoolin/acadepost:latest` en plus de `:demo`, du tag versionne et du SHA.
 - Les defaults Docker et `.env.demo*` utilisent maintenant `ghcr.io/foogoolin/acadepost:latest` pour une installation normale sans changer le numero d'image a chaque update.
 
+## Docker Recovery And Repo Hygiene - 2026-05-17
+
+- Version produit preparee: `v1.1.3`.
+- BYAN MCP route la tache comme travail complexe dans le thread principal; roles de controle: Rachid pour Docker/deploy, Skeptic pour secrets/risques, Tea/Quinn pour gates.
+- Le serveur Contabo reste hors scope jusqu'a publication et verification d'un nouveau `ghcr.io/foogoolin/acadepost:latest`.
+- `Dockerfile.demo` passe en multi-stage: `deps`, `builder`, puis `runner` avec runtime assets seulement.
+- Le runtime image ne copie plus tout le monorepo: seuls `node_modules` production, builds backend/frontend/orchestrator, Prisma schema, nginx config, PM2 config et entrypoint demo sont inclus.
+- `.dockerignore` exclut maintenant BYAN output, agents locaux, Codex config locale, reports, design scratch docs, caches et logs du build context.
+- `_byan-output/*` et `reports/junit.xml` sont retires du suivi Git; `_byan/` reste le framework BYAN local.
+- `.mcp.json` local ne contient plus de BYAN API token; `BYAN_API_TOKEN` doit venir de l'environnement et le token expose doit etre remplace.
+- L'ancien workflow upstream `build-containers.yml`, qui poussait encore vers `ghcr.io/gitroomhq/postiz-app`, est supprime.
+- Le workflow scheduled `stale.yml` upstream est supprime; les templates GitHub issue/PR et les workflows extension ne pointent plus vers les URLs Postiz.
+- Le workflow `Build demo image` publie toujours `latest`, `demo`, `vX.Y.Z` et SHA, puis verifie la taille compressee linux/amd64 contre une limite CI.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?

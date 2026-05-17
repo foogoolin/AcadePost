@@ -26,6 +26,7 @@ permissions:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: foogoolin/acadepost
+  ACADEPOST_IMAGE_MAX_COMPRESSED_MB: "900"
 
 jobs:
   build:
@@ -52,6 +53,33 @@ jobs:
         run: |
           version=$(node -p "require('./package.json').version")
           echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Build image for size gate
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.demo
+          push: false
+          outputs: type=oci,dest=/tmp/acadepost-image.tar
+          build-args: |
+            NEXT_PUBLIC_VERSION=v${{ steps.package-version.outputs.version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Check image size before push
+        shell: bash
+        run: |
+          max_bytes=$((ACADEPOST_IMAGE_MAX_COMPRESSED_MB * 1024 * 1024))
+          size_bytes="$(stat -c%s /tmp/acadepost-image.tar)"
+          size_mb="$(( (size_bytes + 1024 * 1024 - 1) / 1024 / 1024 ))"
+
+          echo "OCI image archive size: ${size_mb} MB"
+          echo "Limit: ${ACADEPOST_IMAGE_MAX_COMPRESSED_MB} MB"
+
+          if (( size_bytes > max_bytes )); then
+            echo "Image is too large. Optimize Dockerfile.demo before publishing this build." >&2
+            exit 1
+          fi
 
       - name: Build and push
         uses: docker/build-push-action@v6

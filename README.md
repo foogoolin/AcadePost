@@ -2,7 +2,7 @@
 
 AcadéPost is a self-hostable social publishing workspace for planning, preparing, scheduling and publishing content across multiple social platforms.
 
-Current version: `v1.1.2`
+Current version: `v1.1.3`
 
 ## Overview
 
@@ -45,18 +45,12 @@ Recommended install image:
 ghcr.io/foogoolin/acadepost:latest
 ```
 
-A moving image tag is also available for the latest MVP build from `main`:
-
-```text
-ghcr.io/foogoolin/acadepost:demo
-```
-
-For normal installs, use `:latest`. For a locked rollback target, use a versioned or SHA image.
+For normal installs, use `:latest`. For rollback, pin a version tag, SHA tag, or digest.
 
 Versioned images are published for releases, for example:
 
 ```text
-ghcr.io/foogoolin/acadepost:v1.1.2
+ghcr.io/foogoolin/acadepost:v1.1.3
 ```
 
 Two Compose modes are provided:
@@ -76,6 +70,12 @@ Shared-infra setup:
 ```bash
 cp .env.demo.shared-infra.example .env.demo.shared-infra
 bash deploy/demo/server-up-shared-infra.sh
+```
+
+Update an existing install by pulling the prebuilt image. The server should not build the app for normal updates:
+
+```bash
+bash deploy/demo/update.sh --env .env.demo --compose docker-compose.demo.yaml
 ```
 
 Deployment docs:
@@ -178,4 +178,4 @@ $env:NODE_OPTIONS='--max-old-space-size=8192'
 - `docs/integrations/social-provider-readiness-2026-05-16.md` - provider readiness matrix.
 - `docs/product/postiz-feature-comparison-2026-05-16.md` - feature comparison and product gaps.
 - `docs/security/acadepost-security-review-2026-05-16.md` - latest security review.
-- `docs/codex-project-memory.md` - encoding and mojibake guardrails.
+- `docs/codex-project-memory.md` - encoding and Docker guardrails.

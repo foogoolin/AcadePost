@@ -8,7 +8,7 @@ wait_for_tcp() {
   host="$2"
   port="$3"
 
-  echo "[acadepost-demo] Waiting for ${name} on ${host}:${port}..."
+  echo "[acadepost] Waiting for ${name} on ${host}:${port}..."
   until nc -z "${host}" "${port}"; do
     sleep 2
   done
@@ -26,21 +26,21 @@ if [ -n "${REDIS_URL:-}" ]; then
   wait_for_tcp "Redis" "${REDIS_HOST}" "${REDIS_PORT}"
 fi
 
-echo "[acadepost-demo] Waiting for Temporal on ${TEMPORAL_ADDRESS:-temporal:7233}..."
+echo "[acadepost] Waiting for Temporal on ${TEMPORAL_ADDRESS:-temporal:7233}..."
 TEMPORAL_HOST="$(printf '%s' "${TEMPORAL_ADDRESS:-temporal:7233}" | cut -d: -f1)"
 TEMPORAL_PORT="$(printf '%s' "${TEMPORAL_ADDRESS:-temporal:7233}" | cut -d: -f2)"
 wait_for_tcp "Temporal" "${TEMPORAL_HOST}" "${TEMPORAL_PORT}"
 
 if [ "${ACADEPOST_DEMO_DB_PUSH:-true}" = "true" ]; then
-  echo "[acadepost-demo] Synchronizing Prisma schema with demo database..."
+  echo "[acadepost] Synchronizing Prisma schema with database..."
   corepack pnpm exec prisma db push --accept-data-loss --schema ./libraries/nestjs-libraries/src/database/prisma/schema.prisma
 fi
 
-echo "[acadepost-demo] Validating nginx configuration..."
+echo "[acadepost] Validating nginx configuration..."
 nginx -t
 
-echo "[acadepost-demo] Starting nginx..."
+echo "[acadepost] Starting nginx..."
 nginx
 
-echo "[acadepost-demo] Starting AcadéPost demo services..."
+echo "[acadepost] Starting services..."
 exec pm2-runtime ecosystem.demo.config.cjs
