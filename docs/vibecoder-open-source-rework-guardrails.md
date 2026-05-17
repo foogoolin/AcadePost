@@ -114,7 +114,7 @@ The image should be reusable. Domain, DB URL, credentials, secrets, ports, and O
 For AcadéPost:
 
 - normal server update is `docker compose pull acadepost && docker compose up -d`, wrapped by `deploy/demo/update.sh`;
-- GHCR release image uses a versioned tag such as `ghcr.io/foogoolin/acadepost:v1.1.1`; `:demo` remains only as a moving latest-MVP tag;
+- GHCR normal install image uses `ghcr.io/foogoolin/acadepost:latest`; versioned and SHA tags remain available for rollback;
 - domain stays in `ACADEPOST_PUBLIC_URL`;
 - credentials encryption key stays in `ACADEPOST_CREDENTIALS_ENCRYPTION_KEY`;
 - the server should not build from source during normal demo updates.

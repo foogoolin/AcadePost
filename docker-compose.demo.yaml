@@ -1,6 +1,6 @@
 services:
   acadepost:
-    image: ${ACADEPOST_IMAGE:-ghcr.io/foogoolin/acadepost:v1.1.1}
+    image: ${ACADEPOST_IMAGE:-ghcr.io/foogoolin/acadepost:latest}
     container_name: acadepost
     restart: unless-stopped
     environment:

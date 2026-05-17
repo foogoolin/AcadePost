@@ -322,6 +322,16 @@ The first workflow should classify content into one of these groups, make the ma
 - Le workflow GHCR lit maintenant la version depuis `package.json` pour publier automatiquement le tag versionne correspondant, au lieu de garder un tag hard-code.
 - Les defaults Docker et la documentation deploiement pointent vers `ghcr.io/foogoolin/acadepost:v1.1.1`.
 
+## Build Web Apps UI Pass And Latest Image - 2026-05-17
+
+- Version produit preparee: `v1.1.2`.
+- Source design chargee: `C:\Users\my\Documents\byan-test\DESIGN.md`; elle s'applique strictement aux calendriers/date-pickers, pas comme redesign complet de tout le produit.
+- Plan de review ajoute: `docs/build-web-apps-ui-review-plan.md`.
+- Browser UI pass a trouve que `/brand/acadepost-logo.png` etait intercepte par le proxy frontend et renvoyait du HTML; le logo raster `A` etait donc casse sur l'auth/app shell.
+- Fix applique dans `apps/frontend/src/proxy.ts`: les chemins `/brand/*` bypassent maintenant la logique auth/proxy comme les assets publics.
+- Workflow GHCR publie maintenant `ghcr.io/foogoolin/acadepost:latest` en plus de `:demo`, du tag versionne et du SHA.
+- Les defaults Docker et `.env.demo*` utilisent maintenant `ghcr.io/foogoolin/acadepost:latest` pour une installation normale sans changer le numero d'image a chaque update.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?

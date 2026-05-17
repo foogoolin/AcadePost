@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.2 - 2026-05-17
+
+- Added `ghcr.io/foogoolin/acadepost:latest` to the GHCR publishing workflow.
+- Switched Docker compose and env defaults to the `latest` image for normal installs.
+- Fixed static `/brand/*` assets being routed through the frontend proxy, which broke the AcadéPost raster logo in auth and app shell UI.
+- Added `docs/build-web-apps-ui-review-plan.md` with the Build Web Apps review scope and imported `DESIGN.md` calendar rules.
+
 ## v1.1.1 - 2026-05-17
 
 - Fixed the visible `Editeur` navigation entry and added a direct Editor action from `/content-routing`.

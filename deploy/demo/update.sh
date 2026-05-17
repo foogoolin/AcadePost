@@ -58,8 +58,8 @@ fi
 echo "Validating Compose..."
 docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" config --quiet
 
-if [[ "${ACADEPOST_IMAGE:-}" == *":demo" ]]; then
-  echo "Warning: ACADEPOST_IMAGE uses mutable :demo tag. Use a SHA tag or digest for pinned production rollback."
+if [[ "${ACADEPOST_IMAGE:-}" == *":demo" || "${ACADEPOST_IMAGE:-}" == *":latest" ]]; then
+  echo "Warning: ACADEPOST_IMAGE uses a mutable tag. Use a SHA tag or digest for pinned production rollback."
 fi
 
 echo "Pulling image for service: $SERVICE"

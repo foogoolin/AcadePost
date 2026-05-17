@@ -277,7 +277,7 @@ Known local caveat:
 
 ### Mutable GHCR tag
 
-`ghcr.io/foogoolin/acadepost:demo` is useful as a moving tag for the latest MVP build, but it is mutable. For production or an important client demo, prefer a versioned tag such as `ghcr.io/foogoolin/acadepost:v1.1.1`, a SHA tag, or an image digest.
+`ghcr.io/foogoolin/acadepost:latest` is the normal install tag and `:demo` is the latest MVP tag, but both are mutable. For a locked rollback target, prefer a versioned tag such as `ghcr.io/foogoolin/acadepost:v1.1.2`, a SHA tag, or an image digest.
 
 Recommendation:
 

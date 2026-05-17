@@ -60,6 +60,7 @@ jobs:
           file: Dockerfile.demo
           push: true
           tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:demo
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v${{ steps.package-version.outputs.version }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}

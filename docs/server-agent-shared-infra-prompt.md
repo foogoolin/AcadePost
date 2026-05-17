@@ -15,7 +15,7 @@ Important architecture:
 - Do NOT use the clean-VPS compose for this server.
 - Use `docker-compose.demo.shared-infra.yaml`.
 - Use `.env.demo.shared-infra`, created from `.env.demo.shared-infra.example`.
-- Use the prebuilt versioned image `ghcr.io/foogoolin/acadepost:v1.1.1`.
+- Use the prebuilt image `ghcr.io/foogoolin/acadepost:latest`.
 - Do NOT build the AcadePost image on the server unless explicitly asked for emergency fallback.
 - Do NOT open public port 4007.
 - Do NOT add a UFW rule for 4007.
@@ -62,7 +62,7 @@ Prepare repository:
    - `git fetch origin main`
    - update safely to latest `main`
 3. Confirm the image is available:
-   - `docker pull ghcr.io/foogoolin/acadepost:v1.1.1`
+   - `docker pull ghcr.io/foogoolin/acadepost:latest`
    - If pull returns unauthorized, make the GHCR package public or run `docker login ghcr.io` with an authorized token.
 
 Prepare env:

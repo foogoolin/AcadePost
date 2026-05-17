@@ -19,7 +19,7 @@ bash deploy/demo/update.sh --env .env.demo.shared-infra --compose docker-compose
 Le script fait volontairement seulement ceci :
 
 - valide le fichier Compose;
-- avertit si `ACADEPOST_IMAGE` utilise le tag mutable `:demo`;
+- avertit si `ACADEPOST_IMAGE` utilise un tag mutable comme `:latest` ou `:demo`;
 - lance `docker compose pull acadepost`;
 - recree le conteneur `acadepost` avec `--no-build --force-recreate`;
 - attend `/api/monitor/ready`;
@@ -31,7 +31,7 @@ Le domaine, le port, la base de donnees, les secrets, SMTP et OAuth restent en r
 
 Variables importantes :
 
-- `ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:v1.1.1`
+- `ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:latest`
 - `ACADEPOST_PUBLIC_URL=https://YOUR_DOMAIN`
 - `DATABASE_URL=postgresql://...`
 - `JWT_SECRET=...`
