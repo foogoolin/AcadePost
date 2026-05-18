@@ -122,6 +122,55 @@ jobs:
             exit 1
           fi
 
+      - name: Build image for container smoke
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.demo
+          push: false
+          load: true
+          tags: acadepost:ci-smoke
+          build-args: |
+            NEXT_PUBLIC_VERSION=v${{ steps.package-version.outputs.version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test Compose stack
+        shell: bash
+        run: |
+          set -euo pipefail
+          env_file=".env.demo.ci"
+          cp .env.demo.example "$env_file"
+          {
+            echo "ACADEPOST_IMAGE=acadepost:ci-smoke"
+            echo "ACADEPOST_PUBLIC_URL=http://127.0.0.1:4007"
+            echo "ACADEPOST_DEMO_DB_PUSH=true"
+          } >> "$env_file"
+
+          cleanup() {
+            docker compose --env-file "$env_file" -f docker-compose.demo.yaml down -v --remove-orphans || true
+          }
+          trap cleanup EXIT
+
+          docker compose --env-file "$env_file" -f docker-compose.demo.yaml up -d --no-build
+
+          for attempt in $(seq 1 90); do
+            if curl -fsS http://127.0.0.1:4007/api/monitor/ready >/dev/null; then
+              echo "Compose smoke passed."
+              exit 0
+            fi
+
+            if (( attempt % 10 == 0 )); then
+              docker compose --env-file "$env_file" -f docker-compose.demo.yaml ps
+            fi
+
+            sleep 4
+          done
+
+          docker compose --env-file "$env_file" -f docker-compose.demo.yaml ps
+          docker compose --env-file "$env_file" -f docker-compose.demo.yaml logs --tail=200
+          exit 1
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
