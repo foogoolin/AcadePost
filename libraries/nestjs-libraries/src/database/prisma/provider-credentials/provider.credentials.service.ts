@@ -15,6 +15,7 @@ import {
   PROVIDER_CREDENTIAL_DEFINITIONS,
   PROVIDER_CREDENTIAL_LOOKUP,
 } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.registry';
+import { TelegramProvider } from '@gitroom/nestjs-libraries/integrations/social/telegram.provider';
 
 type EncryptedPayload = {
   v: 1;
@@ -130,6 +131,10 @@ export class ProviderCredentialsService {
       credential.encryptedData
     );
     this.validateRequired(credential.providerIdentifier as any, fields);
+    await this.testCredentialConnection(
+      credential.providerIdentifier as ProviderCredentialIdentifier,
+      fields
+    );
     const updated = await this._providerCredentialsRepository.markTested(
       orgId,
       id,
@@ -161,7 +166,10 @@ export class ProviderCredentialsService {
           credential.providerIdentifier,
           credential.encryptedData
         );
-        await this._providerCredentialsRepository.markUsed(orgId, credential.id);
+        await this._providerCredentialsRepository.markUsed(
+          orgId,
+          credential.id
+        );
         return {
           credentialId: credential.id,
           providerIdentifier: credential.providerIdentifier,
@@ -285,9 +293,8 @@ export class ProviderCredentialsService {
     providerIdentifier: ProviderCredentialIdentifier,
     fields: Record<string, string>
   ) {
-    const definition = PROVIDER_CREDENTIAL_DEFINITION_MAP.get(
-      providerIdentifier
-    );
+    const definition =
+      PROVIDER_CREDENTIAL_DEFINITION_MAP.get(providerIdentifier);
     if (!definition) {
       throw new BadRequestException('Provider is not supported');
     }
@@ -329,6 +336,33 @@ export class ProviderCredentialsService {
     }
 
     return undefined;
+  }
+
+  private async testCredentialConnection(
+    providerIdentifier: ProviderCredentialIdentifier,
+    fields: Record<string, string>
+  ) {
+    try {
+      switch (providerIdentifier) {
+        case 'telegram':
+          await new TelegramProvider().getBotConfiguration(
+            this.clientInformationFromRuntimeCredentials({
+              providerIdentifier,
+              fields,
+              source: 'database',
+            })
+          );
+          break;
+        default:
+          break;
+      }
+    } catch (error: any) {
+      throw new BadRequestException(
+        error?.message
+          ? `Credential test failed: ${error.message}`
+          : 'Credential test failed'
+      );
+    }
   }
 
   private encrypt(
@@ -413,9 +447,8 @@ export class ProviderCredentialsService {
     providerIdentifier: ProviderCredentialIdentifier,
     fields: Record<string, string>
   ) {
-    const definition = PROVIDER_CREDENTIAL_DEFINITION_MAP.get(
-      providerIdentifier
-    );
+    const definition =
+      PROVIDER_CREDENTIAL_DEFINITION_MAP.get(providerIdentifier);
     return (definition?.fields || []).reduce<Record<string, any>>(
       (all, field) => {
         const value = fields[field.key] || '';

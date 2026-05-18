@@ -92,3 +92,20 @@ Do not retry the same pull/update loop as-is. The next attempt should first addr
 - Keep only the nginx proxy service on the public `5000` contract.
 - Move demo Prisma sync into the one-shot `acadepost-migrate` service.
 - Require CI compose checks, image size gate and cold-pull/digest proof before touching Contabo again.
+
+## Resolution After Docker Image Optimization
+
+The optimized image path was implemented and validated later on 2026-05-18.
+
+- Commit `37c79fa5` added Temporal runtime packaging and stricter update/CI service health gates; CI correctly failed before publishing because `tslib` was still missing from Temporal workflow bundling.
+- Commit `b4aad511` added the remaining Temporal workflow runtime dependencies: `dayjs`, `lodash` and `tslib`.
+- GitHub Actions run `26035055443` passed the Docker image build, size gate, Compose smoke, `acadepost-orchestrator` health check and GHCR publish.
+- The Contabo shared-infra host then pulled `ghcr.io/foogoolin/acadepost:latest` and recreated the app/proxy service set without rebuilding on the server.
+- Public readiness returned HTTP 200 at `/api/monitor/ready`; `acadepost`, `acadepost-backend`, `acadepost-frontend` and `acadepost-orchestrator` were healthy after the update.
+- Running digest recorded from the server: `sha256:0aa076af6444ee1b4e83b32882a859167625292d53322c944c151d226815852c`.
+- Reported image size on the server: `1.02GB`.
+
+Remaining follow-up:
+
+- Prebundle Temporal workflows to reduce orchestrator cold start.
+- Add an explicit app-only update mode to `deploy/demo/update.sh`, or split first-install and update scripts, so shared-infra updates can use `--no-deps` without manual Compose commands.

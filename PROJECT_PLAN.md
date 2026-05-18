@@ -367,9 +367,23 @@ The first workflow should classify content into one of these groups, make the ma
 - `Dockerfile.demo` n'embarque plus nginx/PM2 et utilise Next standalone + trace runtime backend/orchestrator au lieu de copier tout le root `node_modules`.
 - `acadepost-migrate` est le seul service qui peut lancer `prisma db push --accept-data-loss`, controle par `ACADEPOST_DEMO_DB_PUSH`.
 - Les secrets backend ne sont plus passes au conteneur frontend dans les compose demo.
-- CI demo valide les compose, interdit `build:` dans le chemin install, teste l'echec de `deploy/demo/update.sh` quand `pull` echoue, puis applique le gate de taille image.
+- CI demo valide les compose, interdit `build:` dans le chemin install, teste l'echec de `deploy/demo/update.sh` quand `pull` echoue, applique le gate de taille image, lance la stack Compose et verifie la sante backend/frontend/orchestrator/proxy avant publication GHCR.
+- Hotfix runtime: les dependances dynamiques requises par Temporal workflow bundling sont conservees dans l'image optimisee, notamment `@temporalio`, `dayjs`, `lodash` et `tslib`.
 - Version produit fixee pour ce passage: `v1.1.5`.
-- Verification locale: `corepack pnpm run build` passe; `docker compose config --quiet` passe pour clean-VPS et shared-infra; Docker daemon local reste indisponible, donc le build image/smoke conteneur doit etre valide par GitHub Actions ou une machine Docker active avant Contabo.
+- Verification: `npm test` passe apres correction Jest, `git diff --check` passe, le workflow GitHub Actions `Build demo image` run `26035055443` passe et publie `ghcr.io/foogoolin/acadepost:latest`.
+- Resultat serveur: la mise a jour Contabo shared-infra du 2026-05-18 a tire l'image publiee sans `docker build`; `acadepost`, `acadepost-backend`, `acadepost-frontend` et `acadepost-orchestrator` sont sains, et `/api/monitor/ready` retourne `200`.
+- Digest runtime observe: `sha256:0aa076af6444ee1b4e83b32882a859167625292d53322c944c151d226815852c`; taille image rapportee serveur: `1.02GB`.
+- Follow-up P2: prebundler les workflows Temporal pour reduire le cold start orchestrator et ajouter un mode update app-only `--no-deps` dans `deploy/demo/update.sh`, ou separer explicitement first-install et update.
+
+## Telegram Credentials Visibility Fix - 2026-05-18
+
+- Version produit preparee: `v1.1.6`.
+- Bug visible: Telegram etait bien supporte par le runtime credentials, mais il apparaissait trop bas dans la liste `Parametres > Identifiants`, sous le groupe `Community`; sur le premier ecran demo, l'utilisateur ne voyait donc pas ou donner le bot token.
+- Correction: Telegram est maintenant dans le premier groupe `Core social`, juste apres X, avec les champs `Bot Token` et `Bot Name`.
+- Correction UX n8n-like: la page `Identifiants` separe mieux les provider definitions et les saved credential instances avec recherche de provider, liste des credentials du provider courant, edition masquee et bouton `Tester la connexion`.
+- Correction backend: le test d'un credential Telegram appelle maintenant la configuration Bot API via le provider Telegram, au lieu de seulement valider les champs requis.
+- Documentation ajoutee: `docs/provider-credentials-guide.md` avec commande de generation de la cle de chiffrement, exemple Telegram, differences avec n8n et edge cases.
+- Verification: tests rouge/vert ajoutes sur la registry credentials et le test provider Telegram pour garder Telegram visible et verifier que le bouton de test declenche une vraie verification provider.
 
 ## Open Questions
 

@@ -2,7 +2,7 @@
 
 AcadéPost is a self-hostable social publishing workspace for planning, preparing, scheduling and publishing content across multiple social platforms.
 
-Current version: `v1.1.5`
+Current version: `v1.1.6`
 
 ## Overview
 
@@ -33,6 +33,8 @@ The first provider credentials gate focuses on:
 
 Credentials are configured per project from the AcadéPost UI. Facebook, Instagram and Threads are treated as separate credentials, even when a user manually reuses the same Meta app values.
 
+The credential screen follows the n8n-style split between provider definitions and saved credential instances: choose a provider type, save one or more project credentials, keep secrets masked after save, and use `Tester la connexion` before connecting a channel.
+
 `.env` is still used for infrastructure and legacy/demo fallback values such as database, Redis, public URL, JWT, encryption key, SMTP and optional provider fallback credentials.
 
 ## Deployment
@@ -50,7 +52,7 @@ For normal installs, use `:latest`. For rollback, pin a version tag, SHA tag, or
 Versioned images are published for releases, for example:
 
 ```text
-ghcr.io/foogoolin/acadepost:v1.1.5
+ghcr.io/foogoolin/acadepost:v1.1.6
 ```
 
 Two Compose modes are provided:
@@ -60,7 +62,9 @@ Two Compose modes are provided:
 
 The install path uses prebuilt images only. The public service is an nginx proxy named `acadepost`; backend, frontend and orchestrator run as separate internal containers from the same optimized app image. The server must not run `docker build` for normal installs or updates.
 
-Before `:latest` is published, GitHub Actions builds the image, checks the archive size, starts the Compose stack and waits for `/api/monitor/ready`. This validation can take several minutes in CI, but it happens before the VPS update path.
+Before `:latest` is published, GitHub Actions builds the image, checks the archive size, starts the Compose stack, waits for `/api/monitor/ready` and checks the backend, frontend, orchestrator and proxy service health. This validation can take several minutes in CI, but it happens before the VPS update path.
+
+Release evidence for `v1.1.5`: the hotfixed Docker workflow for commit `b4aad511` passed the Compose smoke gate in run `26035055443` and published `ghcr.io/foogoolin/acadepost:latest`. The follow-up Contabo shared-infra update pulled that image successfully and reached public readiness.
 
 Example first-time setup:
 
@@ -82,11 +86,14 @@ Update an existing install by pulling the prebuilt image. The server should not 
 bash deploy/demo/update.sh --env .env.demo --compose docker-compose.demo.yaml
 ```
 
+On an existing shared-infra host where Redis, Temporal or Elasticsearch should not be restarted, use the app-only `--no-deps` Compose flow documented in `docs/demo-docker-update.md` until the update script has a dedicated app-only mode.
+
 Deployment docs:
 
 - `docs/demo-server-deploy.md`
 - `docs/demo-shared-infra-deploy.md`
 - `docs/demo-docker-update.md`
+- `docs/provider-credentials-guide.md`
 
 ## Configuration
 
@@ -117,7 +124,7 @@ https://your-domain.example/integrations/social/youtube
 https://your-domain.example/integrations/social/pinterest
 ```
 
-Telegram uses a bot token rather than OAuth. Create the bot in BotFather, add the bot to the group/channel, then connect it from the AcadéPost UI.
+Telegram uses a bot token rather than OAuth. In the AcadéPost UI, open `Paramètres > Identifiants`, select `Telegram` in the first provider group, then save `Bot Token` and optional `Bot Name`. Use `Tester la connexion` to validate the bot token against Telegram Bot API, add the bot to the group/channel, then connect it from the AcadéPost UI.
 
 ## Local Development
 
@@ -181,5 +188,6 @@ $env:NODE_OPTIONS='--max-old-space-size=8192'
 - `AGENTS.md` - working rules for coding agents.
 - `docs/integrations/social-provider-readiness-2026-05-16.md` - provider readiness matrix.
 - `docs/product/postiz-feature-comparison-2026-05-16.md` - feature comparison and product gaps.
+- `docs/provider-credentials-guide.md` - n8n-like provider credentials setup, examples and edge cases.
 - `docs/security/acadepost-security-review-2026-05-16.md` - latest security review.
 - `docs/codex-project-memory.md` - encoding and Docker guardrails.

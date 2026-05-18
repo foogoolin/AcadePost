@@ -72,6 +72,32 @@ export const PROVIDER_CREDENTIAL_DEFINITIONS: ProviderCredentialDefinition[] = [
     ],
   },
   {
+    identifier: 'telegram',
+    name: 'Telegram',
+    group: 'Core social',
+    fields: [
+      {
+        key: 'botToken',
+        label: 'Bot Token',
+        type: 'password',
+        required: true,
+        env: 'TELEGRAM_TOKEN',
+        placeholder: '1234567890:token',
+      },
+      {
+        key: 'botName',
+        label: 'Bot Name',
+        type: 'text',
+        required: false,
+        env: 'TELEGRAM_BOT_NAME',
+        placeholder: 'acadepost_bot',
+      },
+    ],
+    notes: [
+      'Publie via Telegram Bot API. Ajoutez le bot au groupe ou canal, puis utilisez la commande de connexion affichée par AcadéPost.',
+    ],
+  },
+  {
     identifier: 'linkedin',
     name: 'LinkedIn',
     group: 'Core social',
@@ -270,32 +296,6 @@ export const PROVIDER_CREDENTIAL_DEFINITIONS: ProviderCredentialDefinition[] = [
       'Neynar Secret Key'
     ),
     notes: [serverRuntimeNote],
-  },
-  {
-    identifier: 'telegram',
-    name: 'Telegram',
-    group: 'Community',
-    fields: [
-      {
-        key: 'botToken',
-        label: 'Bot Token',
-        type: 'password',
-        required: true,
-        env: 'TELEGRAM_TOKEN',
-        placeholder: '1234567890:token',
-      },
-      {
-        key: 'botName',
-        label: 'Bot Name',
-        type: 'text',
-        required: false,
-        env: 'TELEGRAM_BOT_NAME',
-        placeholder: 'acadepost_bot',
-      },
-    ],
-    notes: [
-      'Publie via Telegram Bot API. Ajoutez le bot au groupe ou canal, puis utilisez la commande de connexion affichée par AcadéPost.',
-    ],
   },
   {
     identifier: 'mewe',

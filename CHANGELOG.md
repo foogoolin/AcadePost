@@ -1,13 +1,26 @@
 # Changelog
 
+## v1.1.6 - 2026-05-18
+
+- Description: Fixed Telegram credential visibility in the Settings > Identifiants provider list so demo users can configure Telegram from the first credential group.
+- Added an n8n-like credential workflow in Settings > Identifiants: searchable provider types, editable saved credential instances, masked secrets, and a direct connection test action.
+- Moved Telegram into the first `Core social` credential group with the existing `Bot Token` and optional `Bot Name` fields.
+- Changed Telegram credential tests from required-field validation to a real Telegram Bot API configuration check.
+- Added a registry regression test that keeps Telegram among the first visible credential providers.
+- Added a provider credential usage guide with setup commands, Telegram example, runtime behavior and edge cases.
+
 ## v1.1.5 - 2026-05-18
 
+- Description: Completed the Docker image optimization documentation for the validated GHCR and Contabo update path, including Temporal runtime hotfixes, service health gates and shared-infra app-only update caveats.
 - Optimized the self-hosted Docker runtime so normal server updates use the prebuilt `ghcr.io/foogoolin/acadepost:latest` image instead of building the monorepo on the VPS.
 - Split the Compose runtime into a public nginx proxy plus internal backend, frontend, orchestrator and migrate services while preserving the existing public HTTP entrypoint.
 - Added GitHub Actions gates for Compose validation, Docker context hygiene, image size, container smoke and GHCR publishing before `latest` is updated.
 - Fixed runtime tracing for Prisma engines and Google API modules so the optimized image still starts from the traced production payload.
+- Fixed Temporal worker runtime packaging by keeping the dynamic workflow dependencies required by the orchestrator image.
+- Tightened update and CI smoke checks so service container health, including `acadepost-orchestrator`, is checked before the image is treated as demo-ready.
 - Fixed the root Jest config so `npm test` exits successfully in repositories without the old Nx Jest preset.
-- Verified the published `latest` image in workflow run `26031408303`: OCI archive size `317 MB`, Compose smoke passed, digest `sha256:7d7e53976e366d80ce9ed81cbf34efd99f7ed387e3be97a59ef5db30874cd686`.
+- Verified the first optimized `latest` image in workflow run `26031408303`: OCI archive size `317 MB`, Compose smoke passed, digest `sha256:7d7e53976e366d80ce9ed81cbf34efd99f7ed387e3be97a59ef5db30874cd686`.
+- Verified the hotfixed `latest` image in workflow run `26035055443` after the Temporal runtime fix; the Contabo shared-infra stack then pulled the image and reached public readiness with backend, frontend, orchestrator and proxy containers healthy.
 
 ## v1.1.4 - 2026-05-17
 

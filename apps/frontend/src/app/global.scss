@@ -1606,9 +1606,15 @@ html[dir='rtl'] [dir='ltr'] {
   padding: 16px;
 }
 
+.acadepost-credentials-card.provider-list {
+  max-height: calc(100vh - 230px);
+  overflow: auto;
+}
+
 .acadepost-credentials-provider,
 .acadepost-credentials-copy,
-.acadepost-credentials-row {
+.acadepost-credentials-row,
+.acadepost-credentials-inline-credential {
   border: 1px solid var(--new-bgLineColor);
   border-radius: 6px;
   background: color-mix(in srgb, var(--new-bgColor) 86%, transparent);
@@ -1638,7 +1644,8 @@ html[dir='rtl'] [dir='ltr'] {
 }
 
 .acadepost-credentials-provider small,
-.acadepost-credentials-row span {
+.acadepost-credentials-row span,
+.acadepost-credentials-inline-credential small {
   color: var(--new-table-text);
   font-size: 11px;
   font-weight: 600;
@@ -1656,6 +1663,7 @@ html[dir='rtl'] [dir='ltr'] {
   padding: 10px 12px;
 }
 
+.acadepost-credentials-search,
 .acadepost-credentials-field {
   display: flex;
   flex-direction: column;
@@ -1665,12 +1673,17 @@ html[dir='rtl'] [dir='ltr'] {
   font-weight: 800;
 }
 
+.acadepost-credentials-search {
+  margin-bottom: 14px;
+}
+
 .acadepost-credentials-fields {
   display: grid;
   gap: 12px;
   margin-top: 12px;
 }
 
+.acadepost-credentials-search input,
 .acadepost-credentials-field input {
   min-height: 42px;
   width: 100%;
@@ -1684,6 +1697,7 @@ html[dir='rtl'] [dir='ltr'] {
   padding: 0 11px;
 }
 
+.acadepost-credentials-search input:focus,
 .acadepost-credentials-field input:focus {
   border-color: #292929;
 }
@@ -1738,6 +1752,40 @@ html[dir='rtl'] [dir='ltr'] {
 
 .acadepost-credentials-notes {
   margin-top: 14px;
+}
+
+.acadepost-credentials-notes strong {
+  display: block;
+  color: rgb(var(--new-textColor));
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.acadepost-credentials-inline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.acadepost-credentials-inline-credential {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.acadepost-credentials-inline-credential.is-active {
+  border-color: #292929;
+  background: color-mix(in srgb, var(--new-bgColor) 72%, #4cccb8 12%);
+}
+
+.acadepost-credentials-inline-credential span {
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .acadepost-credentials-copy {

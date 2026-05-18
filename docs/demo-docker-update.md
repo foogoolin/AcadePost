@@ -22,6 +22,7 @@ Le script fait volontairement seulement ceci :
 - avertit si `ACADEPOST_IMAGE` utilise un tag mutable comme `:latest` ou `:demo`;
 - lance `docker compose pull` pour `acadepost-migrate`, `acadepost-backend`, `acadepost-frontend`, `acadepost-orchestrator` et le proxy `acadepost`;
 - recree les services avec `--no-build --force-recreate`;
+- attend l'etat sain des services selectionnes quand ils exposent un healthcheck;
 - attend `/api/monitor/ready`;
 - affiche l'image actuellement utilisee et le digest precedent si disponible.
 
@@ -43,6 +44,42 @@ docker compose pull
 docker compose up -d --no-build --force-recreate
 ```
 
+Pour limiter la mise a jour aux conteneurs applicatifs et au proxy:
+
+```bash
+bash deploy/demo/update.sh \
+  --env .env.demo.shared-infra \
+  --compose docker-compose.demo.shared-infra.yaml \
+  --service "acadepost-migrate acadepost-backend acadepost-frontend acadepost-orchestrator acadepost"
+```
+
+### Shared-infra app-only update
+
+Sur un serveur shared-infra deja sain, ne redemarre pas Redis, Temporal ou Elasticsearch juste pour tirer une nouvelle image applicative. Tant que `deploy/demo/update.sh` n'a pas de mode `--no-deps` dedie, utiliser ce flux direct:
+
+```bash
+cd /opt/AcadePost
+APP_SERVICES="acadepost-migrate acadepost-backend acadepost-frontend acadepost-orchestrator acadepost"
+docker compose --env-file .env.demo.shared-infra \
+  -f docker-compose.demo.shared-infra.yaml \
+  pull $APP_SERVICES
+docker compose --env-file .env.demo.shared-infra \
+  -f docker-compose.demo.shared-infra.yaml \
+  up -d --no-build --force-recreate --no-deps $APP_SERVICES
+docker compose --env-file .env.demo.shared-infra \
+  -f docker-compose.demo.shared-infra.yaml \
+  ps
+curl -fsS https://YOUR_DOMAIN/api/monitor/ready
+```
+
+Apres la mise a jour, verifier aussi l'orchestrator:
+
+```bash
+docker compose --env-file .env.demo.shared-infra \
+  -f docker-compose.demo.shared-infra.yaml \
+  logs --tail=120 acadepost-orchestrator
+```
+
 Si `docker compose pull` est lent, le serveur est en train de telecharger des layers depuis GHCR. Ce n'est pas un build local. Ne pas lancer `docker build` sur le VPS pour corriger cela.
 
 Pour verifier l'image actuellement publiee:
@@ -54,6 +91,8 @@ docker buildx imagetools inspect ghcr.io/foogoolin/acadepost:latest
 Edge cases:
 
 - si le health check echoue, lire les logs du service en erreur avant toute autre action;
+- si `acadepost-orchestrator` echoue apres un pull, verifier les erreurs Temporal workflow bundling et les modules runtime dynamiques avant de retenter;
+- si l'infra partagee est deja saine, preferer l'update app-only avec `--no-deps` pour eviter de redemarrer Redis, Temporal ou Elasticsearch pendant une simple mise a jour applicative;
 - ne pas utiliser `down -v` pour une mise a jour, car cela peut supprimer les volumes;
 - pour un rollback fiable, remplacer `:latest` par un tag SHA ou un digest connu, puis relancer le script.
 

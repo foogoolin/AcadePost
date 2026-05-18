@@ -59,12 +59,28 @@ const emptyDraft = {
   fields: {} as Record<string, string>,
 };
 
+const createDraftForProvider = (provider: CredentialProvider) => {
+  const fields: Record<string, string> = {};
+  provider.fields.forEach((field) => {
+    fields[field.key] = '';
+  });
+
+  return {
+    ...emptyDraft,
+    providerIdentifier: provider.identifier,
+    name: `${provider.name} AcadéPost`,
+    fields,
+  };
+};
+
 export const ProviderCredentialsComponent: FC = () => {
   const fetch = useFetch();
   const toaster = useToaster();
   const [selectedProvider, setSelectedProvider] = useState('');
+  const [providerSearch, setProviderSearch] = useState('');
   const [draft, setDraft] = useState(emptyDraft);
   const [isSaving, setIsSaving] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
 
   const loadProviders = useCallback(async () => {
     return (await fetch('/provider-credentials/providers')).json();
@@ -101,16 +117,37 @@ export const ProviderCredentialsComponent: FC = () => {
       ) || providers[0],
     [providers, selectedProvider]
   );
+  const savedForCurrentProvider = useMemo(
+    () =>
+      credentialList.filter(
+        (credential) =>
+          credential.providerIdentifier === currentProvider?.identifier
+      ),
+    [credentialList, currentProvider?.identifier]
+  );
 
   const groupedProviders = useMemo(() => {
-    return providers.reduce(
-      (all: Record<string, CredentialProvider[]>, provider: CredentialProvider) => ({
+    const needle = providerSearch.trim().toLowerCase();
+    const visibleProviders = needle
+      ? providers.filter((provider) =>
+          [provider.name, provider.identifier, provider.group]
+            .join(' ')
+            .toLowerCase()
+            .includes(needle)
+        )
+      : providers;
+
+    return visibleProviders.reduce(
+      (
+        all: Record<string, CredentialProvider[]>,
+        provider: CredentialProvider
+      ) => ({
         ...all,
         [provider.group]: [...(all[provider.group] || []), provider],
       }),
       {}
     );
-  }, [providers]);
+  }, [providerSearch, providers]);
 
   useEffect(() => {
     if (!selectedProvider && providers[0]?.identifier) {
@@ -123,17 +160,16 @@ export const ProviderCredentialsComponent: FC = () => {
       return;
     }
 
-    const fields: Record<string, string> = {};
-    (currentProvider.fields as CredentialField[]).forEach((field) => {
-      fields[field.key] = '';
-    });
+    setDraft((current) => {
+      if (
+        current.id &&
+        current.providerIdentifier === currentProvider.identifier
+      ) {
+        return current;
+      }
 
-    setDraft(() => ({
-      ...emptyDraft,
-      providerIdentifier: currentProvider.identifier,
-      name: `${currentProvider.name} AcadéPost`,
-      fields,
-    }));
+      return createDraftForProvider(currentProvider);
+    });
   }, [currentProvider]);
 
   const editCredential = useCallback(
@@ -203,21 +239,46 @@ export const ProviderCredentialsComponent: FC = () => {
 
   const testCredential = useCallback(
     async (credential: ProviderCredential) => {
-      const response = await fetch(
-        `/provider-credentials/${credential.id}/test`,
-        {
-          method: 'POST',
+      try {
+        const response = await fetch(
+          `/provider-credentials/${credential.id}/test`,
+          {
+            method: 'POST',
+          }
+        );
+        if (!response.ok) {
+          const details = await response.text();
+          toaster.show(details || 'Vérification impossible', 'warning');
+          return false;
         }
-      );
-      if (!response.ok) {
-        toaster.show('Vérification impossible', 'warning');
-        return;
+        await mutate();
+        toaster.show('Connexion vérifiée', 'success');
+        return true;
+      } catch (error: any) {
+        toaster.show(error?.message || 'Vérification impossible', 'warning');
+        return false;
       }
-      await mutate();
-      toaster.show('Champs requis validés', 'success');
     },
     [fetch, mutate, toaster]
   );
+
+  const testDraftCredential = useCallback(async () => {
+    if (!draft.id) {
+      return;
+    }
+
+    const credential = credentialList.find((item) => item.id === draft.id);
+    if (!credential) {
+      return;
+    }
+
+    setIsTesting(true);
+    try {
+      await testCredential(credential);
+    } finally {
+      setIsTesting(false);
+    }
+  }, [credentialList, draft.id, testCredential]);
 
   const deleteCredential = useCallback(
     async (credential: ProviderCredential) => {
@@ -225,10 +286,12 @@ export const ProviderCredentialsComponent: FC = () => {
         method: 'DELETE',
       });
       await mutate();
-      setDraft(emptyDraft);
+      setDraft(
+        currentProvider ? createDraftForProvider(currentProvider) : emptyDraft
+      );
       toaster.show('Identifiant supprimé', 'success');
     },
-    [fetch, mutate, toaster]
+    [currentProvider, fetch, mutate, toaster]
   );
 
   const copyValue = useCallback(
@@ -268,6 +331,14 @@ export const ProviderCredentialsComponent: FC = () => {
 
       <div className="acadepost-credentials-grid">
         <aside className="acadepost-credentials-card provider-list">
+          <label className="acadepost-credentials-search">
+            Rechercher
+            <input
+              value={providerSearch}
+              onChange={(event) => setProviderSearch(event.target.value)}
+              placeholder="Telegram, YouTube, Meta..."
+            />
+          </label>
           {Object.entries(groupedProviders).map(([group, groupProviders]) => (
             <div key={group} className="mb-4">
               <div className="acadepost-credentials-group">{group}</div>
@@ -297,6 +368,11 @@ export const ProviderCredentialsComponent: FC = () => {
               </div>
             </div>
           ))}
+          {!Object.keys(groupedProviders).length && (
+            <div className="acadepost-credentials-empty">
+              Aucune plateforme trouvée.
+            </div>
+          )}
         </aside>
 
         <main className="acadepost-credentials-card editor">
@@ -371,7 +447,18 @@ export const ProviderCredentialsComponent: FC = () => {
             {draft.id && (
               <button
                 className="acadepost-credentials-button secondary"
-                onClick={() => setDraft(emptyDraft)}
+                disabled={isTesting}
+                onClick={testDraftCredential}
+              >
+                {isTesting ? 'Test en cours' : 'Tester la connexion'}
+              </button>
+            )}
+            {draft.id && (
+              <button
+                className="acadepost-credentials-button secondary"
+                onClick={() =>
+                  setDraft(createDraftForProvider(currentProvider))
+                }
               >
                 Nouveau
               </button>
@@ -385,6 +472,27 @@ export const ProviderCredentialsComponent: FC = () => {
               ))}
             </div>
           )}
+
+          {!!savedForCurrentProvider.length && (
+            <div className="acadepost-credentials-notes">
+              <strong>Identifiants enregistrés</strong>
+              <div className="acadepost-credentials-inline-list">
+                {savedForCurrentProvider.map((credential) => (
+                  <button
+                    key={credential.id}
+                    className={clsx(
+                      'acadepost-credentials-inline-credential',
+                      credential.id === draft.id && 'is-active'
+                    )}
+                    onClick={() => editCredential(credential)}
+                  >
+                    <span>{credential.name}</span>
+                    <small>{credential.status}</small>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </main>
 
         <aside className="acadepost-credentials-card setup">
@@ -395,8 +503,14 @@ export const ProviderCredentialsComponent: FC = () => {
             ['Site web', currentProvider.setup.websiteUrl],
             ['Redirect URI', currentProvider.setup.redirectUri],
             ['API base', currentProvider.setup.apiBaseUrl],
-            ['Deauthorize callback', currentProvider.setup.deauthorizeCallbackUrl],
-            ['Data deletion callback', currentProvider.setup.dataDeletionRequestUrl],
+            [
+              'Deauthorize callback',
+              currentProvider.setup.deauthorizeCallbackUrl,
+            ],
+            [
+              'Data deletion callback',
+              currentProvider.setup.dataDeletionRequestUrl,
+            ],
           ].map(([label, value]) => (
             <button
               key={label}
