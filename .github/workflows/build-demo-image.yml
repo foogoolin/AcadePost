@@ -160,8 +160,7 @@ jobs:
 
           for attempt in $(seq 1 90); do
             if curl -fsS http://127.0.0.1:4007/api/monitor/ready >/dev/null; then
-              echo "Compose smoke passed."
-              exit 0
+              break
             fi
 
             if (( attempt % 10 == 0 )); then
@@ -171,9 +170,40 @@ jobs:
             sleep 4
           done
 
-          docker compose --env-file "$env_file" -f docker-compose.demo.yaml ps
-          docker compose --env-file "$env_file" -f docker-compose.demo.yaml logs --tail=200
-          exit 1
+          if ! curl -fsS http://127.0.0.1:4007/api/monitor/ready >/dev/null; then
+            docker compose --env-file "$env_file" -f docker-compose.demo.yaml ps
+            docker compose --env-file "$env_file" -f docker-compose.demo.yaml logs --tail=200
+            exit 1
+          fi
+
+          for service in acadepost-backend acadepost-frontend acadepost-orchestrator acadepost; do
+            for attempt in $(seq 1 60); do
+              container_id="$(docker compose --env-file "$env_file" -f docker-compose.demo.yaml ps -q "$service")"
+              state="$(docker inspect --format '{{.State.Status}}' "$container_id")"
+              health="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{end}}' "$container_id")"
+
+              if [[ "$health" == "healthy" || ( -z "$health" && "$state" == "running" ) ]]; then
+                break
+              fi
+
+              if [[ "$health" == "unhealthy" || "$state" == "exited" || "$state" == "dead" ]]; then
+                docker compose --env-file "$env_file" -f docker-compose.demo.yaml ps
+                docker compose --env-file "$env_file" -f docker-compose.demo.yaml logs --tail=200 "$service"
+                exit 1
+              fi
+
+              if [[ "$attempt" == "60" ]]; then
+                docker compose --env-file "$env_file" -f docker-compose.demo.yaml ps
+                docker compose --env-file "$env_file" -f docker-compose.demo.yaml logs --tail=200 "$service"
+                exit 1
+              fi
+
+              sleep 3
+            done
+          done
+
+          echo "Compose smoke passed."
+          exit 0
 
       - name: Build and push
         uses: docker/build-push-action@v6

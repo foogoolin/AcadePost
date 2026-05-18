@@ -14,6 +14,7 @@ const extraRuntimePaths = [
   'node_modules/.prisma',
   'node_modules/@prisma',
   'node_modules/prisma',
+  'node_modules/@temporalio',
 ];
 
 const forbidden = [

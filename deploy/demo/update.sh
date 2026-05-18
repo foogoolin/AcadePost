@@ -87,6 +87,55 @@ docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull $selected_services
 echo "Recreating services without local build:${selected_services}"
 docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --no-build --force-recreate $selected_services
 
+echo "Waiting for selected service health..."
+for service in $selected_services; do
+  for attempt in $(seq 1 60); do
+    service_container_id="$(docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps -q "$service" 2>/dev/null || true)"
+    if [[ -z "$service_container_id" ]]; then
+      if [[ "$attempt" == "60" ]]; then
+        echo "Service did not create a container: $service" >&2
+        docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps
+        exit 1
+      fi
+
+      sleep 3
+      continue
+    fi
+
+    state="$(docker inspect --format '{{.State.Status}}' "$service_container_id")"
+    exit_code="$(docker inspect --format '{{.State.ExitCode}}' "$service_container_id")"
+    health="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{end}}' "$service_container_id")"
+
+    if [[ "$health" == "healthy" ]]; then
+      break
+    fi
+
+    if [[ -z "$health" && "$state" == "running" ]]; then
+      break
+    fi
+
+    if [[ "$state" == "exited" && "$exit_code" == "0" ]]; then
+      break
+    fi
+
+    if [[ "$health" == "unhealthy" || "$state" == "exited" || "$state" == "dead" ]]; then
+      echo "Service failed health gate: $service (state=$state health=${health:-none} exit=$exit_code)" >&2
+      docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps
+      docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" logs --tail=160 "$service"
+      exit 1
+    fi
+
+    if [[ "$attempt" == "60" ]]; then
+      echo "Service did not become healthy: $service (state=$state health=${health:-none} exit=$exit_code)" >&2
+      docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps
+      docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" logs --tail=160 "$service"
+      exit 1
+    fi
+
+    sleep 3
+  done
+done
+
 echo "Waiting for health: $PUBLIC_URL$HEALTH_PATH"
 for attempt in $(seq 1 60); do
   if curl -fsS "$PUBLIC_URL$HEALTH_PATH" >/dev/null 2>&1; then
