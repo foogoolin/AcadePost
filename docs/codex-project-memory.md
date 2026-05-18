@@ -29,6 +29,8 @@ If this returns results:
 
 Do not touch the production server during Docker image work unless the owner explicitly asks for it in that turn.
 
+When the owner asks for Docker deploy/update work, read `docs/codex-docker-communication-guide.md` first. The expected model is always: build in GitHub Actions, publish to GHCR, pull on server, no normal `docker build` on the VPS.
+
 Normal update path:
 
 - GitHub Actions builds and publishes `ghcr.io/foogoolin/acadepost:latest`.
