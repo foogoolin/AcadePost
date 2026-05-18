@@ -11,6 +11,7 @@ AcadéPost follows the same broad pattern as n8n credentials:
 - Secret values are encrypted at rest and returned to the UI only as masked metadata.
 - The runtime resolves the active project credential first, then falls back to `.env` values for legacy/demo deployments.
 - A credential can be tested before a channel is connected.
+- The provider list shows platform icons from the local `public/icons/platforms` asset set.
 
 n8n's official reference describes credentials as typed definitions that control the credentials modal, define auth fields, encrypt saved values and can include a test request: <https://docs.n8n.io/integrations/creating-nodes/build/reference/credentials-files/>.
 
@@ -31,6 +32,12 @@ ACADEPOST_CREDENTIALS_ENCRYPTION_KEY=<64-hex-character-value>
 ```
 
 For the demo Docker stack, this value belongs in `.env.demo` or `.env.demo.shared-infra`. Do not bake it into a Docker image.
+
+Set the public version shown in the lower-left UI:
+
+```env
+NEXT_PUBLIC_VERSION=v1.1.6
+```
 
 After changing the key, recreate the app containers:
 

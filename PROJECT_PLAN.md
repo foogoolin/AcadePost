@@ -381,7 +381,9 @@ The first workflow should classify content into one of these groups, make the ma
 - Bug visible: Telegram etait bien supporte par le runtime credentials, mais il apparaissait trop bas dans la liste `Parametres > Identifiants`, sous le groupe `Community`; sur le premier ecran demo, l'utilisateur ne voyait donc pas ou donner le bot token.
 - Correction: Telegram est maintenant dans le premier groupe `Core social`, juste apres X, avec les champs `Bot Token` et `Bot Name`.
 - Correction UX n8n-like: la page `Identifiants` separe mieux les provider definitions et les saved credential instances avec recherche de provider, liste des credentials du provider courant, edition masquee et bouton `Tester la connexion`.
+- Correction UI demo: les cards de providers credentials affichent maintenant les icones sociales locales, et la version `NEXT_PUBLIC_VERSION` est visible en bas a gauche dans le rail applicatif et le menu Settings.
 - Correction backend: le test d'un credential Telegram appelle maintenant la configuration Bot API via le provider Telegram, au lieu de seulement valider les champs requis.
+- Correction runtime: le provider Telegram est charge en lazy import pendant le test credential, afin que le backend ne charge pas Telegram Bot API pendant le bootstrap.
 - Documentation ajoutee: `docs/provider-credentials-guide.md` avec commande de generation de la cle de chiffrement, exemple Telegram, differences avec n8n et edge cases.
 - Verification: tests rouge/vert ajoutes sur la registry credentials et le test provider Telegram pour garder Telegram visible et verifier que le bouton de test declenche une vraie verification provider.
 

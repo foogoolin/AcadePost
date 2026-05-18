@@ -4,8 +4,11 @@
 
 - Description: Fixed Telegram credential visibility in the Settings > Identifiants provider list so demo users can configure Telegram from the first credential group.
 - Added an n8n-like credential workflow in Settings > Identifiants: searchable provider types, editable saved credential instances, masked secrets, and a direct connection test action.
+- Added visible social platform icons to the provider credential list.
+- Added visible `NEXT_PUBLIC_VERSION` output in the lower-left app/settings UI so a server build can be identified from the browser.
 - Moved Telegram into the first `Core social` credential group with the existing `Bot Token` and optional `Bot Name` fields.
 - Changed Telegram credential tests from required-field validation to a real Telegram Bot API configuration check.
+- Changed the Telegram credential tester to lazy-load the Telegram provider so backend startup does not load Telegram Bot API unless the test action is used.
 - Added a registry regression test that keeps Telegram among the first visible credential providers.
 - Added a provider credential usage guide with setup commands, Telegram example, runtime behavior and edge cases.
 

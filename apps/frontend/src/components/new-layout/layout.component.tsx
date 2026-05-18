@@ -111,6 +111,11 @@ export const LayoutComponent = ({ children }: { children: ReactNode }) => {
                         <div className="acadepost-sidebar-inner flex flex-col h-full gap-[28px] flex-1 py-[12px]">
                           <Logo />
                           <TopMenu />
+                          {!!process.env.NEXT_PUBLIC_VERSION && (
+                            <div className="acadepost-app-version">
+                              {process.env.NEXT_PUBLIC_VERSION}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

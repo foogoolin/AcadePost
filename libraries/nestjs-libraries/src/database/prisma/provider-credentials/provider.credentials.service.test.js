@@ -9,7 +9,7 @@ describe('provider credential service', () => {
 
   it('uses a provider-specific connection test for Telegram credentials', () => {
     expect(source).toContain(
-      "import { TelegramProvider } from '@gitroom/nestjs-libraries/integrations/social/telegram.provider';"
+      "await import(\n            '@gitroom/nestjs-libraries/integrations/social/telegram.provider'"
     );
     expect(source).toContain("case 'telegram':");
     expect(source).toContain('getBotConfiguration(');

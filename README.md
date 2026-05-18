@@ -35,6 +35,8 @@ Credentials are configured per project from the AcadéPost UI. Facebook, Instagr
 
 The credential screen follows the n8n-style split between provider definitions and saved credential instances: choose a provider type, save one or more project credentials, keep secrets masked after save, and use `Tester la connexion` before connecting a channel.
 
+The running web UI displays `NEXT_PUBLIC_VERSION` in the lower-left navigation/settings area so the server build can be identified from the browser.
+
 `.env` is still used for infrastructure and legacy/demo fallback values such as database, Redis, public URL, JWT, encryption key, SMTP and optional provider fallback credentials.
 
 ## Deployment

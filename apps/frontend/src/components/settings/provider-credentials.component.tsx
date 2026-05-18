@@ -59,6 +59,27 @@ const emptyDraft = {
   fields: {} as Record<string, string>,
 };
 
+const providerIconMap: Record<string, string> = {
+  'instagram-standalone': 'instagram-standalone',
+  'linkedin-page': 'linkedin-page',
+  facebook: 'facebook',
+  gmb: 'gmb',
+  instagram: 'instagram',
+  linkedin: 'linkedin',
+  pinterest: 'pinterest',
+  reddit: 'reddit',
+  telegram: 'telegram',
+  threads: 'threads',
+  tiktok: 'tiktok',
+  x: 'x',
+  youtube: 'youtube',
+};
+
+const providerIcon = (identifier: string) => {
+  const iconName = providerIconMap[identifier] || identifier;
+  return `/icons/platforms/${iconName}.png`;
+};
+
 const createDraftForProvider = (provider: CredentialProvider) => {
   const fields: Record<string, string> = {};
   provider.fields.forEach((field) => {
@@ -353,16 +374,24 @@ export const ProviderCredentialsComponent: FC = () => {
                     )}
                     onClick={() => setSelectedProvider(provider.identifier)}
                   >
-                    <span>{provider.name}</span>
-                    <small>
-                      {
-                        credentialList.filter(
-                          (item: ProviderCredential) =>
-                            item.providerIdentifier === provider.identifier
-                        ).length
-                      }{' '}
-                      configuré
-                    </small>
+                    <img
+                      className="acadepost-credentials-provider-icon"
+                      src={providerIcon(provider.identifier)}
+                      alt=""
+                      aria-hidden="true"
+                    />
+                    <span className="acadepost-credentials-provider-copy">
+                      <span>{provider.name}</span>
+                      <small>
+                        {
+                          credentialList.filter(
+                            (item: ProviderCredential) =>
+                              item.providerIdentifier === provider.identifier
+                          ).length
+                        }{' '}
+                        configuré
+                      </small>
+                    </span>
                   </button>
                 ))}
               </div>

@@ -843,6 +843,25 @@ html[dir='rtl'] [dir='ltr'] {
   box-shadow: 0 12px 30px rgba(76, 204, 184, 0.14);
 }
 
+.acadepost-app-version,
+.acadepost-settings-version {
+  color: var(--new-table-text);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.acadepost-app-version {
+  margin-top: 4px;
+  padding-bottom: 4px;
+  text-align: center;
+}
+
+.acadepost-settings-version {
+  margin-top: 12px;
+  overflow-wrap: anywhere;
+}
+
 .acadepost-main-panel {
   border: 1px solid var(--new-bgLineColor);
   background: var(--new-bgLineColor);
@@ -1624,9 +1643,9 @@ html[dir='rtl'] [dir='ltr'] {
 .acadepost-credentials-provider {
   display: flex;
   min-height: 54px;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
+  gap: 10px;
   padding: 10px;
   text-align: left;
   transition: border-color 150ms ease, background-color 150ms ease;
@@ -1641,6 +1660,22 @@ html[dir='rtl'] [dir='ltr'] {
 .acadepost-credentials-provider span {
   font-size: 13px;
   font-weight: 800;
+}
+
+.acadepost-credentials-provider-icon {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 7px;
+  object-fit: contain;
+}
+
+.acadepost-credentials-provider-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .acadepost-credentials-provider small,
