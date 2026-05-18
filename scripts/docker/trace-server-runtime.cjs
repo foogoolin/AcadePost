@@ -151,7 +151,6 @@ function directorySize(root) {
       '.cache',
       '__tests__',
       'coverage',
-      'docs',
       'example',
       'examples',
       'test',
