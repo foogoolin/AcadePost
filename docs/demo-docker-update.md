@@ -32,6 +32,31 @@ Le service public `acadepost` est maintenant un proxy nginx leger. Les processus
 - `acadepost-orchestrator` sur `3002`;
 - `acadepost-migrate` comme tache one-shot pour le bootstrap Prisma demo.
 
+## Validation CI vs mise a jour serveur
+
+GitHub Actions peut prendre plusieurs minutes avant de publier `:latest`, parce que le workflow construit l'image, controle la taille, demarre la stack Compose et attend `/api/monitor/ready`.
+
+La mise a jour serveur ne doit pas refaire cette construction. Sur le serveur, le script doit seulement tirer l'image deja publiee puis recreer les conteneurs:
+
+```bash
+docker compose pull
+docker compose up -d --no-build --force-recreate
+```
+
+Si `docker compose pull` est lent, le serveur est en train de telecharger des layers depuis GHCR. Ce n'est pas un build local. Ne pas lancer `docker build` sur le VPS pour corriger cela.
+
+Pour verifier l'image actuellement publiee:
+
+```bash
+docker buildx imagetools inspect ghcr.io/foogoolin/acadepost:latest
+```
+
+Edge cases:
+
+- si le health check echoue, lire les logs du service en erreur avant toute autre action;
+- ne pas utiliser `down -v` pour une mise a jour, car cela peut supprimer les volumes;
+- pour un rollback fiable, remplacer `:latest` par un tag SHA ou un digest connu, puis relancer le script.
+
 ## Ce qui reste dans `.env`
 
 Le domaine, le port, la base de donnees, les secrets, SMTP et OAuth restent en runtime config dans `.env`. Ils ne sont pas graves dans l'image Docker.

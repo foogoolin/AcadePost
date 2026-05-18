@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.1.5 - 2026-05-18
+
+- Optimized the self-hosted Docker runtime so normal server updates use the prebuilt `ghcr.io/foogoolin/acadepost:latest` image instead of building the monorepo on the VPS.
+- Split the Compose runtime into a public nginx proxy plus internal backend, frontend, orchestrator and migrate services while preserving the existing public HTTP entrypoint.
+- Added GitHub Actions gates for Compose validation, Docker context hygiene, image size, container smoke and GHCR publishing before `latest` is updated.
+- Fixed runtime tracing for Prisma engines and Google API modules so the optimized image still starts from the traced production payload.
+- Fixed the root Jest config so `npm test` exits successfully in repositories without the old Nx Jest preset.
+- Verified the published `latest` image in workflow run `26031408303`: OCI archive size `317 MB`, Compose smoke passed, digest `sha256:7d7e53976e366d80ce9ed81cbf34efd99f7ed387e3be97a59ef5db30874cd686`.
+
 ## v1.1.4 - 2026-05-17
 
 - Fixed the mobile app shell and launches calendar so the sidebar, topbar, channel list and calendar grid no longer overlap on narrow screens.
@@ -12,7 +21,7 @@
 - Removed tracked BYAN/session outputs from Git and expanded ignore rules for local agent, report, cache and design scratch files.
 - Removed the old upstream container workflow that pushed `ghcr.io/gitroomhq/postiz-app`.
 - Removed upstream scheduled stale workflow and cleaned GitHub issue/PR/extension workflow templates.
-- Added a GHCR compressed image size gate for the AcadéPost demo image.
+- Added a GHCR compressed image size gate for the AcadéPost self-hosted image.
 - Removed the local BYAN API token from `.mcp.json`; future sessions must provide `BYAN_API_TOKEN` from the environment.
 
 ## v1.1.2 - 2026-05-17

@@ -60,6 +60,8 @@ Two Compose modes are provided:
 
 The install path uses prebuilt images only. The public service is an nginx proxy named `acadepost`; backend, frontend and orchestrator run as separate internal containers from the same optimized app image. The server must not run `docker build` for normal installs or updates.
 
+Before `:latest` is published, GitHub Actions builds the image, checks the archive size, starts the Compose stack and waits for `/api/monitor/ready`. This validation can take several minutes in CI, but it happens before the VPS update path.
+
 Example first-time setup:
 
 ```bash
