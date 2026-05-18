@@ -1,8 +1,15 @@
 // @ts-check
 import { withSentryConfig } from '@sentry/nextjs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const enableSourceMaps = process.env.ACADEPOST_ENABLE_SOURCEMAPS === 'true';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
+  outputFileTracingRoot: path.join(__dirname, '../..'),
   experimental: {
     proxyTimeout: 90_000,
   },
@@ -22,13 +29,10 @@ const nextConfig = {
   },
   reactStrictMode: false,
   transpilePackages: ['crypto-hash'],
-  // Enable production sourcemaps for Sentry
-  productionBrowserSourceMaps: true,
+  productionBrowserSourceMaps: enableSourceMaps,
 
-  // Custom webpack config to ensure sourcemaps are generated properly
   webpack: (config, { buildId, dev, isServer, defaultLoaders }) => {
-    // Enable sourcemaps for both client and server in production
-    if (!dev) {
+    if (!dev && enableSourceMaps) {
       config.devtool = isServer ? 'source-map' : 'hidden-source-map';
     }
 
@@ -64,7 +68,7 @@ export default withSentryConfig(nextConfig, {
 
   // Sourcemap configuration optimized for monorepo
   sourcemaps: {
-    disable: false,
+    disable: !enableSourceMaps || !process.env.SENTRY_AUTH_TOKEN,
     // More comprehensive asset patterns for monorepo
     assets: [
       '.next/static/**/*.js',

@@ -1,6 +1,6 @@
 {
   "name": "acadepost-orchestrator",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "",
   "scripts": {
     "dev": "dotenv -e ../../.env -- nest start --watch --entryFile=./apps/orchestrator/src/main",

@@ -20,10 +20,17 @@ Le script fait volontairement seulement ceci :
 
 - valide le fichier Compose;
 - avertit si `ACADEPOST_IMAGE` utilise un tag mutable comme `:latest` ou `:demo`;
-- lance `docker compose pull acadepost`;
-- recree le conteneur `acadepost` avec `--no-build --force-recreate`;
+- lance `docker compose pull` pour `acadepost-migrate`, `acadepost-backend`, `acadepost-frontend`, `acadepost-orchestrator` et le proxy `acadepost`;
+- recree les services avec `--no-build --force-recreate`;
 - attend `/api/monitor/ready`;
 - affiche l'image actuellement utilisee et le digest precedent si disponible.
+
+Le service public `acadepost` est maintenant un proxy nginx leger. Les processus applicatifs tournent dans des conteneurs internes separes:
+
+- `acadepost-backend` sur `3000`;
+- `acadepost-frontend` sur `4200`;
+- `acadepost-orchestrator` sur `3002`;
+- `acadepost-migrate` comme tache one-shot pour le bootstrap Prisma demo.
 
 ## Ce qui reste dans `.env`
 

@@ -3,7 +3,7 @@ set -euo pipefail
 
 ENV_FILE="${ENV_FILE:-.env.demo.shared-infra}"
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.demo.shared-infra.yaml}"
-SERVICE="${SERVICE:-acadepost}"
+SERVICES="${SERVICES:-acadepost-migrate acadepost-backend acadepost-frontend acadepost-orchestrator acadepost}"
 HEALTH_PATH="${ACADEPOST_HEALTH_PATH:-/api/monitor/ready}"
 
 while [[ $# -gt 0 ]]; do
@@ -17,7 +17,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     --service)
-      SERVICE="$2"
+      SERVICES="$2"
       shift 2
       ;;
     *)
@@ -45,7 +45,10 @@ set +a
 PUBLIC_URL="${ACADEPOST_PUBLIC_URL:-http://127.0.0.1:4007}"
 PUBLIC_URL="${PUBLIC_URL%/}"
 
-previous_container_id="$(docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps -q "$SERVICE" 2>/dev/null || true)"
+previous_container_id="$(docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps -q acadepost-backend 2>/dev/null || true)"
+if [[ -z "$previous_container_id" ]]; then
+  previous_container_id="$(docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps -q acadepost 2>/dev/null || true)"
+fi
 previous_image=""
 previous_digest=""
 if [[ -n "$previous_container_id" ]]; then
@@ -57,16 +60,32 @@ fi
 
 echo "Validating Compose..."
 docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" config --quiet
+configured_services="$(docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" config --services)"
+selected_services=""
+for candidate in $SERVICES; do
+  if printf '%s\n' "$configured_services" | grep -qx "$candidate"; then
+    selected_services="${selected_services} ${candidate}"
+  fi
+done
+
+if [[ -z "${selected_services// }" ]]; then
+  if printf '%s\n' "$configured_services" | grep -qx "acadepost"; then
+    selected_services="acadepost"
+  else
+    echo "None of the requested services exist in Compose: $SERVICES" >&2
+    exit 1
+  fi
+fi
 
 if [[ "${ACADEPOST_IMAGE:-}" == *":demo" || "${ACADEPOST_IMAGE:-}" == *":latest" ]]; then
   echo "Warning: ACADEPOST_IMAGE uses a mutable tag. Use a SHA tag or digest for pinned production rollback."
 fi
 
-echo "Pulling image for service: $SERVICE"
-docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull "$SERVICE"
+echo "Pulling images for services:${selected_services}"
+docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull $selected_services
 
-echo "Recreating $SERVICE without local build..."
-docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --no-build --force-recreate "$SERVICE"
+echo "Recreating services without local build:${selected_services}"
+docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --no-build --force-recreate $selected_services
 
 echo "Waiting for health: $PUBLIC_URL$HEALTH_PATH"
 for attempt in $(seq 1 60); do
@@ -78,23 +97,26 @@ for attempt in $(seq 1 60); do
   if [[ "$attempt" == "60" ]]; then
     echo "Health check failed after 60 attempts." >&2
     docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps
-    docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" logs --tail=120 "$SERVICE"
+    docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" logs --tail=120 $selected_services
     exit 1
   fi
 
   sleep 3
 done
 
-container_id="$(docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps -q "$SERVICE")"
-echo "Running container: $container_id"
-docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" images "$SERVICE"
+container_id="$(docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps -q acadepost 2>/dev/null || true)"
+echo "Public container: ${container_id:-unknown}"
+docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" images $selected_services
 
-if [[ -n "$container_id" ]]; then
-  image_id="$(docker inspect --format '{{.Image}}' "$container_id")"
-  image_name="$(docker inspect --format '{{.Config.Image}}' "$container_id")"
-  echo "Image: $image_name"
-  echo "Image ID: $image_id"
-fi
+for service in $selected_services; do
+  service_container_id="$(docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps -q "$service" 2>/dev/null || true)"
+  if [[ -n "$service_container_id" ]]; then
+    image_id="$(docker inspect --format '{{.Image}}' "$service_container_id")"
+    image_name="$(docker inspect --format '{{.Config.Image}}' "$service_container_id")"
+    echo "$service image: $image_name"
+    echo "$service image ID: $image_id"
+  fi
+done
 
 cat <<EOF
 

@@ -85,13 +85,14 @@ Depuis le dossier du depot sur le serveur :
 ACADEPOST_PUBLIC_URL=http://SERVER_IP:4007 bash deploy/demo/server-up.sh
 ```
 
-Le script cree `.env.demo` si absent, remplace les secrets demo par des valeurs aleatoires, valide le compose, tire l'image `ghcr.io/foogoolin/acadepost:latest` et lance la stack.
+Le script cree `.env.demo` si absent, remplace les secrets demo par des valeurs aleatoires, valide le compose, tire les images preconstruites et lance la stack.
 
 ## Logs
 
 ```bash
 docker compose --env-file .env.demo -f docker-compose.demo.yaml ps
 docker compose --env-file .env.demo -f docker-compose.demo.yaml logs -f acadepost
+docker compose --env-file .env.demo -f docker-compose.demo.yaml logs -f acadepost-backend acadepost-frontend acadepost-orchestrator
 ```
 
 ## Health checks
@@ -136,7 +137,7 @@ Pour mettre a jour AcadePost sans build sur le VPS :
 bash deploy/demo/update.sh --env .env.demo --compose docker-compose.demo.yaml
 ```
 
-Voir aussi `docs/demo-docker-update.md`. Le script tire `ACADEPOST_IMAGE` depuis `.env`, recree uniquement le service `acadepost` avec `--no-build`, puis attend `/api/monitor/ready`.
+Voir aussi `docs/demo-docker-update.md`. Le script tire `ACADEPOST_IMAGE` depuis `.env`, recree les services applicatifs et le proxy avec `--no-build`, puis attend `/api/monitor/ready`.
 
 ## Mise a jour du code et des scripts
 
@@ -171,7 +172,7 @@ bash deploy/demo/server-up.sh
 ## Limites connues
 
 - Ce compose est fait pour demo/staging, pas production.
-- Les migrations sont appliquees par `prisma db push` si `ACADEPOST_DEMO_DB_PUSH=true`.
+- Le bootstrap Prisma demo est execute par le service one-shot `acadepost-migrate` si `ACADEPOST_DEMO_DB_PUSH=true`.
 - Le stockage media est local au serveur.
 - Les integrations sociales restent inactives tant que les cles API sont vides.
 - Pour HTTPS, placer Caddy, Traefik, Nginx Proxy Manager ou Cloudflare Tunnel devant le port `4007`.

@@ -218,6 +218,7 @@ The first workflow should classify content into one of these groups, make the ma
 
 - BYAN workflow utilise: Skeptic a audite le modele agent/scopes et Rachid a audite Docker/GHCR/update path.
 - Public API durci: les tokens OAuth `pos_` ne sont plus acceptes par defaut (`PUBLIC_API_ALLOW_OAUTH=false`); l'API key projet reste le credential server-to-server.
+
 - `/public/v1/agent-runs` exige maintenant un agent explicite via `x-acadepost-agent-id` ou `externalAgentId` et le secret via `x-acadepost-agent-secret`; le bypass sans agent est ferme.
 - Les secrets agent ne sont plus acceptes dans le body de `PublicAgentRunDto` et ne sont plus persistables dans `AgentRun.input`.
 - SSRF hardening: les IPv4-mapped IPv6 en forme hex (`::ffff:7f00:1`) sont traites comme IPv4, les fetch publics gardent le dispatcher SSRF-safe et ont un timeout de 15s.
@@ -356,6 +357,19 @@ The first workflow should classify content into one of these groups, make the ma
 - Week and month calendar grids use `acadepost-week-grid` and `acadepost-month-grid` CSS classes with mobile minimum column widths to prevent day-cell overlap.
 - Filter controls now shrink/truncate safely on narrow screens instead of forcing the viewport wider.
 - Verification locale: frontend build passes; browser smoke on mobile `390x667` and desktop `1280x720` shows no body overflow and no relevant console errors.
+
+## Docker Image Optimization - 2026-05-18
+
+- BYAN FD actif: `docker-image-optimization`.
+- BYAN agents utilises: Rachid pour Docker/GHCR/update path, Architect pour process/proxy architecture, Quinn/Tea pour gates, Compliance/Security pour secrets/ports/rollback.
+- Decision: ne pas retenter le pull Contabo du vieux `latest` sans nouveau digest valide.
+- Le chemin demo utilise maintenant un proxy public `acadepost` sur `5000` et des services internes separes: `acadepost-backend`, `acadepost-frontend`, `acadepost-orchestrator`, `acadepost-migrate`.
+- `Dockerfile.demo` n'embarque plus nginx/PM2 et utilise Next standalone + trace runtime backend/orchestrator au lieu de copier tout le root `node_modules`.
+- `acadepost-migrate` est le seul service qui peut lancer `prisma db push --accept-data-loss`, controle par `ACADEPOST_DEMO_DB_PUSH`.
+- Les secrets backend ne sont plus passes au conteneur frontend dans les compose demo.
+- CI demo valide les compose, interdit `build:` dans le chemin install, teste l'echec de `deploy/demo/update.sh` quand `pull` echoue, puis applique le gate de taille image.
+- Version produit fixee pour ce passage: `v1.1.5`.
+- Verification locale: `corepack pnpm run build` passe; `docker compose config --quiet` passe pour clean-VPS et shared-infra; Docker daemon local reste indisponible, donc le build image/smoke conteneur doit etre valide par GitHub Actions ou une machine Docker active avant Contabo.
 
 ## Open Questions
 

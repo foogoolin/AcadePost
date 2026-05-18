@@ -1,111 +1,227 @@
+x-acadepost-common-env: &acadepost-common-env
+  MAIN_URL: ${ACADEPOST_PUBLIC_URL:-http://localhost:4007}
+  FRONTEND_URL: ${ACADEPOST_PUBLIC_URL:-http://localhost:4007}
+  NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:?NEXT_PUBLIC_BACKEND_URL is required}
+  BACKEND_INTERNAL_URL: http://acadepost-backend:3000
+  STORAGE_PROVIDER: ${STORAGE_PROVIDER:-local}
+  UPLOAD_DIRECTORY: /uploads
+  NEXT_PUBLIC_UPLOAD_DIRECTORY: /uploads
+  NEXT_PUBLIC_UPLOAD_STATIC_DIRECTORY: /uploads
+  IS_GENERAL: ${IS_GENERAL:-true}
+  DISABLE_REGISTRATION: ${DISABLE_REGISTRATION:-false}
+  NEXT_PUBLIC_VERSION: ${NEXT_PUBLIC_VERSION:-latest}
+  NEXT_PUBLIC_DISCORD_SUPPORT: ${NEXT_PUBLIC_DISCORD_SUPPORT:-}
+  NEXT_PUBLIC_POLOTNO: ${NEXT_PUBLIC_POLOTNO:-}
+  NEXT_PUBLIC_FACEBOOK_PIXEL: ${NEXT_PUBLIC_FACEBOOK_PIXEL:-}
+  NEXT_PUBLIC_POSTHOG_KEY: ${NEXT_PUBLIC_POSTHOG_KEY:-}
+  NEXT_PUBLIC_POSTHOG_HOST: ${NEXT_PUBLIC_POSTHOG_HOST:-}
+  NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:-}
+  NEXT_PUBLIC_POSTIZ_OAUTH_LOGO_URL: ${NEXT_PUBLIC_POSTIZ_OAUTH_LOGO_URL:-}
+  NEXT_PUBLIC_POSTIZ_OAUTH_DISPLAY_NAME: ${NEXT_PUBLIC_POSTIZ_OAUTH_DISPLAY_NAME:-}
+  POSTIZ_GENERIC_OAUTH: ${POSTIZ_GENERIC_OAUTH:-}
+  MCP_URL: ${MCP_URL:-}
+  CLOUDFLARE_BUCKET_URL: ${CLOUDFLARE_BUCKET_URL:-}
+  TELEGRAM_BOT_NAME: ${TELEGRAM_BOT_NAME:-}
+  NEYNAR_CLIENT_ID: ${NEYNAR_CLIENT_ID:-}
+  NEYNAR_LOGIN_URL: ${NEYNAR_LOGIN_URL:-}
+  DISABLE_X_ANALYTICS: ${DISABLE_X_ANALYTICS:-}
+  DISABLE_IMAGE_COMPRESSION: ${DISABLE_IMAGE_COMPRESSION:-}
+  EXTENSION_ID: ${EXTENSION_ID:-}
+  DATAFAST_WEBSITE_ID: ${DATAFAST_WEBSITE_ID:-}
+  STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
+  SENTRY_SPOTLIGHT: ${SENTRY_SPOTLIGHT:-}
+
+x-acadepost-server-env: &acadepost-server-env
+  <<: *acadepost-common-env
+  DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+  REDIS_URL: redis://acadepost-redis:6379
+  TEMPORAL_ADDRESS: temporal:7233
+  TRUST_PROXY: ${TRUST_PROXY:-true}
+  PUBLIC_API_ALLOW_OAUTH: ${PUBLIC_API_ALLOW_OAUTH:-false}
+  ACADEPOST_DEMO_DB_PUSH: ${ACADEPOST_DEMO_DB_PUSH:-false}
+  JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+  ACADEPOST_CREDENTIALS_ENCRYPTION_KEY: ${ACADEPOST_CREDENTIALS_ENCRYPTION_KEY:-}
+  API_LIMIT: ${API_LIMIT:-30}
+  NX_ADD_PLUGINS: "false"
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  X_URL: ${X_URL:-}
+  X_API_KEY: ${X_API_KEY:-}
+  X_API_SECRET: ${X_API_SECRET:-}
+  LINKEDIN_CLIENT_ID: ${LINKEDIN_CLIENT_ID:-}
+  LINKEDIN_CLIENT_SECRET: ${LINKEDIN_CLIENT_SECRET:-}
+  REDDIT_CLIENT_ID: ${REDDIT_CLIENT_ID:-}
+  REDDIT_CLIENT_SECRET: ${REDDIT_CLIENT_SECRET:-}
+  GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+  GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+  BEEHIIVE_API_KEY: ${BEEHIIVE_API_KEY:-}
+  BEEHIIVE_PUBLICATION_ID: ${BEEHIIVE_PUBLICATION_ID:-}
+  THREADS_APP_ID: ${THREADS_APP_ID:-}
+  THREADS_APP_SECRET: ${THREADS_APP_SECRET:-}
+  FACEBOOK_APP_ID: ${FACEBOOK_APP_ID:-}
+  FACEBOOK_APP_SECRET: ${FACEBOOK_APP_SECRET:-}
+  INSTAGRAM_APP_ID: ${INSTAGRAM_APP_ID:-}
+  INSTAGRAM_APP_SECRET: ${INSTAGRAM_APP_SECRET:-}
+  YOUTUBE_CLIENT_ID: ${YOUTUBE_CLIENT_ID:-}
+  YOUTUBE_CLIENT_SECRET: ${YOUTUBE_CLIENT_SECRET:-}
+  GOOGLE_GMB_CLIENT_ID: ${GOOGLE_GMB_CLIENT_ID:-}
+  GOOGLE_GMB_CLIENT_SECRET: ${GOOGLE_GMB_CLIENT_SECRET:-}
+  TIKTOK_CLIENT_ID: ${TIKTOK_CLIENT_ID:-}
+  TIKTOK_CLIENT_SECRET: ${TIKTOK_CLIENT_SECRET:-}
+  PINTEREST_CLIENT_ID: ${PINTEREST_CLIENT_ID:-}
+  PINTEREST_CLIENT_SECRET: ${PINTEREST_CLIENT_SECRET:-}
+  DRIBBBLE_CLIENT_ID: ${DRIBBBLE_CLIENT_ID:-}
+  DRIBBBLE_CLIENT_SECRET: ${DRIBBBLE_CLIENT_SECRET:-}
+  DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+  DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
+  DISCORD_BOT_TOKEN_ID: ${DISCORD_BOT_TOKEN_ID:-}
+  SLACK_ID: ${SLACK_ID:-}
+  SLACK_SECRET: ${SLACK_SECRET:-}
+  SLACK_SIGNING_SECRET: ${SLACK_SIGNING_SECRET:-}
+  MASTODON_URL: ${MASTODON_URL:-https://mastodon.social}
+  MASTODON_CLIENT_ID: ${MASTODON_CLIENT_ID:-}
+  MASTODON_CLIENT_SECRET: ${MASTODON_CLIENT_SECRET:-}
+  TELEGRAM_TOKEN: ${TELEGRAM_TOKEN:-}
+  TWITCH_CLIENT_ID: ${TWITCH_CLIENT_ID:-}
+  TWITCH_CLIENT_SECRET: ${TWITCH_CLIENT_SECRET:-}
+  KICK_CLIENT_ID: ${KICK_CLIENT_ID:-}
+  KICK_SECRET: ${KICK_SECRET:-}
+  VK_ID: ${VK_ID:-}
+  NEYNAR_SECRET_KEY: ${NEYNAR_SECRET_KEY:-}
+  NEYNAR_LOGIN_URL: ${NEYNAR_LOGIN_URL:-}
+  MEWE_HOST: ${MEWE_HOST:-https://mewe.com}
+  MEWE_APP_ID: ${MEWE_APP_ID:-}
+  MEWE_API_KEY: ${MEWE_API_KEY:-}
+  WHOP_CLIENT_ID: ${WHOP_CLIENT_ID:-}
+  FEE_AMOUNT: ${FEE_AMOUNT:-0.05}
+  STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+  STRIPE_SIGNING_KEY: ${STRIPE_SIGNING_KEY:-}
+  STRIPE_SIGNING_KEY_CONNECT: ${STRIPE_SIGNING_KEY_CONNECT:-}
+  NODE_OPTIONS: --max-old-space-size=${NODE_RUNTIME_MAX_OLD_SPACE_SIZE:-4096}
+
 services:
   acadepost:
-    image: ${ACADEPOST_IMAGE:-ghcr.io/foogoolin/acadepost:latest}
+    image: nginx:1.27-alpine
     container_name: acadepost
     restart: unless-stopped
-    environment:
-      MAIN_URL: ${ACADEPOST_PUBLIC_URL:-http://localhost:4007}
-      FRONTEND_URL: ${ACADEPOST_PUBLIC_URL:-http://localhost:4007}
-      NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:?NEXT_PUBLIC_BACKEND_URL is required}
-      BACKEND_INTERNAL_URL: http://127.0.0.1:3000
-      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
-      REDIS_URL: redis://acadepost-redis:6379
-      TEMPORAL_ADDRESS: temporal:7233
-      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-local}
-      UPLOAD_DIRECTORY: /uploads
-      NEXT_PUBLIC_UPLOAD_DIRECTORY: /uploads
-      NEXT_PUBLIC_UPLOAD_STATIC_DIRECTORY: /uploads
-      IS_GENERAL: "true"
-      DISABLE_REGISTRATION: ${DISABLE_REGISTRATION:-false}
-      TRUST_PROXY: ${TRUST_PROXY:-true}
-      PUBLIC_API_ALLOW_OAUTH: ${PUBLIC_API_ALLOW_OAUTH:-false}
-      ACADEPOST_DEMO_DB_PUSH: ${ACADEPOST_DEMO_DB_PUSH:-false}
-      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
-      ACADEPOST_CREDENTIALS_ENCRYPTION_KEY: ${ACADEPOST_CREDENTIALS_ENCRYPTION_KEY:-}
-      API_LIMIT: ${API_LIMIT:-30}
-      NX_ADD_PLUGINS: "false"
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      NEXT_PUBLIC_DISCORD_SUPPORT: ${NEXT_PUBLIC_DISCORD_SUPPORT:-}
-      NEXT_PUBLIC_POLOTNO: ${NEXT_PUBLIC_POLOTNO:-}
-      X_URL: ${X_URL:-}
-      X_API_KEY: ${X_API_KEY:-}
-      X_API_SECRET: ${X_API_SECRET:-}
-      DISABLE_X_ANALYTICS: ${DISABLE_X_ANALYTICS:-}
-      LINKEDIN_CLIENT_ID: ${LINKEDIN_CLIENT_ID:-}
-      LINKEDIN_CLIENT_SECRET: ${LINKEDIN_CLIENT_SECRET:-}
-      REDDIT_CLIENT_ID: ${REDDIT_CLIENT_ID:-}
-      REDDIT_CLIENT_SECRET: ${REDDIT_CLIENT_SECRET:-}
-      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
-      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
-      BEEHIIVE_API_KEY: ${BEEHIIVE_API_KEY:-}
-      BEEHIIVE_PUBLICATION_ID: ${BEEHIIVE_PUBLICATION_ID:-}
-      THREADS_APP_ID: ${THREADS_APP_ID:-}
-      THREADS_APP_SECRET: ${THREADS_APP_SECRET:-}
-      FACEBOOK_APP_ID: ${FACEBOOK_APP_ID:-}
-      FACEBOOK_APP_SECRET: ${FACEBOOK_APP_SECRET:-}
-      INSTAGRAM_APP_ID: ${INSTAGRAM_APP_ID:-}
-      INSTAGRAM_APP_SECRET: ${INSTAGRAM_APP_SECRET:-}
-      YOUTUBE_CLIENT_ID: ${YOUTUBE_CLIENT_ID:-}
-      YOUTUBE_CLIENT_SECRET: ${YOUTUBE_CLIENT_SECRET:-}
-      GOOGLE_GMB_CLIENT_ID: ${GOOGLE_GMB_CLIENT_ID:-}
-      GOOGLE_GMB_CLIENT_SECRET: ${GOOGLE_GMB_CLIENT_SECRET:-}
-      TIKTOK_CLIENT_ID: ${TIKTOK_CLIENT_ID:-}
-      TIKTOK_CLIENT_SECRET: ${TIKTOK_CLIENT_SECRET:-}
-      PINTEREST_CLIENT_ID: ${PINTEREST_CLIENT_ID:-}
-      PINTEREST_CLIENT_SECRET: ${PINTEREST_CLIENT_SECRET:-}
-      DRIBBBLE_CLIENT_ID: ${DRIBBBLE_CLIENT_ID:-}
-      DRIBBBLE_CLIENT_SECRET: ${DRIBBBLE_CLIENT_SECRET:-}
-      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
-      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
-      DISCORD_BOT_TOKEN_ID: ${DISCORD_BOT_TOKEN_ID:-}
-      SLACK_ID: ${SLACK_ID:-}
-      SLACK_SECRET: ${SLACK_SECRET:-}
-      SLACK_SIGNING_SECRET: ${SLACK_SIGNING_SECRET:-}
-      MASTODON_URL: ${MASTODON_URL:-https://mastodon.social}
-      MASTODON_CLIENT_ID: ${MASTODON_CLIENT_ID:-}
-      MASTODON_CLIENT_SECRET: ${MASTODON_CLIENT_SECRET:-}
-      TELEGRAM_TOKEN: ${TELEGRAM_TOKEN:-}
-      TELEGRAM_BOT_NAME: ${TELEGRAM_BOT_NAME:-}
-      TWITCH_CLIENT_ID: ${TWITCH_CLIENT_ID:-}
-      TWITCH_CLIENT_SECRET: ${TWITCH_CLIENT_SECRET:-}
-      KICK_CLIENT_ID: ${KICK_CLIENT_ID:-}
-      KICK_SECRET: ${KICK_SECRET:-}
-      VK_ID: ${VK_ID:-}
-      NEYNAR_CLIENT_ID: ${NEYNAR_CLIENT_ID:-}
-      NEYNAR_SECRET_KEY: ${NEYNAR_SECRET_KEY:-}
-      NEYNAR_LOGIN_URL: ${NEYNAR_LOGIN_URL:-}
-      MEWE_HOST: ${MEWE_HOST:-https://mewe.com}
-      MEWE_APP_ID: ${MEWE_APP_ID:-}
-      MEWE_API_KEY: ${MEWE_API_KEY:-}
-      WHOP_CLIENT_ID: ${WHOP_CLIENT_ID:-}
-      NEXT_PUBLIC_FACEBOOK_PIXEL: ${NEXT_PUBLIC_FACEBOOK_PIXEL:-}
-      FEE_AMOUNT: ${FEE_AMOUNT:-0.05}
-      STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
-      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
-      STRIPE_SIGNING_KEY: ${STRIPE_SIGNING_KEY:-}
-      STRIPE_SIGNING_KEY_CONNECT: ${STRIPE_SIGNING_KEY_CONNECT:-}
-      NODE_OPTIONS: --max-old-space-size=${NODE_RUNTIME_MAX_OLD_SPACE_SIZE:-4096}
     expose:
       - "5000"
+    volumes:
+      - ./var/docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ${ACADEPOST_DATA_DIR:-./data}/uploads:/uploads:ro
+    networks:
+      - proxy
+      - acadepost-network
+    depends_on:
+      acadepost-backend:
+        condition: service_healthy
+      acadepost-frontend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5000/api/monitor/ready >/dev/null 2>&1"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  acadepost-migrate:
+    image: ${ACADEPOST_IMAGE:-ghcr.io/foogoolin/acadepost:latest}
+    container_name: acadepost-migrate
+    restart: "no"
+    command: ["migrate"]
+    environment:
+      <<: *acadepost-server-env
     volumes:
       - ${ACADEPOST_DATA_DIR:-./data}/config:/config
       - ${ACADEPOST_DATA_DIR:-./data}/uploads:/uploads
     networks:
-      - proxy
+      - backend
+      - acadepost-network
+
+  acadepost-backend:
+    image: ${ACADEPOST_IMAGE:-ghcr.io/foogoolin/acadepost:latest}
+    container_name: acadepost-backend
+    restart: unless-stopped
+    command: ["backend"]
+    environment:
+      <<: *acadepost-server-env
+      PORT: "3000"
+    expose:
+      - "3000"
+    volumes:
+      - ${ACADEPOST_DATA_DIR:-./data}/config:/config
+      - ${ACADEPOST_DATA_DIR:-./data}/uploads:/uploads
+    networks:
       - backend
       - acadepost-network
       - temporal-network
     depends_on:
+      acadepost-migrate:
+        condition: service_completed_successfully
       acadepost-redis:
         condition: service_healthy
       temporal:
         condition: service_started
     healthcheck:
-      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:5000/api/monitor/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3000/monitor/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
       interval: 30s
       timeout: 5s
       retries: 10
-      start_period: 180s
+      start_period: 120s
+
+  acadepost-frontend:
+    image: ${ACADEPOST_IMAGE:-ghcr.io/foogoolin/acadepost:latest}
+    container_name: acadepost-frontend
+    restart: unless-stopped
+    command: ["frontend"]
+    environment:
+      <<: *acadepost-common-env
+      PORT: "4200"
+      HOSTNAME: 0.0.0.0
+    expose:
+      - "4200"
+    volumes:
+      - ${ACADEPOST_DATA_DIR:-./data}/uploads:/uploads:ro
+    networks:
+      - acadepost-network
+    depends_on:
+      acadepost-backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:4200').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  acadepost-orchestrator:
+    image: ${ACADEPOST_IMAGE:-ghcr.io/foogoolin/acadepost:latest}
+    container_name: acadepost-orchestrator
+    restart: unless-stopped
+    command: ["orchestrator"]
+    environment:
+      <<: *acadepost-server-env
+      ORCHESTRATOR_PORT: "3002"
+      BACKEND_HEALTH_URL: http://acadepost-backend:3000/monitor/ready
+    expose:
+      - "3002"
+    volumes:
+      - ${ACADEPOST_DATA_DIR:-./data}/config:/config
+      - ${ACADEPOST_DATA_DIR:-./data}/uploads:/uploads
+    networks:
+      - backend
+      - acadepost-network
+      - temporal-network
+    depends_on:
+      acadepost-backend:
+        condition: service_healthy
+      temporal:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3002/health/status').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
 
   acadepost-redis:
     image: redis:7.2-alpine

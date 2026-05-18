@@ -7,9 +7,14 @@ on:
     paths:
       - Dockerfile.demo
       - .dockerignore
+      - docker-compose.demo.yaml
+      - docker-compose.demo.shared-infra.yaml
+      - .env.demo.example
+      - .env.demo.shared-infra.example
       - apps/**
       - libraries/**
       - deploy/demo/**
+      - scripts/docker/**
       - var/docker/nginx.conf
       - ecosystem.demo.config.cjs
       - package.json
@@ -26,6 +31,7 @@ permissions:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: foogoolin/acadepost
+  ACADEPOST_IMAGE_TARGET_COMPRESSED_MB: "700"
   ACADEPOST_IMAGE_MAX_COMPRESSED_MB: "900"
 
 jobs:
@@ -54,6 +60,35 @@ jobs:
           version=$(node -p "require('./package.json').version")
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
+      - name: Validate Compose install paths
+        shell: bash
+        run: |
+          docker compose --env-file .env.demo.example -f docker-compose.demo.yaml config --quiet
+          docker compose --env-file .env.demo.shared-infra.example -f docker-compose.demo.shared-infra.yaml config --quiet
+
+          if docker compose --env-file .env.demo.example -f docker-compose.demo.yaml config | grep -qE '^[[:space:]]+build:'; then
+            echo "Demo compose must not contain build: in the install path." >&2
+            exit 1
+          fi
+
+          if docker compose --env-file .env.demo.shared-infra.example -f docker-compose.demo.shared-infra.yaml config | grep -qE '^[[:space:]]+build:'; then
+            echo "Shared-infra compose must not contain build: in the install path." >&2
+            exit 1
+          fi
+
+      - name: Guard Docker build context
+        shell: bash
+        run: |
+          forbidden='(^|/)(\.env(\.|$)|\.mcp(\.json)?(/|$)|\.codex/(agents|config\.toml|hooks|hooks\.json)(/|$)|\.agents/|_byan-output/|reports/|secrets/|\.secrets/)'
+          if git ls-files | grep -E "$forbidden" | grep -vE '^\.env(\.demo(\.shared-infra)?|)\.example$' | grep -vE '^\.env\.example$'; then
+            echo "Tracked local/runtime or secret-like files would be sent to Docker context." >&2
+            exit 1
+          fi
+
+      - name: Test update script failure gate
+        shell: bash
+        run: bash scripts/docker/test-update-script.sh
+
       - name: Build image for size gate
         uses: docker/build-push-action@v6
         with:
@@ -70,11 +105,17 @@ jobs:
         shell: bash
         run: |
           max_bytes=$((ACADEPOST_IMAGE_MAX_COMPRESSED_MB * 1024 * 1024))
+          target_bytes=$((ACADEPOST_IMAGE_TARGET_COMPRESSED_MB * 1024 * 1024))
           size_bytes="$(stat -c%s /tmp/acadepost-image.tar)"
           size_mb="$(( (size_bytes + 1024 * 1024 - 1) / 1024 / 1024 ))"
 
           echo "OCI image archive size: ${size_mb} MB"
+          echo "Target: ${ACADEPOST_IMAGE_TARGET_COMPRESSED_MB} MB"
           echo "Limit: ${ACADEPOST_IMAGE_MAX_COMPRESSED_MB} MB"
+
+          if (( size_bytes > target_bytes )); then
+            echo "Image is above the target size; this is a warning until the hard limit is reached." >&2
+          fi
 
           if (( size_bytes > max_bytes )); then
             echo "Image is too large. Optimize Dockerfile.demo before publishing this build." >&2

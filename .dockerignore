@@ -9,6 +9,8 @@ node_modules
 !.env.example
 !.env.demo.example
 .mcp.json
+.mcp
+.mcp/
 .claude
 .codex
 .agents

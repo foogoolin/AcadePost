@@ -2,7 +2,7 @@
 
 AcadéPost is a self-hostable social publishing workspace for planning, preparing, scheduling and publishing content across multiple social platforms.
 
-Current version: `v1.1.3`
+Current version: `v1.1.5`
 
 ## Overview
 
@@ -50,13 +50,15 @@ For normal installs, use `:latest`. For rollback, pin a version tag, SHA tag, or
 Versioned images are published for releases, for example:
 
 ```text
-ghcr.io/foogoolin/acadepost:v1.1.3
+ghcr.io/foogoolin/acadepost:v1.1.5
 ```
 
 Two Compose modes are provided:
 
 - `docker-compose.demo.yaml` for a clean VPS stack.
 - `docker-compose.demo.shared-infra.yaml` for servers that already provide reverse proxy, PostgreSQL and Docker networks.
+
+The install path uses prebuilt images only. The public service is an nginx proxy named `acadepost`; backend, frontend and orchestrator run as separate internal containers from the same optimized app image. The server must not run `docker build` for normal installs or updates.
 
 Example first-time setup:
 

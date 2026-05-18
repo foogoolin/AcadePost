@@ -6,6 +6,7 @@ cd "${ROOT_DIR}"
 
 ENV_FILE="${ENV_FILE:-.env.demo.shared-infra}"
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.demo.shared-infra.yaml}"
+APP_SERVICES="${APP_SERVICES:-acadepost-migrate acadepost-backend acadepost-frontend acadepost-orchestrator acadepost}"
 
 replace_env_value() {
   local key="$1"
@@ -47,6 +48,24 @@ fix_elasticsearch_permissions() {
   fi
 
   echo "Warning: cannot adjust ${dir} ownership. Elasticsearch needs write access for uid 1000." >&2
+}
+
+fix_app_permissions() {
+  local dir="$1"
+
+  if [ "$(id -u)" -eq 0 ]; then
+    chown -R 10001:10001 "${dir}"
+    chmod -R u+rwX,g+rwX "${dir}"
+    return
+  fi
+
+  if command -v sudo >/dev/null 2>&1; then
+    sudo chown -R 10001:10001 "${dir}"
+    sudo chmod -R u+rwX,g+rwX "${dir}"
+    return
+  fi
+
+  echo "Warning: cannot adjust ${dir} ownership. AcadéPost app containers need write access for uid 10001." >&2
 }
 
 if ! command -v docker >/dev/null 2>&1; then
@@ -106,13 +125,15 @@ require_network "${BACKEND_NETWORK:-backend}"
 
 DATA_DIR="$(grep '^ACADEPOST_DATA_DIR=' "${ENV_FILE}" | cut -d= -f2-)"
 mkdir -p "${DATA_DIR:-./data}/config" "${DATA_DIR:-./data}/uploads" "${DATA_DIR:-./data}/redis" "${DATA_DIR:-./data}/temporal-elasticsearch"
+fix_app_permissions "${DATA_DIR:-./data}/config"
+fix_app_permissions "${DATA_DIR:-./data}/uploads"
 fix_elasticsearch_permissions "${DATA_DIR:-./data}/temporal-elasticsearch"
 
 echo "Validating ${COMPOSE_FILE}..."
 docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" config --quiet
 
-echo "Pulling AcadePost image..."
-docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" pull acadepost
+echo "Pulling AcadePost images..."
+docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" pull ${APP_SERVICES}
 
 echo "Starting AcadePost shared-infra demo stack..."
 docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d --no-build

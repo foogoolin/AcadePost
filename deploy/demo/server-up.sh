@@ -6,6 +6,7 @@ cd "${ROOT_DIR}"
 
 ENV_FILE="${ENV_FILE:-.env.demo}"
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.demo.yaml}"
+APP_SERVICES="${APP_SERVICES:-acadepost-migrate acadepost-backend acadepost-frontend acadepost-orchestrator acadepost}"
 
 replace_env_value() {
   local key="$1"
@@ -74,8 +75,8 @@ fi
 echo "Validating ${COMPOSE_FILE}..."
 docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" config --quiet
 
-echo "Pulling AcadePost image..."
-docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" pull acadepost
+echo "Pulling AcadePost images..."
+docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" pull ${APP_SERVICES}
 
 echo "Starting AcadePost demo stack..."
 docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d --no-build
