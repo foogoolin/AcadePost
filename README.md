@@ -183,4 +183,3 @@ $env:NODE_OPTIONS='--max-old-space-size=8192'
 - `docs/product/postiz-feature-comparison-2026-05-16.md` - feature comparison and product gaps.
 - `docs/security/acadepost-security-review-2026-05-16.md` - latest security review.
 - `docs/codex-project-memory.md` - encoding and Docker guardrails.
-- `docs/codex-docker-communication-guide.md` - owner briefing guide for Docker/update requests.

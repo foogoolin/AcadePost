@@ -7,7 +7,6 @@
 - Added GitHub Actions gates for Compose validation, Docker context hygiene, image size, container smoke and GHCR publishing before `latest` is updated.
 - Fixed runtime tracing for Prisma engines and Google API modules so the optimized image still starts from the traced production payload.
 - Fixed the root Jest config so `npm test` exits successfully in repositories without the old Nx Jest preset.
-- Added `docs/codex-docker-communication-guide.md` so future Codex/BYAN sessions interpret Docker work as CI-built GHCR images and server-side pull/update, not VPS builds.
 - Verified the published `latest` image in workflow run `26031408303`: OCI archive size `317 MB`, Compose smoke passed, digest `sha256:7d7e53976e366d80ce9ed81cbf34efd99f7ed387e3be97a59ef5db30874cd686`.
 
 ## v1.1.4 - 2026-05-17
