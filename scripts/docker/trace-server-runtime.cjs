@@ -10,6 +10,11 @@ const entries = [
   'apps/orchestrator/dist/apps/orchestrator/src/main.js',
   'node_modules/prisma/build/index.js',
 ];
+const extraRuntimePaths = [
+  'node_modules/.prisma',
+  'node_modules/@prisma',
+  'node_modules/prisma',
+];
 
 const forbidden = [
   /^\.env(?:\.|$)/,
@@ -52,6 +57,26 @@ function copyFile(relPath) {
   fs.mkdirSync(path.dirname(dest), { recursive: true });
   fs.copyFileSync(src, dest);
   fs.chmodSync(dest, stat.mode);
+}
+
+function copyPath(relPath) {
+  if (isForbidden(relPath)) {
+    return;
+  }
+
+  const src = path.join(base, relPath);
+  const dest = path.join(outDir, relPath);
+
+  if (!fs.existsSync(src)) {
+    return;
+  }
+
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  fs.cpSync(src, dest, {
+    recursive: true,
+    dereference: true,
+    force: true,
+  });
 }
 
 function rmByPattern(root, predicate) {
@@ -106,6 +131,10 @@ function directorySize(root) {
 
   for (const relPath of files) {
     copyFile(relPath);
+  }
+
+  for (const relPath of extraRuntimePaths) {
+    copyPath(relPath);
   }
 
   rmByPattern(outDir, (entry, fullPath) => {

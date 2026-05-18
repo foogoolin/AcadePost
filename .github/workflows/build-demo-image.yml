@@ -152,7 +152,11 @@ jobs:
           }
           trap cleanup EXIT
 
-          docker compose --env-file "$env_file" -f docker-compose.demo.yaml up -d --no-build
+          if ! docker compose --env-file "$env_file" -f docker-compose.demo.yaml up -d --no-build; then
+            docker compose --env-file "$env_file" -f docker-compose.demo.yaml ps || true
+            docker compose --env-file "$env_file" -f docker-compose.demo.yaml logs --tail=200 acadepost-migrate acadepost-backend acadepost-frontend acadepost-orchestrator acadepost || true
+            exit 1
+          fi
 
           for attempt in $(seq 1 90); do
             if curl -fsS http://127.0.0.1:4007/api/monitor/ready >/dev/null; then
