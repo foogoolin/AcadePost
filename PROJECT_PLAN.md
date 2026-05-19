@@ -386,6 +386,8 @@ The first workflow should classify content into one of these groups, make the ma
 - Correction runtime: le provider Telegram est charge en lazy import pendant le test credential, afin que le backend ne charge pas Telegram Bot API pendant le bootstrap.
 - Documentation ajoutee: `docs/provider-credentials-guide.md` avec commande de generation de la cle de chiffrement, exemple Telegram, differences avec n8n et edge cases.
 - Verification: tests rouge/vert ajoutes sur la registry credentials et le test provider Telegram pour garder Telegram visible et verifier que le bouton de test declenche une vraie verification provider.
+- Deploiement serveur: GitHub Actions run `26040847349` a publie `ghcr.io/foogoolin/acadepost:v1.1.6`; le serveur Contabo shared-infra a ete epingle sur ce tag avec `NEXT_PUBLIC_VERSION=v1.1.6` et une cle `ACADEPOST_CREDENTIALS_ENCRYPTION_KEY` generee cote serveur.
+- Verification serveur: `/api/monitor/ready` public retourne `ok`, l'image runtime expose `NEXT_PUBLIC_VERSION=v1.1.6`, et la registry credentials embarquee contient Telegram dans `Core social` avec `Bot Token` / `Bot Name`.
 
 ## Open Questions
 

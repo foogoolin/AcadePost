@@ -68,6 +68,8 @@ Before `:latest` is published, GitHub Actions builds the image, checks the archi
 
 Release evidence for `v1.1.5`: the hotfixed Docker workflow for commit `b4aad511` passed the Compose smoke gate in run `26035055443` and published `ghcr.io/foogoolin/acadepost:latest`. The follow-up Contabo shared-infra update pulled that image successfully and reached public readiness.
 
+Release evidence for `v1.1.6`: commit `34045ef7` passed `Build`, `Code Quality Analysis` and `Build demo image`; Docker run `26040847349` published the image after Compose smoke. The Contabo shared-infra stack was then pinned to `ghcr.io/foogoolin/acadepost:v1.1.6`, public readiness returned `ok`, and the frontend runtime reported `NEXT_PUBLIC_VERSION=v1.1.6`.
+
 Example first-time setup:
 
 ```bash

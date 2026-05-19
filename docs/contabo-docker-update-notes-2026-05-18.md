@@ -109,3 +109,23 @@ Remaining follow-up:
 
 - Prebundle Temporal workflows to reduce orchestrator cold start.
 - Add an explicit app-only update mode to `deploy/demo/update.sh`, or split first-install and update scripts, so shared-infra updates can use `--no-deps` without manual Compose commands.
+
+## v1.1.6 Credentials Release Rollout
+
+The follow-up credentials release was deployed later on 2026-05-18.
+
+- Commit `34045ef7` passed `Build`, `Code Quality Analysis` and `Build demo image`; Docker run `26040847349` published the release after the container smoke gate passed.
+- The earlier commit `453f1c9f` did not reach the server because its `Build demo image` run `26039031680` failed during Compose smoke; that is why Telegram credentials were not visible after the first attempted update.
+- The Contabo shared-infra host was pinned to `ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:v1.1.6` and `NEXT_PUBLIC_VERSION=v1.1.6`.
+- `ACADEPOST_CREDENTIALS_ENCRYPTION_KEY` was added to `.env.demo.shared-infra`; the value was generated on the server and was not printed.
+- The normal tag pull stalled during GHCR layer finalization, so the server pulled the linux/amd64 manifest digest directly and retagged it locally as `v1.1.6`.
+- Pulled image id: `sha256:b1d3d73b0f2d68c919adb61d53196ad538bcfc9494913fd0cd737edbf01ffd31`.
+- Image build-time environment showed `NEXT_PUBLIC_VERSION=v1.1.6`.
+- `acadepost-migrate` completed with exit code `0`.
+- `acadepost-backend`, `acadepost-frontend` and the public nginx proxy reached healthy state on `v1.1.6`.
+- Public readiness returned `{"status":"ok","service":"backend"}` from `https://post.fgln.pro/api/monitor/ready`.
+
+Observed deployment caveats:
+
+- In shared-infra mode, the nginx service port `5000` is internal. Host-level `curl http://127.0.0.1:5000/...` is not a valid readiness check unless the port is published. Use the public URL or `docker exec acadepost`.
+- The orchestrator can remain in `starting` while it compiles Temporal workflow bundles for each task queue. Check logs before treating that state as a crash.

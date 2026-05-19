@@ -11,6 +11,8 @@
 - Changed the Telegram credential tester to lazy-load the Telegram provider so backend startup does not load Telegram Bot API unless the test action is used.
 - Added a registry regression test that keeps Telegram among the first visible credential providers.
 - Added a provider credential usage guide with setup commands, Telegram example, runtime behavior and edge cases.
+- Verified Docker release `v1.1.6` in GitHub Actions run `26040847349`, then deployed the pinned `ghcr.io/foogoolin/acadepost:v1.1.6` image to the Contabo shared-infra stack.
+- Added server rollout notes for the GHCR digest-pull fallback, the internal nginx readiness check and the orchestrator Temporal bundle startup caveat.
 
 ## v1.1.5 - 2026-05-18
 

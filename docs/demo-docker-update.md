@@ -72,6 +72,14 @@ docker compose --env-file .env.demo.shared-infra \
 curl -fsS https://YOUR_DOMAIN/api/monitor/ready
 ```
 
+If the shared-infra compose file only `expose`s the nginx proxy port, do not verify the proxy from the host with `curl http://127.0.0.1:5000/...`; that port is internal to the Docker network. Use the public URL, or verify from inside the proxy container:
+
+```bash
+curl -fsS https://YOUR_DOMAIN/api/monitor/ready
+docker exec acadepost sh -lc \
+  'wget -qO- http://127.0.0.1:5000/api/monitor/ready'
+```
+
 Apres la mise a jour, verifier aussi l'orchestrator:
 
 ```bash
@@ -81,6 +89,23 @@ docker compose --env-file .env.demo.shared-infra \
 ```
 
 Si `docker compose pull` est lent, le serveur est en train de telecharger des layers depuis GHCR. Ce n'est pas un build local. Ne pas lancer `docker build` sur le VPS pour corriger cela.
+
+Si un pull de tag GHCR reste bloque sans nouveau log pendant plusieurs minutes, verifier d'abord que le tag existe et recuperer le digest linux/amd64:
+
+```bash
+docker buildx imagetools inspect ghcr.io/foogoolin/acadepost:v1.1.6
+```
+
+Puis tirer le manifest amd64 directement et retagger localement:
+
+```bash
+IMAGE_DIGEST="ghcr.io/foogoolin/acadepost@sha256:<linux-amd64-manifest>"
+IMAGE_TAG="ghcr.io/foogoolin/acadepost:v1.1.6"
+docker pull --platform linux/amd64 "$IMAGE_DIGEST"
+docker tag "$IMAGE_DIGEST" "$IMAGE_TAG"
+```
+
+Cette methode garde le deploiement domain-agnostic et evite de contourner GHCR avec un build local.
 
 Pour verifier l'image actuellement publiee:
 
@@ -92,6 +117,7 @@ Edge cases:
 
 - si le health check echoue, lire les logs du service en erreur avant toute autre action;
 - si `acadepost-orchestrator` echoue apres un pull, verifier les erreurs Temporal workflow bundling et les modules runtime dynamiques avant de retenter;
+- si `acadepost-orchestrator` reste en `starting`, verifier les logs avant de conclure a un crash: au demarrage il peut compiler plusieurs Temporal workflow bundles avant d'ouvrir `3002`;
 - si l'infra partagee est deja saine, preferer l'update app-only avec `--no-deps` pour eviter de redemarrer Redis, Temporal ou Elasticsearch pendant une simple mise a jour applicative;
 - ne pas utiliser `down -v` pour une mise a jour, car cela peut supprimer les volumes;
 - pour un rollback fiable, remplacer `:latest` par un tag SHA ou un digest connu, puis relancer le script.
