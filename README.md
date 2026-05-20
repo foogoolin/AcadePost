@@ -70,7 +70,7 @@ Release evidence for `v1.1.5`: the hotfixed Docker workflow for commit `b4aad511
 
 Release evidence for `v1.1.6`: commit `34045ef7` passed `Build`, `Code Quality Analysis` and `Build demo image`; Docker run `26040847349` published the image after Compose smoke. The Contabo shared-infra stack was then pinned to `ghcr.io/foogoolin/acadepost:v1.1.6`, public readiness returned `ok`, and the frontend runtime reported `NEXT_PUBLIC_VERSION=v1.1.6`.
 
-Release checklist for `v1.1.7`: run GitHub Actions `Build`, `Code Quality Analysis` and `Build demo image`, publish `ghcr.io/foogoolin/acadepost:v1.1.7`, then pin the server to that tag and verify `/api/monitor/ready`, healthy containers, `NEXT_PUBLIC_VERSION=v1.1.7` and the Telegram credential selector in the Add Channel flow.
+Release evidence for `v1.1.7`: commit `313ac5fe` passed `Build` run `26153076783`, `Code Quality Analysis` run `26153076845` and `Build demo image` run `26153076848`. The workflow published `ghcr.io/foogoolin/acadepost:v1.1.7` with index digest `sha256:8ca16a5a405e3e570e54b9964abf36c38308630fd3381d238c4c26f4bd24d27a`. The Contabo shared-infra stack was pinned to `v1.1.7`, public readiness returned `ok`, backend/frontend/orchestrator/proxy containers were healthy, and the frontend runtime reported `NEXT_PUBLIC_VERSION=v1.1.7`.
 
 Example first-time setup:
 

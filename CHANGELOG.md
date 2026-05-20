@@ -8,7 +8,8 @@
 - Fix: Added `deploy/demo/update.sh --no-deps` for shared-infra app-only updates and made service health attempts configurable with `ACADEPOST_SERVICE_HEALTH_ATTEMPTS` defaulting to `180`.
 - Updated the runtime version metadata to `v1.1.7` so the lower-left UI version indicator can distinguish the hotfix image.
 - Added regression coverage for credential key validation, explicit Settings button types, the Add Channel credential selector path and deploy-script `--no-deps`.
-- Release note: UI/API path is verified by automated checks in this patch; real provider publish smoke still requires owner-supplied platform credentials and deployment of the pinned `v1.1.7` image.
+- Verified Docker release `v1.1.7` in GitHub Actions runs `26153076783`, `26153076845` and `26153076848`, then deployed the pinned `ghcr.io/foogoolin/acadepost:v1.1.7` image to the Contabo shared-infra stack with public readiness and service health passing.
+- Release note: UI/API path is verified by automated checks and server deployment in this patch; real provider publish smoke still requires owner-supplied platform credentials.
 
 ## v1.1.6 - 2026-05-18
 
