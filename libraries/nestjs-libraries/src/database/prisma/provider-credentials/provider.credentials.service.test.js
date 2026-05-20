@@ -14,4 +14,60 @@ describe('provider credential service', () => {
     expect(source).toContain("case 'telegram':");
     expect(source).toContain('getBotConfiguration(');
   });
+
+  const loadGetEncryptionKey = () => {
+    const match = source.match(
+      /  private getEncryptionKey\(\) \{[\s\S]*?\n  \}\n\n  private maskFields/
+    );
+    expect(match).toBeTruthy();
+
+    const methodSource = match[0]
+      .replace('  private getEncryptionKey() {', 'function getEncryptionKey() {')
+      .replace(/\n  private maskFields$/, '');
+
+    return new Function(
+      'process',
+      'crypto',
+      `${methodSource}\nreturn getEncryptionKey;`
+    )(process, require('node:crypto'));
+  };
+
+  describe('credentials encryption key guard', () => {
+    const originalKey = process.env.ACADEPOST_CREDENTIALS_ENCRYPTION_KEY;
+
+    afterEach(() => {
+      if (originalKey === undefined) {
+        delete process.env.ACADEPOST_CREDENTIALS_ENCRYPTION_KEY;
+      } else {
+        process.env.ACADEPOST_CREDENTIALS_ENCRYPTION_KEY = originalKey;
+      }
+    });
+
+    it.each(['', 'change-me', 'change-this', 'CHANGE_ME_CREDENTIALS', 'plain passphrase'])(
+      'rejects unsafe placeholder or passphrase key %p',
+      (value) => {
+        const getEncryptionKey = loadGetEncryptionKey();
+        process.env.ACADEPOST_CREDENTIALS_ENCRYPTION_KEY = value;
+
+        expect(getEncryptionKey()).toBeUndefined();
+      }
+    );
+
+    it('accepts 64 hex character encryption keys', () => {
+      const getEncryptionKey = loadGetEncryptionKey();
+      process.env.ACADEPOST_CREDENTIALS_ENCRYPTION_KEY = 'a'.repeat(64);
+
+      expect(getEncryptionKey()).toHaveLength(32);
+    });
+
+    it('accepts 32-byte base64 encryption keys', () => {
+      const getEncryptionKey = loadGetEncryptionKey();
+      process.env.ACADEPOST_CREDENTIALS_ENCRYPTION_KEY = Buffer.alloc(
+        32,
+        7
+      ).toString('base64');
+
+      expect(getEncryptionKey()).toHaveLength(32);
+    });
+  });
 });

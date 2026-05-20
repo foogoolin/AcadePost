@@ -5,6 +5,8 @@ ENV_FILE="${ENV_FILE:-.env.demo.shared-infra}"
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.demo.shared-infra.yaml}"
 SERVICES="${SERVICES:-acadepost-migrate acadepost-backend acadepost-frontend acadepost-orchestrator acadepost}"
 HEALTH_PATH="${ACADEPOST_HEALTH_PATH:-/api/monitor/ready}"
+SERVICE_HEALTH_ATTEMPTS="${ACADEPOST_SERVICE_HEALTH_ATTEMPTS:-180}"
+NO_DEPS=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -20,6 +22,10 @@ while [[ $# -gt 0 ]]; do
       SERVICES="$2"
       shift 2
       ;;
+    --no-deps)
+      NO_DEPS=true
+      shift
+      ;;
     *)
       echo "Unknown argument: $1" >&2
       exit 1
@@ -34,6 +40,11 @@ fi
 
 if [[ ! -f "$COMPOSE_FILE" ]]; then
   echo "Compose file not found: $COMPOSE_FILE" >&2
+  exit 1
+fi
+
+if [[ ! "$SERVICE_HEALTH_ATTEMPTS" =~ ^[0-9]+$ || "$SERVICE_HEALTH_ATTEMPTS" -lt 1 ]]; then
+  echo "ACADEPOST_SERVICE_HEALTH_ATTEMPTS must be a positive integer." >&2
   exit 1
 fi
 
@@ -85,14 +96,18 @@ echo "Pulling images for services:${selected_services}"
 docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull $selected_services
 
 echo "Recreating services without local build:${selected_services}"
-docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --no-build --force-recreate $selected_services
+up_args=(up -d --no-build --force-recreate)
+if [[ "$NO_DEPS" == "true" ]]; then
+  up_args+=(--no-deps)
+fi
+docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" "${up_args[@]}" $selected_services
 
-echo "Waiting for selected service health..."
+echo "Waiting for selected service health (${SERVICE_HEALTH_ATTEMPTS} attempts)..."
 for service in $selected_services; do
-  for attempt in $(seq 1 60); do
+  for attempt in $(seq 1 "$SERVICE_HEALTH_ATTEMPTS"); do
     service_container_id="$(docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps -q "$service" 2>/dev/null || true)"
     if [[ -z "$service_container_id" ]]; then
-      if [[ "$attempt" == "60" ]]; then
+      if [[ "$attempt" == "$SERVICE_HEALTH_ATTEMPTS" ]]; then
         echo "Service did not create a container: $service" >&2
         docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps
         exit 1
@@ -125,7 +140,7 @@ for service in $selected_services; do
       exit 1
     fi
 
-    if [[ "$attempt" == "60" ]]; then
+    if [[ "$attempt" == "$SERVICE_HEALTH_ATTEMPTS" ]]; then
       echo "Service did not become healthy: $service (state=$state health=${health:-none} exit=$exit_code)" >&2
       docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps
       docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" logs --tail=160 "$service"

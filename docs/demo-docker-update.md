@@ -22,6 +22,7 @@ Le script fait volontairement seulement ceci :
 - avertit si `ACADEPOST_IMAGE` utilise un tag mutable comme `:latest` ou `:demo`;
 - lance `docker compose pull` pour `acadepost-migrate`, `acadepost-backend`, `acadepost-frontend`, `acadepost-orchestrator` et le proxy `acadepost`;
 - recree les services avec `--no-build --force-recreate`;
+- ajoute `--no-deps` a `docker compose up` quand le flag `--no-deps` est passe au script;
 - attend l'etat sain des services selectionnes quand ils exposent un healthcheck;
 - attend `/api/monitor/ready`;
 - affiche l'image actuellement utilisee et le digest precedent si disponible.
@@ -55,22 +56,19 @@ bash deploy/demo/update.sh \
 
 ### Shared-infra app-only update
 
-Sur un serveur shared-infra deja sain, ne redemarre pas Redis, Temporal ou Elasticsearch juste pour tirer une nouvelle image applicative. Tant que `deploy/demo/update.sh` n'a pas de mode `--no-deps` dedie, utiliser ce flux direct:
+Sur un serveur shared-infra deja sain, ne redemarre pas Redis, Temporal ou Elasticsearch juste pour tirer une nouvelle image applicative. Le chemin principal est maintenant le script app-only:
 
 ```bash
 cd /opt/AcadePost
-APP_SERVICES="acadepost-migrate acadepost-backend acadepost-frontend acadepost-orchestrator acadepost"
-docker compose --env-file .env.demo.shared-infra \
-  -f docker-compose.demo.shared-infra.yaml \
-  pull $APP_SERVICES
-docker compose --env-file .env.demo.shared-infra \
-  -f docker-compose.demo.shared-infra.yaml \
-  up -d --no-build --force-recreate --no-deps $APP_SERVICES
-docker compose --env-file .env.demo.shared-infra \
-  -f docker-compose.demo.shared-infra.yaml \
-  ps
-curl -fsS https://YOUR_DOMAIN/api/monitor/ready
+ACADEPOST_SERVICE_HEALTH_ATTEMPTS=180 \
+  bash deploy/demo/update.sh \
+    --env .env.demo.shared-infra \
+    --compose docker-compose.demo.shared-infra.yaml \
+    --service "acadepost-migrate acadepost-backend acadepost-frontend acadepost-orchestrator acadepost" \
+    --no-deps
 ```
+
+`ACADEPOST_SERVICE_HEALTH_ATTEMPTS` defaults to `180`. This gives the orchestrator enough time for a cold Temporal workflow-bundle startup before the update is treated as failed.
 
 If the shared-infra compose file only `expose`s the nginx proxy port, do not verify the proxy from the host with `curl http://127.0.0.1:5000/...`; that port is internal to the Docker network. Use the public URL, or verify from inside the proxy container:
 
@@ -90,17 +88,17 @@ docker compose --env-file .env.demo.shared-infra \
 
 Si `docker compose pull` est lent, le serveur est en train de telecharger des layers depuis GHCR. Ce n'est pas un build local. Ne pas lancer `docker build` sur le VPS pour corriger cela.
 
-Si un pull de tag GHCR reste bloque sans nouveau log pendant plusieurs minutes, verifier d'abord que le tag existe et recuperer le digest linux/amd64:
+Si un pull de tag GHCR reste bloque sans nouveau log pendant plusieurs minutes, verifier d'abord que le tag existe et recuperer le digest linux/amd64. This is an emergency fallback, not the normal deployment path:
 
 ```bash
-docker buildx imagetools inspect ghcr.io/foogoolin/acadepost:v1.1.6
+docker buildx imagetools inspect ghcr.io/foogoolin/acadepost:v1.1.7
 ```
 
 Puis tirer le manifest amd64 directement et retagger localement:
 
 ```bash
 IMAGE_DIGEST="ghcr.io/foogoolin/acadepost@sha256:<linux-amd64-manifest>"
-IMAGE_TAG="ghcr.io/foogoolin/acadepost:v1.1.6"
+IMAGE_TAG="ghcr.io/foogoolin/acadepost:v1.1.7"
 docker pull --platform linux/amd64 "$IMAGE_DIGEST"
 docker tag "$IMAGE_DIGEST" "$IMAGE_TAG"
 ```

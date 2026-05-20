@@ -164,75 +164,80 @@ export const SettingsPopup: FC<{
         </div>
       </div>
       <div className="bg-newBgColorInner flex-1 flex-col flex p-[20px] gap-[12px]">
-        <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(submit)}>
-            {!!getRef && (
-              <button type="submit" className="hidden" ref={getRef}></button>
+        {tab === 'credentials' && isGeneral ? (
+          <div
+            className={clsx(
+              'w-full mx-auto gap-[24px] flex flex-col relative',
+              !getRef && 'rounded-[4px]'
             )}
-            <div
-              className={clsx(
-                'w-full mx-auto gap-[24px] flex flex-col relative',
-                !getRef && 'rounded-[4px]'
+          >
+            <ProviderCredentialsComponent />
+          </div>
+        ) : (
+          <FormProvider {...form}>
+            <form onSubmit={form.handleSubmit(submit)}>
+              {!!getRef && (
+                <button type="submit" className="hidden" ref={getRef}></button>
               )}
-            >
-              {tab === 'global_settings' && (
-                <div>
-                  <GlobalSettings />
-                </div>
-              )}
-              {tab === 'teams' && !!user?.tier?.team_members && isGeneral && (
-                <div>
-                  <TeamsComponent />
-                </div>
-              )}
-
-              {tab === 'webhooks' && !!user?.tier?.webhooks && (
-                <div>
-                  <Webhooks />
-                </div>
-              )}
-
-              {tab === 'autopost' && !!user?.tier?.autoPost && (
-                <div>
-                  <Autopost />
-                </div>
-              )}
-
-              {tab === 'sets' && user?.tier.current !== 'FREE' && (
-                <div>
-                  <Sets />
-                </div>
-              )}
-
-              {tab === 'signatures' && user?.tier.current !== 'FREE' && (
-                <div>
-                  <SignaturesComponent />
-                </div>
-              )}
-
-              {tab === 'api' &&
-                !!user?.tier?.public_api &&
-                isGeneral &&
-                showLogout && (
+              <div
+                className={clsx(
+                  'w-full mx-auto gap-[24px] flex flex-col relative',
+                  !getRef && 'rounded-[4px]'
+                )}
+              >
+                {tab === 'global_settings' && (
                   <div>
-                    <PublicComponent />
+                    <GlobalSettings />
+                  </div>
+                )}
+                {tab === 'teams' && !!user?.tier?.team_members && isGeneral && (
+                  <div>
+                    <TeamsComponent />
                   </div>
                 )}
 
-              {tab === 'credentials' && isGeneral && (
-                <div>
-                  <ProviderCredentialsComponent />
-                </div>
-              )}
+                {tab === 'webhooks' && !!user?.tier?.webhooks && (
+                  <div>
+                    <Webhooks />
+                  </div>
+                )}
 
-              {tab === 'approved_apps' && (
-                <div>
-                  <ApprovedAppsComponent />
-                </div>
-              )}
-            </div>
-          </form>
-        </FormProvider>
+                {tab === 'autopost' && !!user?.tier?.autoPost && (
+                  <div>
+                    <Autopost />
+                  </div>
+                )}
+
+                {tab === 'sets' && user?.tier.current !== 'FREE' && (
+                  <div>
+                    <Sets />
+                  </div>
+                )}
+
+                {tab === 'signatures' && user?.tier.current !== 'FREE' && (
+                  <div>
+                    <SignaturesComponent />
+                  </div>
+                )}
+
+                {tab === 'api' &&
+                  !!user?.tier?.public_api &&
+                  isGeneral &&
+                  showLogout && (
+                    <div>
+                      <PublicComponent />
+                    </div>
+                  )}
+
+                {tab === 'approved_apps' && (
+                  <div>
+                    <ApprovedAppsComponent />
+                  </div>
+                )}
+              </div>
+            </form>
+          </FormProvider>
+        )}
       </div>
     </>
   );

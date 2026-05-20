@@ -366,6 +366,7 @@ export const ProviderCredentialsComponent: FC = () => {
               <div className="flex flex-col gap-2">
                 {(groupProviders as CredentialProvider[]).map((provider) => (
                   <button
+                    type="button"
                     key={provider.identifier}
                     className={clsx(
                       'acadepost-credentials-provider',
@@ -467,6 +468,7 @@ export const ProviderCredentialsComponent: FC = () => {
 
           <div className="flex flex-wrap gap-2 pt-2">
             <button
+              type="button"
               className="acadepost-credentials-button"
               disabled={isSaving || !providerData?.credentialsEnabled}
               onClick={saveCredential}
@@ -475,6 +477,7 @@ export const ProviderCredentialsComponent: FC = () => {
             </button>
             {draft.id && (
               <button
+                type="button"
                 className="acadepost-credentials-button secondary"
                 disabled={isTesting}
                 onClick={testDraftCredential}
@@ -484,6 +487,7 @@ export const ProviderCredentialsComponent: FC = () => {
             )}
             {draft.id && (
               <button
+                type="button"
                 className="acadepost-credentials-button secondary"
                 onClick={() =>
                   setDraft(createDraftForProvider(currentProvider))
@@ -508,6 +512,7 @@ export const ProviderCredentialsComponent: FC = () => {
               <div className="acadepost-credentials-inline-list">
                 {savedForCurrentProvider.map((credential) => (
                   <button
+                    type="button"
                     key={credential.id}
                     className={clsx(
                       'acadepost-credentials-inline-credential',
@@ -542,6 +547,7 @@ export const ProviderCredentialsComponent: FC = () => {
             ],
           ].map(([label, value]) => (
             <button
+              type="button"
               key={label}
               className="acadepost-credentials-copy"
               onClick={() => copyValue(value)}
@@ -581,13 +587,13 @@ export const ProviderCredentialsComponent: FC = () => {
                 )}
               </div>
               <div className="acadepost-credentials-row-actions">
-                <button onClick={() => editCredential(credential)}>
+                <button type="button" onClick={() => editCredential(credential)}>
                   Modifier
                 </button>
-                <button onClick={() => testCredential(credential)}>
+                <button type="button" onClick={() => testCredential(credential)}>
                   Tester
                 </button>
-                <button onClick={() => deleteCredential(credential)}>
+                <button type="button" onClick={() => deleteCredential(credential)}>
                   Supprimer
                 </button>
               </div>

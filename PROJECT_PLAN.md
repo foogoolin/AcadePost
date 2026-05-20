@@ -389,6 +389,28 @@ The first workflow should classify content into one of these groups, make the ma
 - Deploiement serveur: GitHub Actions run `26040847349` a publie `ghcr.io/foogoolin/acadepost:v1.1.6`; le serveur Contabo shared-infra a ete epingle sur ce tag avec `NEXT_PUBLIC_VERSION=v1.1.6` et une cle `ACADEPOST_CREDENTIALS_ENCRYPTION_KEY` generee cote serveur.
 - Verification serveur: `/api/monitor/ready` public retourne `ok`, l'image runtime expose `NEXT_PUBLIC_VERSION=v1.1.6`, et la registry credentials embarquee contient Telegram dans `Core social` avec `Bot Token` / `Bot Name`.
 
+## Credentials Hotfix v1.1.7 - 2026-05-20
+
+- Version produit preparee: `v1.1.7`.
+- Correction Settings: `ProviderCredentialsComponent` est sorti du formulaire global de profil dans `settings.component.tsx`; les boutons d'action credentials ont maintenant un `type="button"` explicite pour eviter les submits accidentels vers `/user/personal`.
+- Correction n8n-like connect: le flow Add Channel charge les credentials projet enregistres, affiche un selector quand le provider a des credentials actifs, transmet `credentialId` a `/integrations/social/{provider}`, puis le backend valide le credential par org/provider avant de le lier au `state` Redis.
+- Correction securite: `ACADEPOST_CREDENTIALS_ENCRYPTION_KEY` active les credentials seulement si la valeur est un `64 hex` ou un base64 de 32 bytes; les placeholders `change-me`, `change-this`, `CHANGE_ME...`, les valeurs vides et les passphrases arbitraires gardent l'UI en mode disabled.
+- Correction deploy: `deploy/demo/update.sh --no-deps` propage maintenant `--no-deps` a `docker compose up`, et `ACADEPOST_SERVICE_HEALTH_ATTEMPTS` vaut `180` par defaut pour reduire les faux echecs pendant le cold start orchestrator.
+- Documentation mise a jour: `README.md`, `CHANGELOG.md`, `docs/provider-credentials-guide.md`, `docs/demo-docker-update.md` et ce plan.
+- Caveat release: le chemin UI/API est couvert par tests, mais le smoke publish Telegram reel reste conditionne a des credentials bot/channel reels et au deploiement de l'image pinnee `ghcr.io/foogoolin/acadepost:v1.1.7`.
+
+## Editor Media Preview Fix - 2026-05-20
+
+- Bug visible: dans `/content-routing`, le CTA primaire `Ouvrir l'editeur` pouvait afficher du texte noir sur bouton noir en theme clair.
+- Bug visible: dans `/editor`, la modale `Choisir une image` etait ouverte sans hauteur explicite; le composant MediaBox pouvait donc sembler vide dans le flow demo.
+- Bug visible: les uploads locaux etaient bien sauves via `POST /media/upload-simple`, mais le preview utilisait `media.path` brut. Quand la DB contenait une URL `/uploads/...` avec un autre host public, l'image ne s'affichait pas dans le navigateur courant.
+- Correction: `useMediaDirectory` normalise les medias locaux vers le chemin courant `/uploads/...` tout en gardant les URLs CDN/externes inchangees.
+- Correction: la selection depuis la bibliotheque media renseigne maintenant aussi `previewMediaId`, afin que `Enregistrer le modele` conserve le lien Media dans `PostTemplate.previewMediaId`.
+- Verification: test Jest cible `libraries/react-shared-libraries/src/helpers/use.media.directory.test.ts`, `git diff --check`, et `corepack pnpm --filter ./apps/frontend run build` passent. La machine locale reste en Node `v24.13.0`, hors plage cible Node 22.x.
+- Constat storage: AcadéPost ne stocke pas les binaires image en PostgreSQL; la table `Media` garde les metadonnees et `path`, tandis que le fichier vit dans le provider choisi par `STORAGE_PROVIDER`.
+- Constat demo: le provider cible reste `local`, avec `UPLOAD_DIRECTORY=/uploads` et `NEXT_PUBLIC_UPLOAD_STATIC_DIRECTORY=/uploads`; les compose demo montent ce dossier comme volume persistant.
+- Constat template: `PostTemplate.previewMediaId` garde le lien vers l'image de preview; sauver un modele sans ce champ donne l'impression que l'image n'est pas conservee.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?
