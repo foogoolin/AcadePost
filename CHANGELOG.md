@@ -1,7 +1,22 @@
 # Changelog
 
+## v1.1.7 - 2026-05-20
+
+- Fix: Prevented Settings > Identifiants actions from accidentally submitting the global profile form.
+- Fix: Added an explicit saved-credential selector to the Add Channel flow; the selected credential is passed as `credentialId` and bound to the temporary integration state after backend validation.
+- Fix: Hardened `ACADEPOST_CREDENTIALS_ENCRYPTION_KEY` so credentials are enabled only with a 64-hex key or a 32-byte base64 key. Placeholder values and arbitrary passphrases now keep credential saving disabled.
+- Fix: Added `deploy/demo/update.sh --no-deps` for shared-infra app-only updates and made service health attempts configurable with `ACADEPOST_SERVICE_HEALTH_ATTEMPTS` defaulting to `180`.
+- Updated the runtime version metadata to `v1.1.7` so the lower-left UI version indicator can distinguish the hotfix image.
+- Added regression coverage for credential key validation, explicit Settings button types, the Add Channel credential selector path and deploy-script `--no-deps`.
+- Release note: UI/API path is verified by automated checks in this patch; real provider publish smoke still requires owner-supplied platform credentials and deployment of the pinned `v1.1.7` image.
+
 ## v1.1.6 - 2026-05-18
 
+- Description: Added an owner-facing vibe-coder service development pipeline covering feature contracts, media storage debugging, Docker/VPS checks and proof-based demo readiness.
+- Description: Fixed the Editor image demo flow so local uploads and media-library selections render in the preview, keep their media link when templates are saved, and keep the primary routing CTA readable in the light theme.
+- Added a media path resolver regression test for local `/uploads/...` URLs saved with an older or different public host.
+- Documented the current image storage contract: PostgreSQL stores media metadata and template links, while image files stay in the configured upload provider.
+- Fixed the root Jest config for TypeScript helper tests with the monorepo `@gitroom/*` aliases.
 - Description: Fixed Telegram credential visibility in the Settings > Identifiants provider list so demo users can configure Telegram from the first credential group.
 - Added an n8n-like credential workflow in Settings > Identifiants: searchable provider types, editable saved credential instances, masked secrets, and a direct connection test action.
 - Added visible social platform icons to the provider credential list.

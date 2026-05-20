@@ -2,7 +2,7 @@
 
 AcadéPost is a self-hostable social publishing workspace for planning, preparing, scheduling and publishing content across multiple social platforms.
 
-Current version: `v1.1.6`
+Current version: `v1.1.7`
 
 ## Overview
 
@@ -54,7 +54,7 @@ For normal installs, use `:latest`. For rollback, pin a version tag, SHA tag, or
 Versioned images are published for releases, for example:
 
 ```text
-ghcr.io/foogoolin/acadepost:v1.1.6
+ghcr.io/foogoolin/acadepost:v1.1.7
 ```
 
 Two Compose modes are provided:
@@ -69,6 +69,8 @@ Before `:latest` is published, GitHub Actions builds the image, checks the archi
 Release evidence for `v1.1.5`: the hotfixed Docker workflow for commit `b4aad511` passed the Compose smoke gate in run `26035055443` and published `ghcr.io/foogoolin/acadepost:latest`. The follow-up Contabo shared-infra update pulled that image successfully and reached public readiness.
 
 Release evidence for `v1.1.6`: commit `34045ef7` passed `Build`, `Code Quality Analysis` and `Build demo image`; Docker run `26040847349` published the image after Compose smoke. The Contabo shared-infra stack was then pinned to `ghcr.io/foogoolin/acadepost:v1.1.6`, public readiness returned `ok`, and the frontend runtime reported `NEXT_PUBLIC_VERSION=v1.1.6`.
+
+Release checklist for `v1.1.7`: run GitHub Actions `Build`, `Code Quality Analysis` and `Build demo image`, publish `ghcr.io/foogoolin/acadepost:v1.1.7`, then pin the server to that tag and verify `/api/monitor/ready`, healthy containers, `NEXT_PUBLIC_VERSION=v1.1.7` and the Telegram credential selector in the Add Channel flow.
 
 Example first-time setup:
 
@@ -90,7 +92,14 @@ Update an existing install by pulling the prebuilt image. The server should not 
 bash deploy/demo/update.sh --env .env.demo --compose docker-compose.demo.yaml
 ```
 
-On an existing shared-infra host where Redis, Temporal or Elasticsearch should not be restarted, use the app-only `--no-deps` Compose flow documented in `docs/demo-docker-update.md` until the update script has a dedicated app-only mode.
+On an existing shared-infra host where Redis, Temporal or Elasticsearch should not be restarted, use the app-only update mode:
+
+```bash
+bash deploy/demo/update.sh \
+  --env .env.demo.shared-infra \
+  --compose docker-compose.demo.shared-infra.yaml \
+  --no-deps
+```
 
 Deployment docs:
 
@@ -108,9 +117,11 @@ ACADEPOST_PUBLIC_URL=https://your-domain.example
 ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:latest
 DATABASE_URL=postgresql://user:password@postgres:5432/acadepost
 JWT_SECRET=change-me
-ACADEPOST_CREDENTIALS_ENCRYPTION_KEY=change-me
+ACADEPOST_CREDENTIALS_ENCRYPTION_KEY=<64-hex-character-value>
 TRUST_PROXY=true
 ```
+
+Generate the credentials encryption key with `openssl rand -hex 32`. Placeholder values such as `change-me`, `change-this`, `CHANGE_ME...`, empty values and arbitrary passphrases intentionally keep credential saving disabled.
 
 External platform apps must use callback URLs in this form:
 

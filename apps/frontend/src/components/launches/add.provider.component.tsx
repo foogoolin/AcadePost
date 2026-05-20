@@ -1,7 +1,7 @@
 'use client';
 
 import { useModals } from '@gitroom/frontend/components/layout/new-modal';
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import { Input } from '@gitroom/react/form/input';
 import { FieldValues, FormProvider, useForm } from 'react-hook-form';
@@ -20,6 +20,14 @@ import clsx from 'clsx';
 import copy from 'copy-to-clipboard';
 import { capitalize } from 'lodash';
 const resolver = classValidatorResolver(ApiKeyDto);
+
+type ProviderCredentialOption = {
+  id: string;
+  providerIdentifier: string;
+  name: string;
+  enabled: boolean;
+  status: string;
+};
 
 export const useAddProvider = (update?: () => void, invite?: boolean) => {
   const modal = useModals();
@@ -170,8 +178,10 @@ export const CustomVariables: FC<{
   identifier: string;
   gotoUrl(url: string): void;
   onboarding?: boolean;
+  credentialId?: string;
 }> = (props) => {
-  const { close, gotoUrl, identifier, variables, onboarding } = props;
+  const { close, credentialId, gotoUrl, identifier, variables, onboarding } =
+    props;
   const fetch = useFetch();
   const modals = useModals();
   const schema = useMemo(() => {
@@ -208,11 +218,15 @@ export const CustomVariables: FC<{
   });
   const submit = useCallback(
     async (data: FieldValues) => {
+      const params = [
+        onboarding ? 'onboarding=true' : '',
+        credentialId ? `credentialId=${encodeURIComponent(credentialId)}` : '',
+      ]
+        .filter(Boolean)
+        .join('&');
       const { url } = await (
         await fetch(
-          `/integrations/social/${identifier}${
-            onboarding ? '?onboarding=true' : ''
-          }`
+          `/integrations/social/${identifier}${params ? `?${params}` : ''}`
         )
       ).json();
       modals.closeAll();
@@ -222,7 +236,7 @@ export const CustomVariables: FC<{
         ).toString('base64')}${onboarding ? '&onboarding=true' : ''}`
       );
     },
-    [variables, onboarding]
+    [credentialId, fetch, gotoUrl, identifier, modals, onboarding]
   );
 
   const t = useT();
@@ -251,6 +265,58 @@ export const CustomVariables: FC<{
     </div>
   );
 };
+
+const CredentialSelector: FC<{
+  credentials: ProviderCredentialOption[];
+  providerName: string;
+  onSelect(id: string): void;
+  onSkip(): void;
+}> = ({ credentials, providerName, onSelect, onSkip }) => {
+  const [selectedId, setSelectedId] = useState(credentials[0]?.id || '');
+  const t = useT();
+
+  return (
+    <div className="flex flex-col gap-[14px] pt-[4px]">
+      <p className="text-[14px] leading-[1.45] text-textColor/80">
+        {t(
+          'choose_provider_credential',
+          `Choisissez l'identifiant ${providerName} à utiliser pour cette connexion.`
+        )}
+      </p>
+      <label className="flex flex-col gap-[8px] text-[12px] font-[700] text-textColor">
+        {t('credential', 'Identifiant')}
+        <select
+          className="h-[42px] rounded-[6px] border border-tableBorder bg-input px-[10px] text-[14px] text-textColor"
+          value={selectedId}
+          onChange={(event) => setSelectedId(event.target.value)}
+        >
+          {credentials.map((credential) => (
+            <option key={credential.id} value={credential.id}>
+              {credential.name} ({credential.status})
+            </option>
+          ))}
+        </select>
+      </label>
+      <div className="flex gap-[10px]">
+        <Button
+          type="button"
+          className="flex-1"
+          onClick={() => selectedId && onSelect(selectedId)}
+        >
+          {t('use_credential', 'Utiliser cet identifiant')}
+        </Button>
+        <Button
+          type="button"
+          className="flex-1 !bg-transparent border border-tableBorder text-textColor"
+          onClick={onSkip}
+        >
+          {t('use_default', 'Utiliser le défaut')}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 const ExtensionNotFound: FC = () => {
   const modals = useModals();
   const t = useT();
@@ -376,32 +442,120 @@ export const AddProviderComponent: FC<{
   const router = useRouter();
   const fetch = useFetch();
   const modal = useModals();
+  const t = useT();
+  const [providerCredentials, setProviderCredentials] = useState<
+    ProviderCredentialOption[]
+  >([]);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadCredentials = async () => {
+      try {
+        const response = await fetch('/provider-credentials');
+        if (!response.ok) {
+          return;
+        }
+        const data = await response.json();
+        if (active && Array.isArray(data)) {
+          setProviderCredentials(data);
+        }
+      } catch {
+        if (active) {
+          setProviderCredentials([]);
+        }
+      }
+    };
+
+    loadCredentials();
+
+    return () => {
+      active = false;
+    };
+  }, [fetch]);
+
+  const enabledCredentialsByProvider = useMemo(() => {
+    return providerCredentials.reduce<Record<string, ProviderCredentialOption[]>>(
+      (all, credential) => {
+        if (!credential.enabled) {
+          return all;
+        }
+
+        return {
+          ...all,
+          [credential.providerIdentifier]: [
+            ...(all[credential.providerIdentifier] || []),
+            credential,
+          ],
+        };
+      },
+      {}
+    );
+  }, [providerCredentials]);
+
+  const chooseCredential = useCallback(
+    (identifier: string, providerName: string) => {
+      const credentials = enabledCredentialsByProvider[identifier] || [];
+      if (!credentials.length) {
+        return Promise.resolve<string | undefined>(undefined);
+      }
+
+      return new Promise<string | undefined>((resolve) => {
+        modal.openModal({
+          title: t('choose_credential', 'Choisir un identifiant'),
+          withCloseButton: true,
+          onClose: () => resolve(undefined),
+          children: (close) => (
+            <CredentialSelector
+              credentials={credentials}
+              providerName={providerName}
+              onSelect={(id) => {
+                resolve(id);
+                close();
+              }}
+              onSkip={() => {
+                resolve(undefined);
+                close();
+              }}
+            />
+          ),
+        });
+      });
+    },
+    [enabledCredentialsByProvider, modal, t]
+  );
   const getSocialLink = useCallback(
     (
-        invite: boolean,
-        identifier: string,
-        isExternal: boolean,
-        isWeb3: boolean,
-        isChromeExtension?: boolean,
-        customFields?: Array<{
-          key: string;
-          label: string;
-          validation: string;
-          defaultValue?: string;
-          type: 'text' | 'password';
-        }>
-      ) =>
+      invite: boolean,
+      identifier: string,
+      providerName: string,
+      isExternal: boolean,
+      isWeb3: boolean,
+      isChromeExtension?: boolean,
+      customFields?: Array<{
+        key: string;
+        label: string;
+        validation: string;
+        defaultValue?: string;
+        type: 'text' | 'password';
+      }>
+    ) =>
       async () => {
         const onboardingParam = onboarding ? 'onboarding=true' : '';
+        const credentialId = await chooseCredential(identifier, providerName);
+        const credentialParam = credentialId
+          ? `credentialId=${encodeURIComponent(credentialId)}`
+          : '';
         const openWeb3 = async () => {
           const { component: Web3Providers } = web3List.find(
             (item) => item.identifier === identifier
           )!;
+          const params = [onboardingParam, credentialParam]
+            .filter(Boolean)
+            .join('&');
           const { url } = await (
             await fetch(
-              `/integrations/social/${identifier}${
-                onboarding ? '?onboarding=true' : ''
-              }`
+              `/integrations/social/${identifier}${params ? `?${params}` : ''}`
             )
           ).json();
           modal.openModal({
@@ -436,6 +590,7 @@ export const AddProviderComponent: FC<{
           const params = [
             `externalUrl=${encodeURIComponent(externalUrl)}`,
             onboardingParam,
+            credentialParam,
             isMobile
               ? `redirectUrl=${encodeURIComponent('acadepost://integrations')}`
               : '',
@@ -570,9 +725,15 @@ export const AddProviderComponent: FC<{
               return;
             }
             const { url } = await (
+              // selected credential is bound to the temporary state on the
+              // backend; it is not sent to the final callback URL.
               await fetch(
                 `/integrations/social/${identifier}${
-                  onboarding ? '?onboarding=true' : ''
+                  [onboardingParam, credentialParam].filter(Boolean).length
+                    ? `?${[onboardingParam, credentialParam]
+                        .filter(Boolean)
+                        .join('&')}`
+                    : ''
                 }`
               )
             ).json();
@@ -620,6 +781,7 @@ export const AddProviderComponent: FC<{
                   gotoUrl={(url: string) => router.push(url)}
                   variables={customFields}
                   onboarding={onboarding}
+                  credentialId={credentialId}
                 />
               </div>
             ),
@@ -628,10 +790,18 @@ export const AddProviderComponent: FC<{
         }
         await gotoIntegration();
       },
-    [onboarding]
+    [
+      chooseCredential,
+      extensionId,
+      fetch,
+      isMobile,
+      modal,
+      onboarding,
+      router,
+      t,
+      toaster,
+    ]
   );
-
-  const t = useT();
 
   return (
     <div className="w-full flex flex-col gap-[20px] rounded-[4px] relative]">
@@ -663,6 +833,7 @@ export const AddProviderComponent: FC<{
                 onClick={getSocialLink(
                   props.invite,
                   item.identifier,
+                  item.name,
                   item.isExternal,
                   item.isWeb3,
                   item.isChromeExtension,

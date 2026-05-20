@@ -424,9 +424,12 @@ export class ProviderCredentialsService {
   }
 
   private getEncryptionKey() {
-    const value = process.env.ACADEPOST_CREDENTIALS_ENCRYPTION_KEY || '';
+    const value = (
+      process.env.ACADEPOST_CREDENTIALS_ENCRYPTION_KEY || ''
+    ).trim();
     if (
       !value ||
+      value.includes('change-me') ||
       value.includes('change-this') ||
       value.includes('CHANGE_ME')
     ) {
@@ -438,11 +441,11 @@ export class ProviderCredentialsService {
     }
 
     const base64 = Buffer.from(value, 'base64');
-    if (base64.length === 32) {
+    if (base64.length === 32 && base64.toString('base64') === value) {
       return base64;
     }
 
-    return crypto.createHash('sha256').update(value).digest();
+    return undefined;
   }
 
   private maskFields(

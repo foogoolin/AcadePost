@@ -199,6 +199,7 @@ export class IntegrationsController {
     @Query('externalUrl') externalUrl: string,
     @Query('redirectUrl') redirectUrl: string,
     @Query('onboarding') onboarding: string,
+    @Query('credentialId') credentialId: string,
     @GetOrgFromRequest() org: Organization
   ) {
     if (
@@ -226,11 +227,13 @@ export class IntegrationsController {
       const existingIntegration = refresh
         ? await this._integrationService.getIntegrationById(org.id, refresh)
         : undefined;
-      const runtimeClientInformation = existingIntegration?.providerCredentialId
+      const selectedCredentialId =
+        existingIntegration?.providerCredentialId || credentialId;
+      const runtimeClientInformation = selectedCredentialId
         ? await this._providerCredentialsService.resolveClientInformationByCredentialId(
             org.id,
             integration,
-            existingIntegration.providerCredentialId
+            selectedCredentialId
           )
         : await this._providerCredentialsService.resolveClientInformation(
             org.id,
