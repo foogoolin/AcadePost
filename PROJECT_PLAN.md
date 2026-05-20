@@ -397,7 +397,9 @@ The first workflow should classify content into one of these groups, make the ma
 - Correction securite: `ACADEPOST_CREDENTIALS_ENCRYPTION_KEY` active les credentials seulement si la valeur est un `64 hex` ou un base64 de 32 bytes; les placeholders `change-me`, `change-this`, `CHANGE_ME...`, les valeurs vides et les passphrases arbitraires gardent l'UI en mode disabled.
 - Correction deploy: `deploy/demo/update.sh --no-deps` propage maintenant `--no-deps` a `docker compose up`, et `ACADEPOST_SERVICE_HEALTH_ATTEMPTS` vaut `180` par defaut pour reduire les faux echecs pendant le cold start orchestrator.
 - Documentation mise a jour: `README.md`, `CHANGELOG.md`, `docs/provider-credentials-guide.md`, `docs/demo-docker-update.md` et ce plan.
-- Caveat release: le chemin UI/API est couvert par tests, mais le smoke publish Telegram reel reste conditionne a des credentials bot/channel reels et au deploiement de l'image pinnee `ghcr.io/foogoolin/acadepost:v1.1.7`.
+- Deploiement serveur: GitHub Actions runs `26153076783`, `26153076845` et `26153076848` ont valide `Build`, `Code Quality Analysis` et `Build demo image`; GHCR publie `ghcr.io/foogoolin/acadepost:v1.1.7` avec digest index `sha256:8ca16a5a405e3e570e54b9964abf36c38308630fd3381d238c4c26f4bd24d27a`.
+- Verification serveur: le serveur Contabo shared-infra est epingle sur `ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:v1.1.7` et `NEXT_PUBLIC_VERSION=v1.1.7`; `/api/monitor/ready` public retourne `ok`, `acadepost-backend`, `acadepost-frontend`, `acadepost-orchestrator` et `acadepost` sont healthy, et `acadepost-migrate` termine avec exit code `0`.
+- Caveat release: le chemin UI/API et le deploiement serveur sont verifies, mais le smoke publish Telegram reel reste conditionne a des credentials bot/channel reels.
 
 ## Editor Media Preview Fix - 2026-05-20
 

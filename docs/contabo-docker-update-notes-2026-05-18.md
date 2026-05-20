@@ -129,3 +129,23 @@ Observed deployment caveats:
 
 - In shared-infra mode, the nginx service port `5000` is internal. Host-level `curl http://127.0.0.1:5000/...` is not a valid readiness check unless the port is published. Use the public URL or `docker exec acadepost`.
 - The orchestrator can remain in `starting` while it compiles Temporal workflow bundles for each task queue. Check logs before treating that state as a crash.
+
+## v1.1.7 Credentials Hotfix Rollout
+
+The credentials hotfix release was deployed later on 2026-05-20.
+
+- Merge commit `313ac5fe` passed `Build` run `26153076783`, `Code Quality Analysis` run `26153076845` and `Build demo image` run `26153076848`.
+- `Build demo image` published `ghcr.io/foogoolin/acadepost:v1.1.7`.
+- GHCR index digest: `sha256:8ca16a5a405e3e570e54b9964abf36c38308630fd3381d238c4c26f4bd24d27a`.
+- Linux/amd64 manifest digest: `sha256:2d913da1c8749d3e69f5dfd762946ad2d3ca8564d30abfc4f68d16c77361eff5`.
+- Server env backup: `.server-backups/.env.demo.shared-infra.bak-20260520-112823-v117`.
+- The Contabo shared-infra host was pinned to `ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:v1.1.7` and `NEXT_PUBLIC_VERSION=v1.1.7`.
+- The app-only update path used `deploy/demo/update.sh --no-deps`, so Redis and the shared infrastructure were not restarted.
+- `acadepost-migrate` completed with exit code `0`.
+- `acadepost-backend`, `acadepost-frontend`, `acadepost-orchestrator` and the public nginx proxy reached healthy state on `v1.1.7`.
+- Public readiness returned `{"status":"ok","service":"backend"}` from `https://post.fgln.pro/api/monitor/ready`.
+- The frontend runtime exposed `NEXT_PUBLIC_VERSION=v1.1.7`.
+
+Observed deployment caveat:
+
+- The remote SSH command timed out while the update script was printing final output, leaving an orphaned `sudo bash deploy/demo/update.sh` process with no child `docker compose` work. After service health and public readiness were verified, that shell tail was killed without touching the running containers.
