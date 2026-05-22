@@ -26,4 +26,12 @@ describe('provider logs service', () => {
     );
     expect(serviceSource).toContain('sanitizeProviderLogError(error)');
   });
+
+  it('exposes scoped readers for publish attempts and connection logs', () => {
+    expect(serviceSource).toContain('listConnectionLogs(');
+    expect(serviceSource).toContain('listPublishAttempts(');
+    expect(repositorySource).toContain('providerConnectionLog.findMany');
+    expect(repositorySource).toContain('providerPublishAttempt.findMany');
+    expect(repositorySource).toContain('organizationId: input.organizationId');
+  });
 });

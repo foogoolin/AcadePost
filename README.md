@@ -13,6 +13,7 @@ AcadéPost provides a team workspace for social publishing:
 - Media library.
 - Social channel connections.
 - Project-level provider credentials.
+- Provider pipeline logs for connection tests and publish attempts.
 - n8n/webhook agent integration.
 - Human-in-the-loop and full-access agent workflows.
 - Editor presets for reusable post and carousel visuals.

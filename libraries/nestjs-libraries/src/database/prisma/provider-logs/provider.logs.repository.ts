@@ -39,6 +39,25 @@ export type ProviderPublishAttemptUpdateInput = Partial<
   >
 >;
 
+export type ProviderLogsListInput = {
+  organizationId: string;
+  page?: number;
+  limit?: number;
+  providerIdentifier?: string;
+  status?: string;
+};
+
+export type ProviderConnectionLogsListInput = ProviderLogsListInput & {
+  providerCredentialId?: string;
+};
+
+export type ProviderPublishAttemptsListInput = ProviderLogsListInput & {
+  integrationId?: string;
+  providerCredentialId?: string;
+  postId?: string;
+  operationId?: string;
+};
+
 @Injectable()
 export class ProviderLogsRepository {
   constructor(
@@ -104,6 +123,117 @@ export class ProviderLogsRepository {
     });
   }
 
+  async listConnectionLogs(input: ProviderConnectionLogsListInput) {
+    const page = this.page(input.page);
+    const limit = this.limit(input.limit);
+    const skip = page * limit;
+    const where = this.withoutUndefined({
+      organizationId: input.organizationId,
+      providerIdentifier: input.providerIdentifier,
+      providerCredentialId: input.providerCredentialId,
+      status: input.status,
+    });
+
+    const [items, total] = await Promise.all([
+      this._providerLogs.model.providerConnectionLog.findMany({
+        where: where as any,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        skip,
+        take: limit,
+        include: {
+          providerCredential: {
+            select: {
+              id: true,
+              name: true,
+              providerIdentifier: true,
+              status: true,
+              enabled: true,
+            },
+          },
+        },
+      }),
+      this._providerLogs.model.providerConnectionLog.count({
+        where: where as any,
+      }),
+    ]);
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      hasMore: skip + items.length < total,
+    };
+  }
+
+  async listPublishAttempts(input: ProviderPublishAttemptsListInput) {
+    const page = this.page(input.page);
+    const limit = this.limit(input.limit);
+    const skip = page * limit;
+    const where = this.withoutUndefined({
+      organizationId: input.organizationId,
+      providerIdentifier: input.providerIdentifier,
+      integrationId: input.integrationId,
+      postId: input.postId,
+      providerCredentialId: input.providerCredentialId,
+      operationId: input.operationId,
+      status: input.status,
+    });
+
+    const [items, total] = await Promise.all([
+      this._providerLogs.model.providerPublishAttempt.findMany({
+        where: where as any,
+        orderBy: {
+          startedAt: 'desc',
+        },
+        skip,
+        take: limit,
+        include: {
+          integration: {
+            select: {
+              id: true,
+              name: true,
+              providerIdentifier: true,
+              profile: true,
+              disabled: true,
+            },
+          },
+          providerCredential: {
+            select: {
+              id: true,
+              name: true,
+              providerIdentifier: true,
+              status: true,
+              enabled: true,
+            },
+          },
+          post: {
+            select: {
+              id: true,
+              state: true,
+              publishDate: true,
+              releaseURL: true,
+              error: true,
+            },
+          },
+        },
+      }),
+      this._providerLogs.model.providerPublishAttempt.count({
+        where: where as any,
+      }),
+    ]);
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      hasMore: skip + items.length < total,
+    };
+  }
+
   private withoutUndefined(values: Record<string, unknown>) {
     return Object.entries(values).reduce<Record<string, unknown>>(
       (all, [key, value]) => {
@@ -114,5 +244,19 @@ export class ProviderLogsRepository {
       },
       {}
     );
+  }
+
+  private page(page?: number) {
+    if (!Number.isFinite(page)) {
+      return 0;
+    }
+    return Math.max(0, Math.floor(page || 0));
+  }
+
+  private limit(limit?: number) {
+    if (!Number.isFinite(limit)) {
+      return 20;
+    }
+    return Math.min(Math.max(1, Math.floor(limit || 20)), 100);
   }
 }

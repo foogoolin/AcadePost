@@ -80,6 +80,35 @@ export const useMenuItem = () => {
       path: '/content-routing',
     },
     {
+      name: 'Pipeline',
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+        >
+          <path
+            d="M4 6.5H9.5M9.5 6.5L7.5 4.5M9.5 6.5L7.5 8.5M14.5 6.5H20M4 17.5H9.5M9.5 17.5L7.5 15.5M9.5 17.5L7.5 19.5M14.5 17.5H20M12 7V17"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M12 12H16.5C18.433 12 20 10.433 20 8.5V6.5M12 12H7.5C5.567 12 4 13.567 4 15.5V17.5"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ),
+      path: '/provider-logs',
+      role: ['ADMIN', 'SUPERADMIN'],
+    },
+    {
       name: 'Editeur',
       icon: (
         <svg

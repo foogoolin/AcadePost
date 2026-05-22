@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import {
+  ProviderConnectionLogsListInput,
   ProviderConnectionLogCreateInput,
   ProviderLogsRepository,
+  ProviderPublishAttemptsListInput,
   ProviderPublishAttemptCreateInput,
   ProviderPublishAttemptUpdateInput,
 } from '@gitroom/nestjs-libraries/database/prisma/provider-logs/provider.logs.repository';
@@ -73,6 +75,14 @@ export class ProviderLogsService {
       durationMs: this.duration(input.durationMs),
       completedAt: input.completedAt,
     });
+  }
+
+  listConnectionLogs(input: ProviderConnectionLogsListInput) {
+    return this._providerLogsRepository.listConnectionLogs(input);
+  }
+
+  listPublishAttempts(input: ProviderPublishAttemptsListInput) {
+    return this._providerLogsRepository.listPublishAttempts(input);
   }
 
   private sanitizeErrorSummary(error?: unknown, fallback?: unknown) {

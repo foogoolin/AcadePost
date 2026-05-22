@@ -11,7 +11,13 @@ BYAN FD: `20260522-100231-provider-pipeline-rework`
 
 Rework the AcadéPost publishing service around a clear provider pipeline:
 
-`Composer -> optional Template -> Destination -> Operation -> Provider Options -> Publish/Schedule -> Logs`
+`Editor -> Template? -> Render Template -> Destination -> Operation -> Provider Options -> Publish/Schedule -> Result -> Published/Error -> Provider Publish Attempt Log`
+
+Supporting lanes:
+
+- `Identifiants -> Provider Connection Log`.
+- `Canaux / Destinations -> Provider Connection Log`.
+- `Publish/Schedule -> Calendar Queue -> Provider Publish Attempt Log`.
 
 The target is to make credentials, channels, publishing intent, provider-specific operations, scheduling, and audit logs separate and explicit. This avoids the current ambiguity where the backend often infers a provider action from media shape, and where user-facing concepts such as Telegram `chat_id` can drift into environment/configuration concerns.
 

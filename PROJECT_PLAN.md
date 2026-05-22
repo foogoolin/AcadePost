@@ -423,6 +423,7 @@ The first workflow should classify content into one of these groups, make the ma
 - Backend: ajout des modeles `ProviderConnectionLog` et `ProviderPublishAttempt`, repository/service logs, sanitizer central, logs de test credential et publish attempt logging dans l'orchestrator.
 - Provider: Telegram expose les operations explicites `telegram.message.send`, `telegram.photo.send`, `telegram.mediaGroup.send`, `telegram.document.send`, avec defaults legacy.
 - Frontend: le composer garde un contrat `settings.providerOperation.operationId`, ajoute un selecteur d'operation Telegram, et le flow Add Channel est renomme autour des destinations.
+- Observability: ajout des endpoints `/provider-logs/publish-attempts` et `/provider-logs/connection`, plus la page UI `Pipeline` pour consulter `Provider Publish Attempt Log` et `Provider Connection Log`.
 - Design gate: `design.md` ajoute le contrat court; les boutons/cartes touches utilisent les utilities `acadepost-button-primary`, `acadepost-button-secondary`, `acadepost-surface-card` avec gradients discrets, ombres et palette AcadéPost.
 
 ## Open Questions
