@@ -13,15 +13,30 @@ import mime from 'mime';
 import TelegramBot from 'node-telegram-bot-api';
 import { Integration } from '@prisma/client';
 import striptags from 'striptags';
+import {
+  resolveTelegramOperation,
+  TELEGRAM_OPERATION_IDS,
+  TELEGRAM_OPERATIONS,
+} from '@gitroom/nestjs-libraries/integrations/social/telegram.operations';
 
 // Added to support local storage posting
 const frontendURL = process.env.FRONTEND_URL || 'http://localhost:5000';
 const mediaStorage = process.env.STORAGE_PROVIDER || 'local';
 
+type TelegramProcessedMedia = {
+  type: 'photo' | 'video' | 'document';
+  media: string;
+  fileOptions: {
+    filename: string | undefined;
+    contentType: string;
+  };
+};
+
 export class TelegramProvider extends SocialAbstract implements SocialProvider {
   override maxConcurrentJob = 3; // Telegram has moderate bot API limits
   identifier = 'telegram';
   name = 'Telegram';
+  operations = TELEGRAM_OPERATIONS;
   isBetweenSteps = false;
   isWeb3 = true;
   scopes = [] as string[];
@@ -172,7 +187,9 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
       : {};
   }
 
-  private processMedia(mediaFiles: PostDetails['media']) {
+  private processMedia(
+    mediaFiles: PostDetails['media']
+  ): TelegramProcessedMedia[] {
     return (mediaFiles || []).map((media) => {
       let mediaUrl = media.path;
       if (mediaStorage === 'local' && mediaUrl.startsWith(frontendURL)) {
@@ -216,17 +233,32 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
       .replace(/<p>(.*?)<\/p>/g, '$1\n');
 
     const processedMedia = this.processMedia(mediaFiles);
+    const messageOperation = message as {
+      operation?: unknown;
+      operationId?: unknown;
+      providerOperation?: unknown;
+      providerOperationId?: unknown;
+    };
+    const { id: operation } = resolveTelegramOperation({
+      message: message.message,
+      media: processedMedia,
+      operation:
+        messageOperation.operation ||
+        messageOperation.operationId ||
+        messageOperation.providerOperation ||
+        messageOperation.providerOperationId,
+      settings: message.settings,
+    });
 
-    // if there's no media, bot sends a text message only
-    if (processedMedia.length === 0) {
+    if (operation === TELEGRAM_OPERATION_IDS.MESSAGE_SEND) {
       const response = await telegramBot.sendMessage(accessToken, text, {
         parse_mode: 'HTML',
         ...(replyToMessageId ? { reply_to_message_id: replyToMessageId } : {}),
       });
       messageId = response.message_id;
     }
-    // if there's only one media, bot sends the media with the text message as caption
-    else if (processedMedia.length === 1) {
+
+    if (operation === TELEGRAM_OPERATION_IDS.PHOTO_SEND) {
       const media = processedMedia[0];
       const options = {
         caption: text,
@@ -241,14 +273,7 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
               options,
               media.fileOptions
             )
-          : media.type === 'photo'
-          ? await telegramBot.sendPhoto(
-              accessToken,
-              media.media,
-              options,
-              media.fileOptions
-            )
-          : await telegramBot.sendDocument(
+          : await telegramBot.sendPhoto(
               accessToken,
               media.media,
               options,
@@ -256,12 +281,29 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
             );
       messageId = response.message_id;
     }
-    // if there are multiple media, bot sends them as a media group - max 10 media per group - with the text as a caption (if there are more than 1 group, the caption will only be sent with the first group)
-    else {
+
+    if (operation === TELEGRAM_OPERATION_IDS.DOCUMENT_SEND) {
+      const media = processedMedia[0];
+      const response = await telegramBot.sendDocument(
+        accessToken,
+        media.media,
+        {
+          caption: text,
+          parse_mode: 'HTML',
+          ...(replyToMessageId
+            ? { reply_to_message_id: replyToMessageId }
+            : {}),
+        },
+        media.fileOptions
+      );
+      messageId = response.message_id;
+    }
+
+    if (operation === TELEGRAM_OPERATION_IDS.MEDIA_GROUP_SEND) {
       const mediaGroups = this.chunkMedia(processedMedia, 10);
       for (let i = 0; i < mediaGroups.length; i++) {
         const mediaGroup = mediaGroups[i].map((m, index) => ({
-          type: m.type === 'document' ? 'document' : m.type, // Documents are not allowed in media groups
+          type: m.type === 'document' ? 'document' : m.type,
           media: m.media,
           caption: i === 0 && index === 0 ? text : undefined,
           parse_mode: 'HTML',

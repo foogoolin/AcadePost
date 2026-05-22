@@ -2,10 +2,12 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import crypto from 'crypto';
 import { ProviderCredential } from '@prisma/client';
 import { ProviderCredentialsRepository } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.repository';
+import { ProviderLogsService } from '@gitroom/nestjs-libraries/database/prisma/provider-logs/provider.logs.service';
 import {
   ProviderCredentialDto,
   ProviderCredentialIdentifier,
@@ -34,7 +36,9 @@ export type ProviderRuntimeCredentials = {
 @Injectable()
 export class ProviderCredentialsService {
   constructor(
-    private _providerCredentialsRepository: ProviderCredentialsRepository
+    private _providerCredentialsRepository: ProviderCredentialsRepository,
+    @Optional()
+    private _providerLogsService?: ProviderLogsService
   ) {}
 
   list(orgId: string) {
@@ -124,27 +128,65 @@ export class ProviderCredentialsService {
       throw new NotFoundException('Credential not found');
     }
 
-    const fields = this.decrypt(
-      orgId,
-      credential.providerIdentifier,
-      credential.encryptedData
-    );
-    this.validateRequired(credential.providerIdentifier as any, fields);
-    await this.testCredentialConnection(
-      credential.providerIdentifier as ProviderCredentialIdentifier,
-      fields
-    );
-    const updated = await this._providerCredentialsRepository.markTested(
-      orgId,
-      id,
-      'configured'
-    );
+    const startedAt = Date.now();
+    const providerIdentifier =
+      credential.providerIdentifier as ProviderCredentialIdentifier;
 
-    return {
-      ok: true,
-      status: 'configured',
-      credential: this.toPublic(updated),
-    };
+    try {
+      const fields = this.decrypt(
+        orgId,
+        credential.providerIdentifier,
+        credential.encryptedData
+      );
+      this.validateRequired(providerIdentifier, fields);
+      const providerResponse = await this.testCredentialConnection(
+        providerIdentifier,
+        fields
+      );
+      const updated = await this._providerCredentialsRepository.markTested(
+        orgId,
+        id,
+        'configured'
+      );
+
+      await this.writeConnectionLog({
+        orgId,
+        providerIdentifier,
+        providerCredentialId: id,
+        action: 'credential.test',
+        status: 'success',
+        startedAt,
+        requestSummary: {
+          credentialId: id,
+          providerIdentifier,
+        },
+        responseSummary: {
+          status: 'configured',
+          providerResponse,
+        },
+      });
+
+      return {
+        ok: true,
+        status: 'configured',
+        credential: this.toPublic(updated),
+      };
+    } catch (error: any) {
+      await this.writeConnectionLog({
+        orgId,
+        providerIdentifier,
+        providerCredentialId: id,
+        action: 'credential.test',
+        status: 'failed',
+        startedAt,
+        requestSummary: {
+          credentialId: id,
+          providerIdentifier,
+        },
+        errorSummary: error,
+      });
+      throw error;
+    }
   }
 
   async resolveRuntimeCredentials(
@@ -340,23 +382,22 @@ export class ProviderCredentialsService {
   private async testCredentialConnection(
     providerIdentifier: ProviderCredentialIdentifier,
     fields: Record<string, string>
-  ) {
+  ): Promise<unknown | undefined> {
     try {
       switch (providerIdentifier) {
         case 'telegram':
           const { TelegramProvider } = await import(
             '@gitroom/nestjs-libraries/integrations/social/telegram.provider'
           );
-          await new TelegramProvider().getBotConfiguration(
+          return new TelegramProvider().getBotConfiguration(
             this.clientInformationFromRuntimeCredentials({
               providerIdentifier,
               fields,
               source: 'database',
             })
           );
-          break;
         default:
-          break;
+          return undefined;
       }
     } catch (error: any) {
       throw new BadRequestException(
@@ -364,6 +405,38 @@ export class ProviderCredentialsService {
           ? `Credential test failed: ${error.message}`
           : 'Credential test failed'
       );
+    }
+  }
+
+  private async writeConnectionLog(input: {
+    orgId: string;
+    providerIdentifier: string;
+    providerCredentialId: string;
+    action: string;
+    status: string;
+    startedAt: number;
+    requestSummary?: unknown;
+    responseSummary?: unknown;
+    errorSummary?: unknown;
+  }) {
+    if (!this._providerLogsService) {
+      return;
+    }
+
+    try {
+      await this._providerLogsService.recordConnectionLog({
+        organizationId: input.orgId,
+        providerIdentifier: input.providerIdentifier,
+        providerCredentialId: input.providerCredentialId,
+        action: input.action,
+        status: input.status,
+        requestSummary: input.requestSummary,
+        responseSummary: input.responseSummary,
+        error: input.errorSummary,
+        durationMs: Date.now() - input.startedAt,
+      });
+    } catch {
+      // Connection log writes must never block credential validation.
     }
   }
 

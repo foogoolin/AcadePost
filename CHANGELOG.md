@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.1.8 - 2026-05-22
+
+- Added provider connection and publish attempt logs with centralized sanitization for tokens, API keys, auth headers, Telegram bot tokens, nested secrets, errors and binary payloads.
+- Added explicit Telegram publish operations: `telegram.message.send`, `telegram.photo.send`, `telegram.mediaGroup.send` and `telegram.document.send`, while keeping legacy media-based defaults.
+- Added composer-side provider operation selection and persisted the selected operation under `settings.providerOperation.operationId`.
+- Updated the Add Channel flow vocabulary toward destinations and kept Telegram credentials in `Paramètres > Identifiants`.
+- Added the short `design.md` contract and shared AcadéPost button/card utilities with subtle gradients, shadows and the black/mint/amber palette.
+- Added publish attempt logging around orchestrator provider `post` and `comment` calls without storing provider access tokens in request summaries.
+- Release note: schema changes add `ProviderConnectionLog` and `ProviderPublishAttempt`; server rollout requires a controlled Prisma schema update before the new runtime is considered ready.
+
 ## v1.1.7 - 2026-05-20
 
 - Fix: Prevented Settings > Identifiants actions from accidentally submitting the global profile form.

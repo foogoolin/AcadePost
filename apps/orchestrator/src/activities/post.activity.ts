@@ -12,7 +12,10 @@ import {
 import { Integration, Post, State } from '@prisma/client';
 import { stripHtmlValidation } from '@gitroom/helpers/utils/strip.html.validation';
 import { IntegrationManager } from '@gitroom/nestjs-libraries/integrations/integration.manager';
-import { AuthTokenDetails } from '@gitroom/nestjs-libraries/integrations/social/social.integrations.interface';
+import {
+  AuthTokenDetails,
+  PostResponse,
+} from '@gitroom/nestjs-libraries/integrations/social/social.integrations.interface';
 import { RefreshIntegrationService } from '@gitroom/nestjs-libraries/integrations/refresh.integration.service';
 import { timer } from '@gitroom/helpers/utils/timer';
 import { IntegrationService } from '@gitroom/nestjs-libraries/database/prisma/integrations/integration.service';
@@ -24,6 +27,12 @@ import {
 } from '@gitroom/nestjs-libraries/temporal/temporal.search.attribute';
 import { SubscriptionService } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/subscription.service';
 import { ProviderCredentialsService } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.service';
+import { ProviderLogsService } from '@gitroom/nestjs-libraries/database/prisma/provider-logs/provider.logs.service';
+import {
+  fallbackProviderOperationId,
+  getExplicitProviderOperationId,
+} from '@gitroom/nestjs-libraries/integrations/provider.operations';
+import { resolveTelegramOperation } from '@gitroom/nestjs-libraries/integrations/social/telegram.operations';
 
 // Drops fields the workflow and downstream activities never read — biggest wins are `error` (grows per retry) and `childrenPost` (Prisma side-loads it on every recursive row).
 function slimPost(post: any) {
@@ -64,7 +73,8 @@ export class PostActivity {
     private _webhookService: WebhooksService,
     private _temporalService: TemporalService,
     private _subscriptionService: SubscriptionService,
-    private _providerCredentialsService: ProviderCredentialsService
+    private _providerCredentialsService: ProviderCredentialsService,
+    private _providerLogsService: ProviderLogsService
   ) {}
 
   @ActivityMethod()
@@ -182,15 +192,42 @@ export class PostActivity {
       }))
     );
 
-    return (getIntegration as any).comment(
-      integration.internalId,
-      postId,
-      lastPostId,
-      integration.token,
-      postDetails,
+    const startedAt = Date.now();
+    const attempt = await this.createProviderPublishAttempt({
       integration,
-      clientInformation
-    );
+      posts,
+      postDetails,
+      operationId: this.resolvePublishOperationId(integration, postDetails),
+      action: 'comment',
+      startedAt,
+    });
+
+    try {
+      const response = await (getIntegration as any).comment(
+        integration.internalId,
+        postId,
+        lastPostId,
+        integration.token,
+        postDetails,
+        integration,
+        clientInformation
+      );
+
+      await this.completeProviderPublishAttempt(attempt?.id, {
+        status: 'completed',
+        response,
+        startedAt,
+      });
+
+      return response;
+    } catch (error) {
+      await this.completeProviderPublishAttempt(attempt?.id, {
+        status: 'failed',
+        error,
+        startedAt,
+      });
+      throw error;
+    }
   }
 
   @ActivityMethod()
@@ -226,13 +263,39 @@ export class PostActivity {
       }))
     );
 
-    const postNow = await (getIntegration as any).post(
-      integration.internalId,
-      integration.token,
-      postDetails,
+    const startedAt = Date.now();
+    const attempt = await this.createProviderPublishAttempt({
       integration,
-      clientInformation
-    );
+      posts,
+      postDetails,
+      operationId: this.resolvePublishOperationId(integration, postDetails),
+      action: 'publish',
+      startedAt,
+    });
+
+    let postNow: PostResponse[];
+    try {
+      postNow = await (getIntegration as any).post(
+        integration.internalId,
+        integration.token,
+        postDetails,
+        integration,
+        clientInformation
+      );
+
+      await this.completeProviderPublishAttempt(attempt?.id, {
+        status: 'completed',
+        response: postNow,
+        startedAt,
+      });
+    } catch (error) {
+      await this.completeProviderPublishAttempt(attempt?.id, {
+        status: 'failed',
+        error,
+        startedAt,
+      });
+      throw error;
+    }
 
     await this._temporalService.client
       .getRawClient()
@@ -250,6 +313,109 @@ export class PostActivity {
       });
 
     return postNow;
+  }
+
+  private resolvePublishOperationId(
+    integration: Integration,
+    postDetails: Array<{
+      message?: string;
+      settings?: any;
+      media?: any[];
+      operation?: unknown;
+    }>
+  ) {
+    const firstPost = postDetails[0] || {};
+    if (integration.providerIdentifier === 'telegram') {
+      try {
+        return resolveTelegramOperation(firstPost).id;
+      } catch {
+        return (
+          getExplicitProviderOperationId(firstPost) ||
+          fallbackProviderOperationId(integration.providerIdentifier)
+        );
+      }
+    }
+
+    return (
+      getExplicitProviderOperationId(firstPost) ||
+      fallbackProviderOperationId(integration.providerIdentifier)
+    );
+  }
+
+  private async createProviderPublishAttempt(input: {
+    integration: Integration;
+    posts: Post[];
+    postDetails: Array<{
+      id: string;
+      message?: string;
+      media?: any[];
+      settings?: any;
+    }>;
+    operationId: string;
+    action: 'publish' | 'comment';
+    startedAt: number;
+  }) {
+    try {
+      return await this._providerLogsService.createPublishAttempt({
+        organizationId: input.integration.organizationId,
+        integrationId: input.integration.id,
+        postId: input.posts[0]?.id,
+        providerCredentialId:
+          input.integration.providerCredentialId || undefined,
+        providerIdentifier: input.integration.providerIdentifier,
+        operationId: input.operationId,
+        status: 'started',
+        startedAt: new Date(input.startedAt),
+        requestSummary: {
+          action: input.action,
+          postIds: input.posts.map((post) => post.id),
+          messageLengths: input.postDetails.map(
+            (post) => post.message?.length || 0
+          ),
+          mediaCounts: input.postDetails.map((post) => post.media?.length || 0),
+        },
+      });
+    } catch {
+      return undefined;
+    }
+  }
+
+  private async completeProviderPublishAttempt(
+    attemptId: string | undefined,
+    input: {
+      status: 'completed' | 'failed';
+      response?: Array<{
+        postId?: string;
+        releaseURL?: string;
+        status?: string;
+      }>;
+      error?: unknown;
+      startedAt: number;
+    }
+  ) {
+    if (!attemptId) {
+      return;
+    }
+
+    try {
+      const firstResponse = input.response?.[0];
+      await this._providerLogsService.updatePublishAttempt(attemptId, {
+        status: input.status,
+        providerStatus: firstResponse?.status || input.status,
+        responseSummary: input.response?.map((response) => ({
+          postId: response.postId,
+          releaseURL: response.releaseURL,
+          status: response.status,
+        })),
+        error: input.error,
+        releaseId: firstResponse?.postId,
+        releaseURL: firstResponse?.releaseURL,
+        durationMs: Date.now() - input.startedAt,
+        completedAt: new Date(),
+      });
+    } catch {
+      return;
+    }
   }
 
   private resolveClientInformation(integration: Integration) {

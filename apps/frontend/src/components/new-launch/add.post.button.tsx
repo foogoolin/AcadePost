@@ -1,6 +1,5 @@
 'use client';
 
-import { Button } from '@gitroom/react/form/button';
 import React, { FC } from 'react';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { PostComment } from '@gitroom/frontend/components/new-launch/providers/high.order.provider';
@@ -14,9 +13,10 @@ export const AddPostButton: FC<{
 
   return (
     <div className="flex">
-      <div
+      <button
+        type="button"
         onClick={onClick}
-        className="select-none cursor-pointer h-[34px] rounded-[6px] flex bg-[#D82D7E] gap-[8px] justify-center items-center pl-[16px] pr-[20px] text-[13px] font-[600] mt-[12px]"
+        className="acadepost-button-secondary !min-h-[34px] !h-[34px] mt-[12px] text-[13px]"
       >
         <div>
           <svg
@@ -28,14 +28,14 @@ export const AddPostButton: FC<{
           >
             <path
               d="M8.00065 3.33301V12.6663M3.33398 7.99967H12.6673"
-              stroke="white"
+              stroke="currentColor"
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
           </svg>
         </div>
-        <div className="!text-white">
+        <div>
           {t(
             ...(props.postComment === PostComment.ALL
               ? ['add_comment_or_post', 'Add comment or post']
@@ -44,7 +44,7 @@ export const AddPostButton: FC<{
               : ['add_comment', 'Add comment'])
           )}
         </div>
-      </div>
+      </button>
     </div>
   );
 };

@@ -6,6 +6,12 @@ import { Integrations } from '@gitroom/frontend/components/launches/calendar.con
 import { createRef, RefObject } from 'react';
 import { PostComment } from '@gitroom/frontend/components/new-launch/providers/post-comment.enum';
 import { newDayjs } from '@gitroom/frontend/components/layout/set.timezone';
+import {
+  AUTO_OPERATION_ID,
+  ComposerOperationSelection,
+  ComposerProviderOptions,
+  getProviderOperationFromSettings,
+} from '@gitroom/frontend/components/new-launch/provider-operation.contract';
 
 interface Values {
   id: string;
@@ -44,6 +50,7 @@ interface StoreState {
   setLocked: (locked: boolean) => void;
   integrations: Integrations[];
   selectedIntegrations: SelectedIntegrations[];
+  providerSelections: Record<string, ComposerOperationSelection>;
   global: Values[];
   internal: Internal[];
   addGlobalValue: (index: number, value: Values[]) => void;
@@ -105,6 +112,16 @@ interface StoreState {
     integration: Integrations,
     settings: any
   ) => void;
+  setProviderOperation: (
+    integrationId: string,
+    providerIdentifier: string,
+    operationId: string
+  ) => void;
+  setProviderOptions: (
+    integrationId: string,
+    providerIdentifier: string,
+    providerOptions: ComposerProviderOptions
+  ) => void;
   reset: () => void;
   setSelectedIntegrations: (
     params: { selectedIntegrations: Integrations; settings: any }[]
@@ -152,6 +169,7 @@ const initialState = {
   hide: false,
   integrations: [] as Integrations[],
   selectedIntegrations: [] as SelectedIntegrations[],
+  providerSelections: {} as Record<string, ComposerOperationSelection>,
   global: [] as Values[],
   internal: [] as Internal[],
   chars: {},
@@ -173,6 +191,8 @@ export const useLaunchStore = create<StoreState>()((set) => ({
       );
 
       if (existing) {
+        const { [existing.integration.id]: _removed, ...providerSelections } =
+          state.providerSelections;
         const selectedList = state.selectedIntegrations.filter(
           (s, index) => s.integration.id !== existing.integration.id
         );
@@ -183,6 +203,7 @@ export const useLaunchStore = create<StoreState>()((set) => ({
             : {}),
           loaded: false,
           selectedIntegrations: selectedList,
+          providerSelections,
           ...(selectedList.length === 0
             ? {
                 current: 'global',
@@ -192,14 +213,62 @@ export const useLaunchStore = create<StoreState>()((set) => ({
         };
       }
 
+      const providerSelection = getProviderOperationFromSettings(
+        settings,
+        integration.identifier
+      );
+
       return {
         selectedIntegrations: [
           ...state.selectedIntegrations,
           { integration, settings, ref: createRef() },
         ],
+        providerSelections: {
+          ...state.providerSelections,
+          ...(providerSelection
+            ? {
+                [integration.id]: providerSelection,
+              }
+            : {}),
+        },
       };
     });
   },
+  setProviderOperation: (
+    integrationId: string,
+    providerIdentifier: string,
+    operationId: string
+  ) =>
+    set((state) => ({
+      providerSelections: {
+        ...state.providerSelections,
+        [integrationId]: {
+          providerIdentifier,
+          operationId,
+          providerOptions:
+            state.providerSelections[integrationId]?.providerOptions || {},
+          source: 'manual',
+        },
+      },
+    })),
+  setProviderOptions: (
+    integrationId: string,
+    providerIdentifier: string,
+    providerOptions: ComposerProviderOptions
+  ) =>
+    set((state) => ({
+      providerSelections: {
+        ...state.providerSelections,
+        [integrationId]: {
+          providerIdentifier,
+          operationId:
+            state.providerSelections[integrationId]?.operationId ||
+            AUTO_OPERATION_ID,
+          providerOptions,
+          source: state.providerSelections[integrationId]?.source || 'manual',
+        },
+      },
+    })),
   addGlobalValue: (index: number, value: Values[]) =>
     set((state) => {
       if (!state.global.length) {
@@ -554,6 +623,23 @@ export const useLaunchStore = create<StoreState>()((set) => ({
         settings: p.settings,
         ref: createRef(),
       })),
+      providerSelections: params.reduce<
+        Record<string, ComposerOperationSelection>
+      >((all, p) => {
+        const selection = getProviderOperationFromSettings(
+          p.settings,
+          p.selectedIntegrations.identifier
+        );
+
+        if (!selection) {
+          return all;
+        }
+
+        return {
+          ...all,
+          [p.selectedIntegrations.id]: selection,
+        };
+      }, {}),
     })),
   setGlobalValue: (value: Values[]) =>
     set((state) => ({

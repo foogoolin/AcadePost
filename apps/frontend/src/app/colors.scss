@@ -97,6 +97,95 @@
 }
 
 :root {
+  --acadepost-button-radius: 999px;
+  --acadepost-button-border: rgba(255, 255, 255, 0.16);
+  --acadepost-button-shadow: 0 14px 30px -18px rgba(0, 0, 0, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.18);
+  --acadepost-card-radius: 12px;
+  --acadepost-card-shadow: var(--acadepost-shadow);
+
+  .dark {
+    --acadepost-button-primary-bg: linear-gradient(
+      135deg,
+      #4cccb8 0%,
+      #73dccd 46%,
+      #fda100 145%
+    );
+    --acadepost-button-primary-text: #050505;
+    --acadepost-button-secondary-bg: linear-gradient(135deg, #181818 0%, #101010 100%);
+    --acadepost-button-secondary-text: #ffffff;
+    --acadepost-surface-card-bg: #101010;
+    --acadepost-surface-card-border: rgba(76, 204, 184, 0.2);
+  }
+
+  .light {
+    --acadepost-button-primary-bg: linear-gradient(
+      135deg,
+      #050505 0%,
+      #101010 52%,
+      #296f65 135%
+    );
+    --acadepost-button-primary-text: #ffffff;
+    --acadepost-button-secondary-bg: linear-gradient(135deg, #ffffff 0%, #f4f4f4 100%);
+    --acadepost-button-secondary-text: #101010;
+    --acadepost-surface-card-bg: #ffffff;
+    --acadepost-surface-card-border: rgba(16, 16, 16, 0.1);
+  }
+}
+
+.acadepost-button-primary,
+.acadepost-button-secondary {
+  align-items: center;
+  border-radius: var(--acadepost-button-radius);
+  border: 1px solid var(--acadepost-button-border);
+  box-shadow: var(--acadepost-button-shadow);
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 700;
+  gap: 8px;
+  justify-content: center;
+  letter-spacing: 0;
+  min-height: 40px;
+  padding: 0 18px;
+  transition:
+    box-shadow 180ms ease,
+    filter 180ms ease,
+    transform 180ms ease;
+  white-space: nowrap;
+}
+
+.acadepost-button-primary {
+  background: var(--acadepost-button-primary-bg);
+  color: var(--acadepost-button-primary-text);
+}
+
+.acadepost-button-secondary {
+  background: var(--acadepost-button-secondary-bg);
+  color: var(--acadepost-button-secondary-text);
+}
+
+.acadepost-button-primary:hover,
+.acadepost-button-secondary:hover {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+
+.acadepost-button-primary:disabled,
+.acadepost-button-secondary:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.2);
+  opacity: 0.55;
+  transform: none;
+}
+
+.acadepost-surface-card {
+  background: var(--acadepost-surface-card-bg);
+  border: 1px solid var(--acadepost-surface-card-border);
+  border-radius: var(--acadepost-card-radius);
+  box-shadow: var(--acadepost-card-shadow);
+}
+
+:root {
   --acadepost-black: #050505;
   --acadepost-ink: #101010;
   --acadepost-accent: #4cccb8;

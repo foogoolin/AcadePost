@@ -114,6 +114,7 @@ export type PostDetails<T = any> = {
   message: string;
   settings: T;
   media?: MediaContent[];
+  operation?: string;
   poll?: PollDetails;
 };
 

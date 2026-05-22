@@ -12,7 +12,17 @@ describe('provider credential service', () => {
       "await import(\n            '@gitroom/nestjs-libraries/integrations/social/telegram.provider'"
     );
     expect(source).toContain("case 'telegram':");
-    expect(source).toContain('getBotConfiguration(');
+    expect(source).toContain('return new TelegramProvider().getBotConfiguration(');
+  });
+
+  it('records credential test connection logs without passing raw fields', () => {
+    expect(source).toContain('ProviderLogsService');
+    expect(source).toContain('recordConnectionLog({');
+    expect(source).toContain("action: 'credential.test'");
+    expect(source).toContain("status: 'success'");
+    expect(source).toContain("status: 'failed'");
+    expect(source).toContain('credentialId: id');
+    expect(source).not.toContain('requestSummary: fields');
   });
 
   const loadGetEncryptionKey = () => {

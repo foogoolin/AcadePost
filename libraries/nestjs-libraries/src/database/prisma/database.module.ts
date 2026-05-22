@@ -50,6 +50,8 @@ import { AgentRunsRepository } from '@gitroom/nestjs-libraries/database/prisma/a
 import { AgentRunsService } from '@gitroom/nestjs-libraries/database/prisma/agent-runs/agent.runs.service';
 import { ProviderCredentialsRepository } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.repository';
 import { ProviderCredentialsService } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.service';
+import { ProviderLogsRepository } from '@gitroom/nestjs-libraries/database/prisma/provider-logs/provider.logs.repository';
+import { ProviderLogsService } from '@gitroom/nestjs-libraries/database/prisma/provider-logs/provider.logs.service';
 
 @Global()
 @Module({
@@ -109,6 +111,8 @@ import { ProviderCredentialsService } from '@gitroom/nestjs-libraries/database/p
     AgentRunsService,
     ProviderCredentialsRepository,
     ProviderCredentialsService,
+    ProviderLogsRepository,
+    ProviderLogsService,
   ],
   get exports() {
     return this.providers;

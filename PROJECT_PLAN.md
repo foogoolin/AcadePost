@@ -411,6 +411,20 @@ The first workflow should classify content into one of these groups, make the ma
 - Constat demo: le provider cible reste `local`, avec `UPLOAD_DIRECTORY=/uploads` et `NEXT_PUBLIC_UPLOAD_STATIC_DIRECTORY=/uploads`; les compose demo montent ce dossier comme volume persistant.
 - Constat template: `PostTemplate.previewMediaId` garde le lien vers l'image de preview; sauver un modele sans ce champ donne l'impression que l'image n'est pas conservee.
 
+## Provider Pipeline Rework Fork - 2026-05-22
+
+- Version produit preparee: `v1.1.8`.
+- Worktree/fork local cree pour isoler la refonte: `/opt/AcadePost-provider-rework`.
+- Branche de travail: `byan/provider-pipeline-rework`.
+- BYAN MCP FD demarre: `20260522-100231-provider-pipeline-rework`, phase `DOC`.
+- Plan d'implementation ajoute: `docs/superpowers/plans/2026-05-22-provider-pipeline-rework-implementation.md`.
+- Plugins/workflows UI actives pour la suite: Build Web Apps frontend planning, React best practices, frontend testing avec fallback Playwright; Mermaid Chart disponible pour les schemas.
+- Gate `ok doc` valide par Ilya; implementation demarree sous BYAN FD `20260522-101949-provider-pipeline-rework-build`.
+- Backend: ajout des modeles `ProviderConnectionLog` et `ProviderPublishAttempt`, repository/service logs, sanitizer central, logs de test credential et publish attempt logging dans l'orchestrator.
+- Provider: Telegram expose les operations explicites `telegram.message.send`, `telegram.photo.send`, `telegram.mediaGroup.send`, `telegram.document.send`, avec defaults legacy.
+- Frontend: le composer garde un contrat `settings.providerOperation.operationId`, ajoute un selecteur d'operation Telegram, et le flow Add Channel est renomme autour des destinations.
+- Design gate: `design.md` ajoute le contrat court; les boutons/cartes touches utilisent les utilities `acadepost-button-primary`, `acadepost-button-secondary`, `acadepost-surface-card` avec gradients discrets, ombres et palette AcadéPost.
+
 ## Open Questions
 
 - Which real platform API should be connected first after the MVP demo path is stable?

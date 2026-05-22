@@ -7,7 +7,6 @@ import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import { timer } from '@gitroom/helpers/utils/timer';
 import { makeId } from '@gitroom/nestjs-libraries/services/make.is';
 import { Input } from '@gitroom/react/form/input';
-import { Button } from '@gitroom/react/form/button';
 import copy from 'copy-to-clipboard';
 import { useToaster } from '@gitroom/react/toaster/toaster';
 import { useVariables } from '@gitroom/react/helpers/variable.context';
@@ -50,7 +49,7 @@ export const TelegramProvider: FC<Web3ProviderInterface> = (props) => {
       toaster.show(
         t(
           'telegram_credentials_missing',
-          'Configurez d’abord l’identifiant Telegram dans Paramètres > Identifiants.'
+          'Configurez d’abord l’identifiant d’accès Telegram dans Paramètres > Identifiants, puis ajoutez ce groupe ou canal comme destination.'
         ),
         'warning'
       );
@@ -68,7 +67,7 @@ export const TelegramProvider: FC<Web3ProviderInterface> = (props) => {
         toaster.show(
           t(
             'telegram_credentials_missing',
-            'Configurez d’abord l’identifiant Telegram dans Paramètres > Identifiants.'
+            'Configurez d’abord l’identifiant d’accès Telegram dans Paramètres > Identifiants, puis ajoutez ce groupe ou canal comme destination.'
           ),
           'warning'
         );
@@ -139,24 +138,27 @@ export const TelegramProvider: FC<Web3ProviderInterface> = (props) => {
               {t('please_add', 'Ajoutez')} <strong>@{botName}</strong>{' '}
               {t(
                 'to_your_telegram_group_channel_and_click_here',
-                'à votre groupe ou canal Telegram, puis cliquez ici :'
+                'à votre groupe ou canal Telegram, puis validez cette destination :'
               )}
             </>
           ) : (
             t(
               'telegram_credentials_missing',
-              'Configurez d’abord l’identifiant Telegram dans Paramètres > Identifiants.'
+              'Configurez d’abord l’identifiant d’accès Telegram dans Paramètres > Identifiants, puis ajoutez ce groupe ou canal comme destination.'
             )
           )}
         </div>
         {!step ? (
-          <div className="w-full mt-[16px]" onClick={loadAll}>
-            <div
+          <div className="w-full mt-[16px]">
+            <button
+              type="button"
+              disabled={!telegramConfigured || configLoading}
+              onClick={loadAll}
               className={`${
                 telegramConfigured && !configLoading
-                  ? 'cursor-pointer bg-[#2EA6DD]'
-                  : 'cursor-not-allowed bg-[#53636b]'
-              } h-[44px] rounded-[4px] flex justify-center items-center text-white gap-[4px]`}
+                  ? 'acadepost-button-primary'
+                  : 'acadepost-button-secondary'
+              } w-full h-[44px]`}
             >
               <svg
                 width="51"
@@ -179,10 +181,10 @@ export const TelegramProvider: FC<Web3ProviderInterface> = (props) => {
                 />
               </svg>
               <div>{t('connect_telegram', 'Connecter Telegram')}</div>
-            </div>
+            </button>
           </div>
         ) : (
-          <div className="w-full text-center" onClick={copyText}>
+          <div className="w-full text-center">
             {t(
               'please_add_the_following_command_in_your_chat',
               'Please add the following command in your chat:'
@@ -196,7 +198,13 @@ export const TelegramProvider: FC<Web3ProviderInterface> = (props) => {
                   disableForm={true}
                 />
               </div>
-              <Button>{t('copy', 'Copy')}</Button>
+              <button
+                type="button"
+                className="acadepost-button-secondary ms-[8px]"
+                onClick={copyText}
+              >
+                {t('copy', 'Copy')}
+              </button>
             </div>
           </div>
         )}

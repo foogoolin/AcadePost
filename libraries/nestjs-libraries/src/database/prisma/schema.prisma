@@ -47,6 +47,8 @@ model Organization {
   oauthApp            OAuthApp[]
   oauthAuthorizations OAuthAuthorization[]
   providerCredentials ProviderCredential[]
+  providerConnectionLogs ProviderConnectionLog[]
+  providerPublishAttempts ProviderPublishAttempt[]
 
   @@index([apiKey])
   @@index([streakSince])
@@ -348,6 +350,7 @@ model Integration {
   orderItems            OrderItems[]
   plugs                 Plugs[]
   posts                 Post[]
+  providerPublishAttempts ProviderPublishAttempt[]
 
   @@unique([organizationId, internalId])
   @@index([rootInternalId])
@@ -439,6 +442,7 @@ model Post {
   submittedForOrder          Orders?                   @relation(fields: [submittedForOrderId], references: [id])
   submittedForOrganization   Organization?             @relation("submittedForOrg", fields: [submittedForOrganizationId], references: [id])
   tags                       TagsPosts[]
+  providerPublishAttempts    ProviderPublishAttempt[]
 
   @@index([group])
   @@index([deletedAt])
@@ -710,11 +714,78 @@ model ProviderCredential {
   updatedAt          DateTime     @updatedAt
   organization       Organization @relation(fields: [organizationId], references: [id])
   integrations        Integration[]
+  connectionLogs      ProviderConnectionLog[]
+  publishAttempts     ProviderPublishAttempt[]
 
   @@index([organizationId])
   @@index([providerIdentifier])
   @@index([enabled])
   @@index([deletedAt])
+}
+
+model ProviderConnectionLog {
+  id                   String              @id @default(uuid())
+  organizationId       String
+  providerIdentifier   String
+  providerCredentialId String?
+  action               String
+  status               String
+  requestSummary       Json?
+  responseSummary      Json?
+  errorSummary         Json?
+  durationMs           Int?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  organization         Organization        @relation(fields: [organizationId], references: [id])
+  providerCredential   ProviderCredential? @relation(fields: [providerCredentialId], references: [id])
+
+  @@index([organizationId])
+  @@index([providerIdentifier])
+  @@index([providerCredentialId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([organizationId, providerIdentifier, createdAt])
+  @@index([organizationId, providerCredentialId, createdAt])
+}
+
+model ProviderPublishAttempt {
+  id                   String              @id @default(uuid())
+  organizationId       String
+  integrationId        String?
+  postId               String?
+  providerCredentialId String?
+  providerIdentifier   String
+  operationId          String
+  status               String              @default("started")
+  providerStatus       String?
+  requestSummary       Json?
+  responseSummary      Json?
+  errorSummary         Json?
+  releaseId            String?
+  releaseURL           String?
+  durationMs           Int?
+  startedAt            DateTime            @default(now())
+  completedAt          DateTime?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  organization         Organization        @relation(fields: [organizationId], references: [id])
+  integration          Integration?        @relation(fields: [integrationId], references: [id])
+  post                 Post?               @relation(fields: [postId], references: [id])
+  providerCredential   ProviderCredential? @relation(fields: [providerCredentialId], references: [id])
+
+  @@index([organizationId])
+  @@index([providerIdentifier])
+  @@index([integrationId])
+  @@index([postId])
+  @@index([providerCredentialId])
+  @@index([operationId])
+  @@index([status])
+  @@index([providerStatus])
+  @@index([startedAt])
+  @@index([createdAt])
+  @@index([organizationId, providerIdentifier, startedAt])
+  @@index([organizationId, integrationId, startedAt])
+  @@index([organizationId, status, startedAt])
 }
 
 model AgentRun {

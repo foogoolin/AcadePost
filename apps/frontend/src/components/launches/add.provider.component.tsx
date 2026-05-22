@@ -35,7 +35,7 @@ export const useAddProvider = (update?: () => void, invite?: boolean) => {
   return useCallback(async () => {
     const data = await (await fetch('/integrations')).json();
     modal.openModal({
-      title: 'Add Channel',
+      title: 'Ajouter une destination',
       withCloseButton: true,
       children: (
         <AddProviderComponent invite={!!invite} update={update} {...data} />
@@ -54,7 +54,8 @@ export const AddProviderButton: FC<{
   return (
     <div className="flex group-[.sidebar]:block gap-[8px]">
       <button
-        className="flex-1 group-[.sidebar]:w-[100%] group-[.sidebar]:flex-none text-btnText bg-btnSimple h-[44px] pt-[12px] pb-[14px] ps-[16px] pe-[20px] justify-center items-center flex rounded-[8px] gap-[8px]"
+        type="button"
+        className="acadepost-button-primary flex-1 group-[.sidebar]:w-[100%] group-[.sidebar]:flex-none h-[44px] text-[14px]"
         onClick={add}
       >
         <div>
@@ -75,17 +76,18 @@ export const AddProviderButton: FC<{
           </svg>
         </div>
         <div className="text-start text-[14px] group-[.sidebar]:hidden">
-          {t('add_channel', 'Add Channel')}
+          {t('add_destination', 'Ajouter une destination')}
         </div>
       </button>
       <button
+        type="button"
         onClick={invite}
         data-tooltip-id="tooltip"
         data-tooltip-content={t(
           'invite_link',
-          'Send Invite Link to a customer to add channel'
+          'Envoyer un lien d’invitation pour ajouter une destination'
         )}
-        className="group-[.sidebar]:hidden min-h-[44px] min-w-[44px] bg-btnSimple justify-center items-center flex rounded-[8px] cursor-pointer"
+        className="acadepost-button-secondary group-[.sidebar]:hidden !min-h-[44px] !min-w-[44px] !w-[44px] !px-0"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -280,11 +282,11 @@ const CredentialSelector: FC<{
       <p className="text-[14px] leading-[1.45] text-textColor/80">
         {t(
           'choose_provider_credential',
-          `Choisissez l'identifiant ${providerName} à utiliser pour cette connexion.`
+          `Choisissez l'identifiant d’accès ${providerName} à utiliser pour cette destination.`
         )}
       </p>
       <label className="flex flex-col gap-[8px] text-[12px] font-[700] text-textColor">
-        {t('credential', 'Identifiant')}
+        {t('credential', 'Identifiant d’accès')}
         <select
           className="h-[42px] rounded-[6px] border border-tableBorder bg-input px-[10px] text-[14px] text-textColor"
           value={selectedId}
@@ -298,20 +300,20 @@ const CredentialSelector: FC<{
         </select>
       </label>
       <div className="flex gap-[10px]">
-        <Button
+        <button
           type="button"
-          className="flex-1"
+          className="acadepost-button-primary flex-1"
           onClick={() => selectedId && onSelect(selectedId)}
         >
           {t('use_credential', 'Utiliser cet identifiant')}
-        </Button>
-        <Button
+        </button>
+        <button
           type="button"
-          className="flex-1 !bg-transparent border border-tableBorder text-textColor"
+          className="acadepost-button-secondary flex-1"
           onClick={onSkip}
         >
           {t('use_default', 'Utiliser le défaut')}
-        </Button>
+        </button>
       </div>
     </div>
   );
@@ -325,17 +327,17 @@ const ExtensionNotFound: FC = () => {
       <p className="text-[14px] text-textColor/80">
         {t(
           'extension_not_available',
-          'The AcadéPost browser extension is not available in this demo build. Use an OAuth or API-based channel connection for now.'
+          'L’extension navigateur AcadéPost n’est pas disponible dans cette build de démonstration. Utilisez une destination OAuth ou API pour l’instant.'
         )}
       </p>
       <div className="flex gap-[10px]">
-        <Button
+        <button
           type="button"
-          className="flex-1 !bg-transparent border border-tableBorder text-textColor"
+          className="acadepost-button-secondary flex-1"
           onClick={() => modals.closeCurrent()}
         >
           {t('cancel', 'Cancel')}
-        </Button>
+        </button>
       </div>
     </div>
   );
@@ -352,7 +354,7 @@ const ChromeExtensionWarning: FC<{
       <p className="text-[14px] text-textColor/80">
         {t(
           'chrome_extension_warning_intro',
-          'This channel connects via the browser extension. Please be aware of the following:'
+          'Cette destination se connecte via l’extension navigateur. À noter :'
         )}
       </p>
       <ul className="flex flex-col gap-[8px] list-disc ps-[20px] text-[14px] text-textColor/80">
@@ -383,26 +385,26 @@ const ChromeExtensionWarning: FC<{
         </li>
       </ul>
       <div className="flex gap-[10px] mt-[8px]">
-        <Button
+        <button
           type="button"
-          className="flex-1"
+          className="acadepost-button-primary flex-1"
           onClick={() => {
             modals.closeCurrent();
             onConfirm();
           }}
         >
           {t('i_understand_continue', 'I understand, continue')}
-        </Button>
-        <Button
+        </button>
+        <button
           type="button"
-          className="flex-1 !bg-transparent border border-tableBorder text-textColor"
+          className="acadepost-button-secondary flex-1"
           onClick={() => {
             modals.closeCurrent();
             onCancel();
           }}
         >
           {t('cancel', 'Cancel')}
-        </Button>
+        </button>
       </div>
     </div>
   );
@@ -615,7 +617,7 @@ export const AddProviderComponent: FC<{
 
           if (invite) {
             toaster.show(
-              'Invite link copied to clipboard, link will be available for 1 hour',
+              'Lien d’invitation de destination copié, disponible pendant 1 heure',
               'success'
             );
             modal.closeAll();
@@ -649,7 +651,7 @@ export const AddProviderComponent: FC<{
         if (isChromeExtension) {
           const confirmed = await new Promise<boolean>((resolve) => {
             modal.openModal({
-              title: t('chrome_extension_notice', 'Browser Extension Notice'),
+              title: t('chrome_extension_notice', 'Connexion par extension'),
               withCloseButton: true,
               onClose: () => resolve(false),
               children: (
@@ -669,7 +671,7 @@ export const AddProviderComponent: FC<{
           }
           if (!extensionId || !chrome?.runtime?.sendMessage) {
             modal.openModal({
-              title: t('extension_not_available_title', 'Extension Not Found'),
+              title: t('extension_not_available_title', 'Extension introuvable'),
               withCloseButton: true,
               children: <ExtensionNotFound />,
             });
@@ -766,7 +768,7 @@ export const AddProviderComponent: FC<{
         }
         if (customFields) {
           modal.openModal({
-            title: t('add_provider_title', 'Add Provider'),
+            title: t('add_provider_title', 'Ajouter une destination'),
             withCloseButton: true,
             ...(isMobile ? { removeLayout: true, fullScreen: true } : {}),
             classNames: {
@@ -849,7 +851,7 @@ export const AddProviderComponent: FC<{
                   isMobile
                     ? 'flex-row h-[72px] p-[16px]'
                     : 'flex-col p-[10px] h-[100px] justify-center',
-                  'w-full text-[14px] rounded-[8px] bg-newTableHeader text-textColor relative items-center flex gap-[10px] cursor-pointer'
+                  'acadepost-surface-card w-full text-[14px] text-textColor relative items-center flex gap-[10px] cursor-pointer transition-colors hover:border-acadeMint'
                 )}
               >
                 <div>

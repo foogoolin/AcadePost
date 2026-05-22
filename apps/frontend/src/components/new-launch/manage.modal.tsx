@@ -44,6 +44,8 @@ import { useHasScroll } from '@gitroom/frontend/components/ui/is.scroll.hook';
 import { useShortlinkPreference } from '@gitroom/frontend/components/settings/shortlink-preference.component';
 import dayjs from 'dayjs';
 import { Button } from '@gitroom/react/form/button';
+import { OperationSelector } from '@gitroom/frontend/components/new-launch/operation.selector';
+import { buildComposerDestinationContract } from '@gitroom/frontend/components/new-launch/provider-operation.contract';
 
 function countCharacters(text: string, type: string): number {
   if (type !== 'x') {
@@ -80,6 +82,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
     current,
     activateExitButton,
     setHide,
+    providerSelections,
   } = useLaunchStore(
     useShallow((state) => ({
       hide: state.hide,
@@ -96,6 +99,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
       setSelectedIntegrations: state.setSelectedIntegrations,
       locked: state.locked,
       activateExitButton: state.activateExitButton,
+      providerSelections: state.providerSelections,
     }))
   );
 
@@ -110,7 +114,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
       return (
         <div className="flex items-center gap-[10px]">
           <div className="relative">
-            <SettingsIcon size={15} className="text-white" />
+            <SettingsIcon size={15} className="text-current" />
           </div>
           <div>Settings</div>
         </div>
@@ -129,7 +133,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
           />
           <SettingsIcon
             size={15}
-            className="text-white absolute -end-[5px] -bottom-[5px]"
+            className="text-current absolute -end-[5px] -bottom-[5px]"
           />
         </div>
         <div>
@@ -372,28 +376,40 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
         tags,
         shortLink,
         date: date.utc().format('YYYY-MM-DDTHH:mm:ss'),
-        posts: checkAllValid.map((post: any) => ({
-          integration: {
-            id: post.integration.id,
-          },
-          group,
-          settings: { ...(post.settings || {}) },
-          value: post.values.map((value: any) => ({
-            ...(value.id ? { id: value.id } : {}),
-            content: value.content,
-            delay: value.delay || 0,
-            image:
-              (value?.media || []).map(
-                ({ id, path, alt, thumbnail, thumbnailTimestamp }: any) => ({
-                  id,
-                  path,
-                  alt,
-                  thumbnail,
-                  thumbnailTimestamp,
-                })
-              ) || [],
-          })),
-        })),
+        posts: checkAllValid.map((post: any) => {
+          const providerOperation = buildComposerDestinationContract({
+            destinationId: post.integration.id,
+            providerIdentifier: post.integration.identifier,
+            stored: providerSelections[post.integration.id],
+            values: post.values,
+          });
+
+          return {
+            integration: {
+              id: post.integration.id,
+            },
+            group,
+            settings: {
+              ...(post.settings || {}),
+              providerOperation,
+            },
+            value: post.values.map((value: any) => ({
+              ...(value.id ? { id: value.id } : {}),
+              content: value.content,
+              delay: value.delay || 0,
+              image:
+                (value?.media || []).map(
+                  ({ id, path, alt, thumbnail, thumbnailTimestamp }: any) => ({
+                    id,
+                    path,
+                    alt,
+                    thumbnail,
+                    thumbnailTimestamp,
+                  })
+                ) || [],
+            })),
+          };
+        }),
       };
 
       if (dummy) {
@@ -439,7 +455,16 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
         }
       }
     },
-    [ref, repeater, tags, date, addEditSets, dummy, shortlinkPreferenceData]
+    [
+      ref,
+      repeater,
+      tags,
+      date,
+      addEditSets,
+      dummy,
+      shortlinkPreferenceData,
+      providerSelections,
+    ]
   );
 
   return (
@@ -473,6 +498,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
                   </div>
                   <div className="flex flex-1 gap-[6px] flex-col">
                     <div>{!existingData.integration && <SelectCurrent />}</div>
+                    <OperationSelector />
                     <div className="flex-1 flex">
                       {!hide && <EditorWrapper totalPosts={1} value="" />}
                     </div>
@@ -495,23 +521,24 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
                 )}
               >
                 <div className="flex-1 flex flex-col rounded-[12px] gap-[12px] overflow-hidden bg-newSettings">
-                  <div
+                  <button
+                    type="button"
                     onClick={() => setShowSettings(!showSettings)}
                     className={clsx(
-                      'bg-[#4cccb8] rounded-[12px] flex items-center gap-[8px] cursor-pointer p-[12px]',
+                      'acadepost-button-primary w-full !justify-between !rounded-[12px] !px-[12px] !py-[12px]',
                       showSettings ? '!rounded-b-none' : ''
                     )}
                   >
-                    <div className="flex-1 text-[14px] font-[600] text-white">
+                    <div className="flex-1 text-start text-[14px] font-[700]">
                       {currentIntegrationText}
                     </div>
                     <div>
                       <ChevronDownIcon
                         rotated={showSettings}
-                        className="text-white"
+                        className="text-current"
                       />
                     </div>
-                  </div>
+                  </button>
                   <div
                     className={clsx(
                       !showSettings ? 'hidden' : 'flex-1',
@@ -569,8 +596,9 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
           <div className="pe-[20px] flex items-center justify-end gap-[8px]">
             {existingData?.integration && (
               <button
+                type="button"
                 onClick={deletePost}
-                className="cursor-pointer flex text-[#FF3F3F] gap-[8px] items-center text-[15px] font-[600]"
+                className="acadepost-button-secondary !text-[#FF3F3F] text-[15px]"
               >
                 <div>
                   <TrashIcon />
@@ -581,15 +609,16 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
             <DatePicker onChange={setDate} date={date} />
             {!addEditSets && (
               <button
+                type="button"
                 disabled={
                   selectedIntegrations.length === 0 || loading || locked
                 }
                 onClick={schedule('draft')}
-                className="relative cursor-pointer disabled:cursor-not-allowed px-[20px] h-[44px] bg-btnSimple justify-center items-center flex rounded-[8px] text-[15px] font-[600]"
+                className="acadepost-button-secondary relative h-[44px] text-[15px]"
               >
                 {loading && (
                   <div className="absolute left-[50%] top-[50%] -translate-y-[50%] -translate-x-[50%]">
-                    <div className="animate-spin h-[20px] w-[20px] border-4 border-textColor border-t-transparent rounded-full" />
+                    <div className="animate-spin h-[20px] w-[20px] rounded-full border-4 border-current border-t-transparent" />
                   </div>
                 )}
                 <div className={clsx(loading && 'invisible')}>
@@ -599,7 +628,8 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
             )}
             {addEditSets && (
               <button
-                className="text-white text-[15px] font-[600] min-w-[180px] btnSub disabled:cursor-not-allowed disabled:opacity-80 outline-none gap-[8px] flex justify-center items-center h-[44px] rounded-[8px] bg-[#4cccb8] ps-[20px] pe-[16px]"
+                type="button"
+                className="acadepost-button-primary h-[44px] min-w-[180px] text-[15px]"
                 disabled={
                   selectedIntegrations.length === 0 || loading || locked
                 }
@@ -611,15 +641,16 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
             {!addEditSets && (
               <div className="group cursor-pointer relative">
                 <button
+                  type="button"
                   disabled={
                     selectedIntegrations.length === 0 || loading || locked
                   }
                   onClick={schedule('schedule')}
-                  className="text-white relative min-w-[180px] btnSub disabled:cursor-not-allowed disabled:opacity-80 outline-none gap-[8px] flex justify-center items-center h-[44px] rounded-[8px] bg-[#4cccb8] ps-[20px] pe-[16px]"
+                  className="acadepost-button-primary relative h-[44px] min-w-[180px] text-[15px]"
                 >
                   {loading && (
                     <div className="absolute left-[50%] top-[50%] -translate-y-[50%] -translate-x-[50%]">
-                      <div className="animate-spin h-[20px] w-[20px] border-4 border-white border-t-transparent rounded-full" />
+                      <div className="animate-spin h-[20px] w-[20px] rounded-full border-4 border-current border-t-transparent" />
                     </div>
                   )}
                   <div
@@ -640,20 +671,21 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
                   </div>
                   {!dummy && (
                     <div className="flex justify-center items-center h-[20px] w-[20px] pt-[4px] arrow-change">
-                      <DropdownArrowSmallIcon className="group-hover:rotate-180 text-white" />
+                      <DropdownArrowSmallIcon className="group-hover:rotate-180 text-current" />
                     </div>
                   )}
                 </button>
 
                 {!dummy && (
                   <button
+                    type="button"
                     onClick={schedule('now')}
                     disabled={
                       selectedIntegrations.length === 0 || loading || locked
                     }
-                    className="rounded-[8px] z-[300] disabled:cursor-not-allowed disabled:opacity-80 hidden group-hover:flex absolute bottom-[100%] -left-[12px] p-[12px] w-[206px] bg-newBgColorInner"
+                    className="acadepost-surface-card z-[300] hidden group-hover:flex w-[220px] absolute bottom-[100%] -left-[20px] p-[10px] disabled:cursor-not-allowed disabled:opacity-70"
                   >
-                    <div className="text-white rounded-[8px] bg-[#D82D7E] h-[44px] w-full flex justify-center items-center post-now">
+                    <div className="acadepost-button-secondary h-[44px] w-full post-now">
                       {t('post_now', 'Post Now')}
                     </div>
                   </button>

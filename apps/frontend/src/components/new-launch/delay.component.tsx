@@ -96,7 +96,7 @@ export const DelayComponent: FC<{
         }
         className={clsx(
           'cursor-pointer flex items-center gap-[4px]',
-          currentDelay > 0 && 'bg-[#D82D7E] text-white rounded-full'
+          currentDelay > 0 && 'bg-acadeAmber text-acadeBlack rounded-full'
         )}
       >
         <DelayIcon />
@@ -111,7 +111,7 @@ export const DelayComponent: FC<{
                 className={clsx(
                   'h-[32px] flex items-center justify-center rounded-[4px] cursor-pointer hover:bg-newBgColor text-[13px]',
                   currentDelay === option.value &&
-                    'bg-[#4cccb8] text-white hover:bg-[#4cccb8]'
+                    'bg-acadeMint text-acadeBlack hover:bg-acadeMint'
                 )}
               >
                 {option.label}
@@ -133,6 +133,7 @@ export const DelayComponent: FC<{
                 )}
               />
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   const value = parseInt(customValue, 10);
@@ -141,7 +142,7 @@ export const DelayComponent: FC<{
                     setCustomValue('');
                   }
                 }}
-                className="h-[32px] px-[10px] rounded-[4px] bg-[#4cccb8] text-white text-[12px] font-[600] hover:bg-[#4cccb8]/80"
+                className="acadepost-button-primary !min-h-[32px] !h-[32px] !px-[10px] text-[12px]"
               >
                 Set
               </button>

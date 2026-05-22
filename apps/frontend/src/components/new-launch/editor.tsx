@@ -407,9 +407,17 @@ export const EditorWrapper: FC<{
               )}
             </div>
             <div>
-              <div className="text-white rounded-[8px] h-[44px] px-[20px] bg-[#D82D7E] cursor-pointer flex justify-center items-center">
+              <button
+                type="button"
+                className="acadepost-button-primary h-[44px] px-[20px]"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setLoaded(false);
+                  addRemoveInternal(current);
+                }}
+              >
                 {t('edit_content', 'Edit content')}
-              </div>
+              </button>
             </div>
           </div>
           <div className="absolute w-full h-full left-0 top-0 bg-newBackdrop opacity-60 z-[100] rounded-[12px]" />
