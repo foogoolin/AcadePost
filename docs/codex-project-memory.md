@@ -55,3 +55,7 @@ For provider-pipeline work, use the flow that worked for the v1.1.8 rollout:
 - Do a review pass before deployment. Findings first if this is a formal review; otherwise record the self-review result and remaining risks.
 - Deploy by changing `.env.demo.shared-infra` to the pinned image, backing it up, running one controlled Prisma `db push`, then recreating runtime services through `deploy/demo/update.sh`.
 - Verify the live domain with `/api/monitor/ready`, compose health, image IDs, route accessibility, and backend route registration logs.
+
+### 2026-05-22 — BYAN MCP Refresh Gate Rule
+
+During provider-pipeline work, refresh BYAN MCP at every phase gate (`BUILD -> REVIEW -> VALIDATE -> DOC/DEPLOY`), every ~20 tool actions, and after any resume/compaction before continuing. Refresh means reading the active BYAN workflow/standup state and then proceeding from the current phase. User explicitly validated this rule on 2026-05-22.
