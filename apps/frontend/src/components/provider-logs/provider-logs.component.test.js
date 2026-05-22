@@ -14,6 +14,12 @@ describe('provider logs UI', () => {
     expect(source).toContain('Provider Connection Log');
   });
 
+  it('uses theme-aware readable status and accent classes', () => {
+    expect(source).toContain('acadepost-status-pill is-success');
+    expect(source).toContain('acadepost-readable-accent');
+    expect(source).not.toContain('acadepost-button-primary text-white');
+  });
+
   it('keeps native tab buttons from submitting parent forms', () => {
     const buttonTags = Array.from(source.matchAll(/<button\b[^>]*>/g)).map(
       (match) => match[0]

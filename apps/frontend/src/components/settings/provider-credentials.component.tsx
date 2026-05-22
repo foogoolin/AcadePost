@@ -51,6 +51,16 @@ type ProviderCredential = {
   lastTestedAt?: string;
 };
 
+type IntegrationDestination = {
+  id: string;
+  name: string;
+  identifier: string;
+  display?: string;
+  disabled: boolean;
+  refreshNeeded: boolean;
+  inBetweenSteps: boolean;
+};
+
 const emptyDraft = {
   id: '',
   providerIdentifier: '',
@@ -58,6 +68,9 @@ const emptyDraft = {
   enabled: true,
   fields: {} as Record<string, string>,
 };
+
+const defaultTestPostMessage =
+  '<b>AcadéPost test</b>\n<i>italique</i> · <u>souligné</u> · <s>barré</s>';
 
 const providerIconMap: Record<string, string> = {
   'instagram-standalone': 'instagram-standalone',
@@ -102,6 +115,12 @@ export const ProviderCredentialsComponent: FC = () => {
   const [draft, setDraft] = useState(emptyDraft);
   const [isSaving, setIsSaving] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
+  const [isTestingPost, setIsTestingPost] = useState(false);
+  const [testPostIntegrationId, setTestPostIntegrationId] = useState('');
+  const [testPostMessage, setTestPostMessage] = useState(
+    defaultTestPostMessage
+  );
+  const [testPostImageUrl, setTestPostImageUrl] = useState('');
 
   const loadProviders = useCallback(async () => {
     return (await fetch('/provider-credentials/providers')).json();
@@ -109,6 +128,10 @@ export const ProviderCredentialsComponent: FC = () => {
 
   const loadCredentials = useCallback(async () => {
     return (await fetch('/provider-credentials')).json();
+  }, [fetch]);
+
+  const loadIntegrations = useCallback(async () => {
+    return (await fetch('/integrations/list')).json();
   }, [fetch]);
 
   const { data: providerData } = useSWR(
@@ -127,9 +150,19 @@ export const ProviderCredentialsComponent: FC = () => {
       revalidateOnFocus: false,
     }
   );
+  const { data: integrationsData } = useSWR(
+    'provider-credentials/integrations',
+    loadIntegrations,
+    {
+      fallbackData: { integrations: [] },
+      revalidateOnFocus: false,
+    }
+  );
 
   const providers = (providerData?.providers || []) as CredentialProvider[];
   const credentialList = (credentials || []) as ProviderCredential[];
+  const integrationList = (integrationsData?.integrations ||
+    []) as IntegrationDestination[];
   const currentProvider = useMemo(
     () =>
       providers.find(
@@ -145,6 +178,17 @@ export const ProviderCredentialsComponent: FC = () => {
           credential.providerIdentifier === currentProvider?.identifier
       ),
     [credentialList, currentProvider?.identifier]
+  );
+  const destinationsForCurrentProvider = useMemo(
+    () =>
+      integrationList.filter(
+        (integration) =>
+          integration.identifier === currentProvider?.identifier &&
+          !integration.disabled &&
+          !integration.refreshNeeded &&
+          !integration.inBetweenSteps
+      ),
+    [currentProvider?.identifier, integrationList]
   );
 
   const groupedProviders = useMemo(() => {
@@ -192,6 +236,29 @@ export const ProviderCredentialsComponent: FC = () => {
       return createDraftForProvider(currentProvider);
     });
   }, [currentProvider]);
+
+  useEffect(() => {
+    if (
+      testPostIntegrationId &&
+      destinationsForCurrentProvider.some(
+        (destination) => destination.id === testPostIntegrationId
+      )
+    ) {
+      return;
+    }
+
+    setTestPostIntegrationId(destinationsForCurrentProvider[0]?.id || '');
+  }, [destinationsForCurrentProvider, testPostIntegrationId]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    setTestPostImageUrl(
+      (current) => current || `${window.location.origin}/brand/acadepost-logo.png`
+    );
+  }, []);
 
   const editCredential = useCallback(
     (credential: ProviderCredential) => {
@@ -300,6 +367,62 @@ export const ProviderCredentialsComponent: FC = () => {
       setIsTesting(false);
     }
   }, [credentialList, draft.id, testCredential]);
+
+  const testPostDraftCredential = useCallback(async () => {
+    if (!draft.id) {
+      return;
+    }
+    if (!testPostIntegrationId) {
+      toaster.show('Choisissez une destination pour le test post', 'warning');
+      return;
+    }
+
+    setIsTestingPost(true);
+    try {
+      const response = await fetch(`/provider-credentials/${draft.id}/test-post`, {
+        method: 'POST',
+        body: JSON.stringify({
+          integrationId: testPostIntegrationId,
+          message: testPostMessage,
+          imageUrl: testPostImageUrl,
+        }),
+      });
+      const responseText = await response.text();
+      let details: any = {};
+      try {
+        details = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        details = { message: responseText };
+      }
+      if (!response.ok) {
+        toaster.show(
+          details?.message || details?.error || 'Test post impossible',
+          'warning'
+        );
+        return;
+      }
+
+      await mutate();
+      toaster.show(
+        details?.releaseURL
+          ? `Test post publié: ${details.releaseURL}`
+          : 'Test post publié',
+        'success'
+      );
+    } catch (error: any) {
+      toaster.show(error?.message || 'Test post impossible', 'warning');
+    } finally {
+      setIsTestingPost(false);
+    }
+  }, [
+    draft.id,
+    fetch,
+    mutate,
+    testPostIntegrationId,
+    testPostImageUrl,
+    testPostMessage,
+    toaster,
+  ]);
 
   const deleteCredential = useCallback(
     async (credential: ProviderCredential) => {
@@ -497,6 +620,70 @@ export const ProviderCredentialsComponent: FC = () => {
               </button>
             )}
           </div>
+
+          {draft.id && (
+            <div className="acadepost-credentials-testpost">
+              <div>
+                <p className="acadepost-credentials-kicker">
+                  Publication test
+                </p>
+                <strong>Tester le post provider</strong>
+                <span>
+                  Envoie un vrai post de test via cet identifiant vers une
+                  destination connectée.
+                </span>
+              </div>
+              <label className="acadepost-credentials-field">
+                Destination
+                <select
+                  value={testPostIntegrationId}
+                  onChange={(event) =>
+                    setTestPostIntegrationId(event.target.value)
+                  }
+                  disabled={!destinationsForCurrentProvider.length}
+                >
+                  {destinationsForCurrentProvider.map((destination) => (
+                    <option key={destination.id} value={destination.id}>
+                      {destination.name}
+                      {destination.display ? ` · ${destination.display}` : ''}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="acadepost-credentials-field">
+                Message HTML
+                <textarea
+                  value={testPostMessage}
+                  onChange={(event) => setTestPostMessage(event.target.value)}
+                  rows={3}
+                />
+              </label>
+              <label className="acadepost-credentials-field">
+                Image URL
+                <input
+                  value={testPostImageUrl}
+                  onChange={(event) => setTestPostImageUrl(event.target.value)}
+                  placeholder="https://..."
+                />
+              </label>
+              <button
+                type="button"
+                className="acadepost-credentials-button"
+                disabled={
+                  isTestingPost || !destinationsForCurrentProvider.length
+                }
+                onClick={testPostDraftCredential}
+              >
+                {isTestingPost ? 'Publication en cours' : 'Envoyer test post'}
+              </button>
+              {!destinationsForCurrentProvider.length && (
+                <div className="acadepost-credentials-muted">
+                  Aucune destination active pour ce provider. Connectez un canal
+                  avant de tester une publication.
+                </div>
+              )}
+            </div>
+          )}
 
           {!!currentProvider.notes?.length && (
             <div className="acadepost-credentials-notes">

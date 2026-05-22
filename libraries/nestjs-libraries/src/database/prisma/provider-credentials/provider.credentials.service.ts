@@ -11,12 +11,22 @@ import { ProviderLogsService } from '@gitroom/nestjs-libraries/database/prisma/p
 import {
   ProviderCredentialDto,
   ProviderCredentialIdentifier,
+  ProviderCredentialTestPostDto,
 } from '@gitroom/nestjs-libraries/dtos/provider-credentials/provider.credentials.dto';
 import {
   PROVIDER_CREDENTIAL_DEFINITION_MAP,
   PROVIDER_CREDENTIAL_DEFINITIONS,
   PROVIDER_CREDENTIAL_LOOKUP,
 } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.registry';
+import { IntegrationRepository } from '@gitroom/nestjs-libraries/database/prisma/integrations/integration.repository';
+import { IntegrationManager } from '@gitroom/nestjs-libraries/integrations/integration.manager';
+import { PostResponse } from '@gitroom/nestjs-libraries/integrations/social/social.integrations.interface';
+import type { MediaContent } from '@gitroom/nestjs-libraries/integrations/social/social.integrations.interface';
+import {
+  fallbackProviderOperationId,
+  getExplicitProviderOperationId,
+} from '@gitroom/nestjs-libraries/integrations/provider.operations';
+import { resolveTelegramOperation } from '@gitroom/nestjs-libraries/integrations/social/telegram.operations';
 
 type EncryptedPayload = {
   v: 1;
@@ -37,6 +47,8 @@ export type ProviderRuntimeCredentials = {
 export class ProviderCredentialsService {
   constructor(
     private _providerCredentialsRepository: ProviderCredentialsRepository,
+    private _integrationRepository: IntegrationRepository,
+    private _integrationManager: IntegrationManager,
     @Optional()
     private _providerLogsService?: ProviderLogsService
   ) {}
@@ -184,6 +196,127 @@ export class ProviderCredentialsService {
           providerIdentifier,
         },
         errorSummary: error,
+      });
+      throw error;
+    }
+  }
+
+  async testPost(
+    orgId: string,
+    id: string,
+    body?: ProviderCredentialTestPostDto
+  ) {
+    if (!body?.integrationId) {
+      throw new BadRequestException('Destination is required');
+    }
+
+    const credential = await this._providerCredentialsRepository.get(orgId, id);
+    if (!credential || !credential.enabled) {
+      throw new NotFoundException('Credential not found');
+    }
+
+    const integration = await this._integrationRepository.getIntegrationById(
+      orgId,
+      body.integrationId
+    );
+    if (!integration || integration.deletedAt) {
+      throw new NotFoundException('Destination not found');
+    }
+    if (integration.disabled || integration.refreshNeeded) {
+      throw new BadRequestException('Destination is not ready');
+    }
+
+    const lookup = this.lookupFor(integration.providerIdentifier);
+    if (!lookup.includes(credential.providerIdentifier as any)) {
+      throw new BadRequestException(
+        'Credential does not match destination provider'
+      );
+    }
+
+    const provider = this._integrationManager.getSocialIntegration(
+      integration.providerIdentifier
+    );
+    const message =
+      typeof body?.message === 'string' && body.message.trim()
+        ? body.message.trim()
+        : `AcadéPost test post ${new Date().toISOString()}`;
+    const imageUrl =
+      typeof body?.imageUrl === 'string' && body.imageUrl.trim()
+        ? body.imageUrl.trim()
+        : '';
+    const media: MediaContent[] = imageUrl
+      ? [
+          {
+            type: 'image',
+            path: imageUrl,
+          },
+        ]
+      : [];
+    const postDetails = [
+      {
+        id: `provider-test-${Date.now()}`,
+        message,
+        settings: {
+          providerOperation: body?.operationId
+            ? {
+                operationId: body.operationId,
+                source: 'test-post',
+              }
+            : undefined,
+        },
+        media,
+      },
+    ];
+    const operationId = this.resolveTestPostOperationId(
+      integration.providerIdentifier,
+      postDetails[0]
+    );
+    const startedAt = Date.now();
+    const attempt = await this.createTestPostAttempt({
+      orgId,
+      providerIdentifier: integration.providerIdentifier,
+      providerCredentialId: id,
+      integrationId: integration.id,
+      operationId,
+      message,
+      mediaCount: media.length,
+      startedAt,
+    });
+
+    try {
+      const clientInformation = await this.resolveClientInformationByCredentialId(
+        orgId,
+        integration.providerIdentifier,
+        id
+      );
+      const response = (await (provider as any).post(
+        integration.internalId,
+        integration.token,
+        postDetails,
+        integration,
+        clientInformation
+      )) as PostResponse[];
+
+      await this.completeTestPostAttempt(attempt?.id, {
+        status: 'completed',
+        response,
+        startedAt,
+      });
+      await this._providerCredentialsRepository.markUsed(orgId, id);
+
+      const firstResponse = response?.[0];
+      return {
+        ok: true,
+        status: firstResponse?.status || 'completed',
+        releaseId: firstResponse?.postId,
+        releaseURL: firstResponse?.releaseURL,
+        response,
+      };
+    } catch (error) {
+      await this.completeTestPostAttempt(attempt?.id, {
+        status: 'failed',
+        error,
+        startedAt,
       });
       throw error;
     }
@@ -405,6 +538,104 @@ export class ProviderCredentialsService {
           ? `Credential test failed: ${error.message}`
           : 'Credential test failed'
       );
+    }
+  }
+
+  private resolveTestPostOperationId(
+    providerIdentifier: string,
+    postDetails: {
+      message?: string;
+      settings?: any;
+      media?: any[];
+      operation?: unknown;
+    }
+  ) {
+    if (providerIdentifier === 'telegram') {
+      try {
+        return resolveTelegramOperation(postDetails).id;
+      } catch {
+        return (
+          getExplicitProviderOperationId(postDetails) ||
+          fallbackProviderOperationId(providerIdentifier)
+        );
+      }
+    }
+
+    return (
+      getExplicitProviderOperationId(postDetails) ||
+      fallbackProviderOperationId(providerIdentifier)
+    );
+  }
+
+  private async createTestPostAttempt(input: {
+    orgId: string;
+    providerIdentifier: string;
+    providerCredentialId: string;
+    integrationId: string;
+    operationId: string;
+    message: string;
+    mediaCount: number;
+    startedAt: number;
+  }) {
+    if (!this._providerLogsService) {
+      return undefined;
+    }
+
+    try {
+      return await this._providerLogsService.createPublishAttempt({
+        organizationId: input.orgId,
+        integrationId: input.integrationId,
+        providerCredentialId: input.providerCredentialId,
+        providerIdentifier: input.providerIdentifier,
+        operationId: input.operationId,
+        status: 'started',
+        startedAt: new Date(input.startedAt),
+        requestSummary: {
+          action: 'test-post',
+          messageLength: input.message.length,
+          mediaCount: input.mediaCount,
+        },
+      });
+    } catch {
+      return undefined;
+    }
+  }
+
+  private async completeTestPostAttempt(
+    attemptId: string | undefined,
+    input: {
+      status: 'completed' | 'failed';
+      response?: Array<{
+        postId?: string;
+        releaseURL?: string;
+        status?: string;
+      }>;
+      error?: unknown;
+      startedAt: number;
+    }
+  ) {
+    if (!this._providerLogsService || !attemptId) {
+      return;
+    }
+
+    try {
+      const firstResponse = input.response?.[0];
+      await this._providerLogsService.updatePublishAttempt(attemptId, {
+        status: input.status,
+        providerStatus: firstResponse?.status || input.status,
+        responseSummary: input.response?.map((response) => ({
+          postId: response.postId,
+          releaseURL: response.releaseURL,
+          status: response.status,
+        })),
+        error: input.error,
+        releaseId: firstResponse?.postId,
+        releaseURL: firstResponse?.releaseURL,
+        durationMs: Date.now() - input.startedAt,
+        completedAt: new Date(),
+      });
+    } catch {
+      return;
     }
   }
 

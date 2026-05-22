@@ -13,6 +13,7 @@ import { GetOrgFromRequest } from '@gitroom/nestjs-libraries/user/org.from.reque
 import { ProviderCredentialsService } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.service';
 import {
   ProviderCredentialDto,
+  ProviderCredentialTestPostDto,
   UpdateProviderCredentialDto,
 } from '@gitroom/nestjs-libraries/dtos/provider-credentials/provider.credentials.dto';
 import { CheckPolicies } from '@gitroom/backend/services/auth/permissions/permissions.ability';
@@ -69,6 +70,16 @@ export class ProviderCredentialsController {
   @CheckPolicies([AuthorizationActions.Update, Sections.ADMIN])
   test(@GetOrgFromRequest() org: Organization, @Param('id') id: string) {
     return this._providerCredentialsService.test(org.id, id);
+  }
+
+  @Post('/:id/test-post')
+  @CheckPolicies([AuthorizationActions.Update, Sections.ADMIN])
+  testPost(
+    @GetOrgFromRequest() org: Organization,
+    @Param('id') id: string,
+    @Body() body: ProviderCredentialTestPostDto
+  ) {
+    return this._providerCredentialsService.testPost(org.id, id, body);
   }
 
   @Delete('/:id')

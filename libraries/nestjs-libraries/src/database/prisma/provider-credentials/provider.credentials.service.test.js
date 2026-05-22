@@ -25,6 +25,17 @@ describe('provider credential service', () => {
     expect(source).not.toContain('requestSummary: fields');
   });
 
+  it('supports real provider test posts with publish attempt logging', () => {
+    expect(source).toContain('async testPost(');
+    expect(source).toContain("action: 'test-post'");
+    expect(source).toContain('createPublishAttempt({');
+    expect(source).toContain('updatePublishAttempt(attemptId,');
+    expect(source).toContain('resolveClientInformationByCredentialId(');
+    expect(source).toContain('.post(');
+    expect(source).toContain('imageUrl');
+    expect(source).toContain('mediaCount: input.mediaCount');
+  });
+
   const loadGetEncryptionKey = () => {
     const match = source.match(
       /  private getEncryptionKey\(\) \{[\s\S]*?\n  \}\n\n  private maskFields/

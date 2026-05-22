@@ -99,37 +99,47 @@
 :root {
   --acadepost-button-radius: 999px;
   --acadepost-button-border: rgba(255, 255, 255, 0.16);
-  --acadepost-button-shadow: 0 14px 30px -18px rgba(0, 0, 0, 0.55),
-    0 1px 2px rgba(0, 0, 0, 0.18);
   --acadepost-card-radius: 12px;
   --acadepost-card-shadow: var(--acadepost-shadow);
 
   .dark {
-    --acadepost-button-primary-bg: linear-gradient(
-      135deg,
-      #4cccb8 0%,
-      #73dccd 46%,
-      #fda100 145%
-    );
+    --acadepost-button-primary-bg: #4cccb8;
     --acadepost-button-primary-text: #050505;
-    --acadepost-button-secondary-bg: linear-gradient(135deg, #181818 0%, #101010 100%);
+    --acadepost-button-secondary-bg: #101010;
     --acadepost-button-secondary-text: #ffffff;
+    --acadepost-button-border: rgba(76, 204, 184, 0.26);
+    --acadepost-button-shadow: 0 14px 32px -20px rgba(76, 204, 184, 0.72),
+      0 1px 2px rgba(0, 0, 0, 0.44);
     --acadepost-surface-card-bg: #101010;
     --acadepost-surface-card-border: rgba(76, 204, 184, 0.2);
+    --acadepost-readable-accent: #4cccb8;
+    --acadepost-readable-warm: #fda100;
+    --acadepost-success-pill-bg: rgba(76, 204, 184, 0.12);
+    --acadepost-success-pill-border: rgba(76, 204, 184, 0.42);
+    --acadepost-success-pill-text: #73dccd;
+    --acadepost-error-pill-bg: rgba(253, 161, 0, 0.12);
+    --acadepost-error-pill-border: rgba(253, 161, 0, 0.5);
+    --acadepost-error-pill-text: #fda100;
   }
 
   .light {
-    --acadepost-button-primary-bg: linear-gradient(
-      135deg,
-      #050505 0%,
-      #101010 52%,
-      #296f65 135%
-    );
+    --acadepost-button-primary-bg: #050505;
     --acadepost-button-primary-text: #ffffff;
-    --acadepost-button-secondary-bg: linear-gradient(135deg, #ffffff 0%, #f4f4f4 100%);
+    --acadepost-button-secondary-bg: #ffffff;
     --acadepost-button-secondary-text: #101010;
+    --acadepost-button-border: rgba(16, 16, 16, 0.14);
+    --acadepost-button-shadow: 0 18px 30px -24px rgba(0, 0, 0, 0.52),
+      0 1px 2px rgba(0, 0, 0, 0.12);
     --acadepost-surface-card-bg: #ffffff;
     --acadepost-surface-card-border: rgba(16, 16, 16, 0.1);
+    --acadepost-readable-accent: #087568;
+    --acadepost-readable-warm: #a46200;
+    --acadepost-success-pill-bg: rgba(8, 117, 104, 0.1);
+    --acadepost-success-pill-border: rgba(8, 117, 104, 0.28);
+    --acadepost-success-pill-text: #075f55;
+    --acadepost-error-pill-bg: rgba(164, 98, 0, 0.1);
+    --acadepost-error-pill-border: rgba(164, 98, 0, 0.28);
+    --acadepost-error-pill-text: #884f00;
   }
 }
 
@@ -145,23 +155,26 @@
   gap: 8px;
   justify-content: center;
   letter-spacing: 0;
-  min-height: 40px;
-  padding: 0 18px;
+  line-height: 1.15;
+  min-height: 42px;
+  min-width: max-content;
+  padding: 0 20px;
   transition:
     box-shadow 180ms ease,
     filter 180ms ease,
     transform 180ms ease;
+  text-align: center;
   white-space: nowrap;
 }
 
 .acadepost-button-primary {
-  background: var(--acadepost-button-primary-bg);
-  color: var(--acadepost-button-primary-text);
+  background: var(--acadepost-button-primary-bg) !important;
+  color: var(--acadepost-button-primary-text) !important;
 }
 
 .acadepost-button-secondary {
-  background: var(--acadepost-button-secondary-bg);
-  color: var(--acadepost-button-secondary-text);
+  background: var(--acadepost-button-secondary-bg) !important;
+  color: var(--acadepost-button-secondary-text) !important;
 }
 
 .acadepost-button-primary:hover,
@@ -178,11 +191,46 @@
   transform: none;
 }
 
+.acadepost-button-primary > *,
+.acadepost-button-secondary > * {
+  min-width: 0;
+}
+
 .acadepost-surface-card {
   background: var(--acadepost-surface-card-bg);
   border: 1px solid var(--acadepost-surface-card-border);
   border-radius: var(--acadepost-card-radius);
   box-shadow: var(--acadepost-card-shadow);
+}
+
+.acadepost-readable-accent {
+  color: var(--acadepost-readable-accent) !important;
+}
+
+.acadepost-readable-warm {
+  color: var(--acadepost-readable-warm) !important;
+}
+
+.acadepost-link {
+  color: var(--acadepost-readable-accent);
+}
+
+.acadepost-status-pill {
+  border: 1px solid var(--new-table-border);
+  background: var(--new-bgColorInner);
+  color: rgb(var(--new-textColor));
+}
+
+.acadepost-status-pill.is-success {
+  border-color: var(--acadepost-success-pill-border);
+  background: var(--acadepost-success-pill-bg);
+  color: var(--acadepost-success-pill-text);
+}
+
+.acadepost-status-pill.is-error {
+  border-color: var(--acadepost-error-pill-border);
+  background: var(--acadepost-error-pill-bg);
+  color: var(--acadepost-error-pill-text);
 }
 
 :root {

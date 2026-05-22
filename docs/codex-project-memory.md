@@ -42,3 +42,16 @@ Domains, ports, database URLs, OAuth callbacks, and secrets belong in `.env` or 
 `_byan/` is the local BYAN framework source. `_byan-output/` is generated session state and must not be committed.
 
 If `_byan-output/` or `reports/` appear in `git status` as tracked files, remove them from Git and keep them ignored.
+
+## Provider Pipeline Delivery Pattern
+
+For provider-pipeline work, use the flow that worked for the v1.1.8 rollout:
+
+- Keep the branch isolated from `main`, push a named feature branch, and use a pinned GHCR SHA tag for server updates.
+- Build from the supplied publishing pipeline diagram, not just from ad hoc UI ideas:
+  `Editor -> Template -> Destination -> Operation -> Provider Options -> Publish/Schedule -> Result -> Provider Publish Attempt Log`, with `Provider Connection Log` as the credential/destination support lane.
+- Treat `design.md` as the UI contract. Check both dark and light themes for contrast, button padding safe zones, shadows, and broken text.
+- Run targeted Jest tests, Prisma validate, backend build, frontend build, orchestrator build, GitHub Actions image smoke, then server health checks.
+- Do a review pass before deployment. Findings first if this is a formal review; otherwise record the self-review result and remaining risks.
+- Deploy by changing `.env.demo.shared-infra` to the pinned image, backing it up, running one controlled Prisma `db push`, then recreating runtime services through `deploy/demo/update.sh`.
+- Verify the live domain with `/api/monitor/ready`, compose health, image IDs, route accessibility, and backend route registration logs.

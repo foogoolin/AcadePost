@@ -13,7 +13,9 @@ This file is the canonical quick contract for new AcadéPost UI work. The longer
 ## Components
 
 - Primary routing/status actions use pill shapes.
-- Primary buttons must feel deliberate: subtle gradient, quiet shadow, clear hover/focus, no flat low-effort blocks.
+- Primary buttons must feel deliberate: solid theme color, quiet shadow, clear hover/focus, no flat low-effort blocks.
+- Do not use mint-to-amber gradients in product UI. Use shadows instead: black shadows in light theme, mint/accent shadows in dark theme.
+- Buttons need consistent safe zones: no label should sit close to the edge; use shared AcadéPost button utilities or match their min-height, padding, line-height, and gap.
 - Cards use 12px radius with subtle shadows or quiet borders.
 - Keep most UI monochrome; use mint for active states and amber for secondary emphasis.
 - Preserve dark and light theme parity.

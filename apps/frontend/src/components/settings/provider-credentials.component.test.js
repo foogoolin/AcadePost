@@ -15,4 +15,13 @@ describe('provider credentials settings UI', () => {
     expect(buttonTags.length).toBeGreaterThan(0);
     expect(buttonTags.filter((tag) => !/\btype=/.test(tag))).toEqual([]);
   });
+
+  it('exposes a destination-based provider test post action', () => {
+    expect(source).toContain('/integrations/list');
+    expect(source).toContain('/test-post');
+    expect(source).toContain('testPostIntegrationId');
+    expect(source).toContain('testPostImageUrl');
+    expect(source).toContain('<s>barré</s>');
+    expect(source).toContain('Envoyer test post');
+  });
 });

@@ -56,3 +56,21 @@ export class ProviderCredentialDto {
 }
 
 export class UpdateProviderCredentialDto extends ProviderCredentialDto {}
+
+export class ProviderCredentialTestPostDto {
+  @IsDefined()
+  @IsString()
+  integrationId: string;
+
+  @IsOptional()
+  @IsString()
+  message?: string;
+
+  @IsOptional()
+  @IsString()
+  operationId?: string;
+
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
+}

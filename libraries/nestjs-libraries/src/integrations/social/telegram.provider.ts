@@ -21,6 +21,7 @@ import {
 
 // Added to support local storage posting
 const frontendURL = process.env.FRONTEND_URL || 'http://localhost:5000';
+const normalizedFrontendURL = frontendURL.replace(/\/$/, '');
 const mediaStorage = process.env.STORAGE_PROVIDER || 'local';
 
 type TelegramProcessedMedia = {
@@ -192,8 +193,11 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
   ): TelegramProcessedMedia[] {
     return (mediaFiles || []).map((media) => {
       let mediaUrl = media.path;
-      if (mediaStorage === 'local' && mediaUrl.startsWith(frontendURL)) {
-        mediaUrl = mediaUrl.replace(frontendURL, '');
+      if (
+        mediaStorage === 'local' &&
+        mediaUrl.startsWith(`${normalizedFrontendURL}/uploads/`)
+      ) {
+        mediaUrl = mediaUrl.replace(normalizedFrontendURL, '');
       }
       //get mime type to pass contentType to telegram api.
       //some photos and videos might not pass telegram api restrictions, so they are sent as documents instead of returning errors
@@ -219,6 +223,34 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
     });
   }
 
+  private normalizeHtmlText(message: string) {
+    return striptags(message || '', [
+      'b',
+      'strong',
+      'i',
+      'em',
+      'u',
+      'ins',
+      's',
+      'strike',
+      'del',
+      'code',
+      'pre',
+      'blockquote',
+      'tg-spoiler',
+      'p',
+    ])
+      .replace(/<strong>/g, '<b>')
+      .replace(/<\/strong>/g, '</b>')
+      .replace(/<em>/g, '<i>')
+      .replace(/<\/em>/g, '</i>')
+      .replace(/<ins>/g, '<u>')
+      .replace(/<\/ins>/g, '</u>')
+      .replace(/<(strike|del)>/g, '<s>')
+      .replace(/<\/(strike|del)>/g, '</s>')
+      .replace(/<p>(.*?)<\/p>/gs, '$1\n');
+  }
+
   private async sendMessage(
     telegramBot: TelegramBot,
     accessToken: string,
@@ -227,10 +259,7 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
   ): Promise<number | null> {
     let messageId: number | null = null;
     const mediaFiles = message.media || [];
-    const text = striptags(message.message || '', ['u', 'strong', 'p'])
-      .replace(/<strong>/g, '<b>')
-      .replace(/<\/strong>/g, '</b>')
-      .replace(/<p>(.*?)<\/p>/g, '$1\n');
+    const text = this.normalizeHtmlText(message.message || '');
 
     const processedMedia = this.processMedia(mediaFiles);
     const messageOperation = message as {

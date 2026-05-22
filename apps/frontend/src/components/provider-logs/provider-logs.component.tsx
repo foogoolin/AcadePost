@@ -79,12 +79,12 @@ interface ConnectionLogRow {
 const statusTone = (status: string) => {
   const normalized = status.toLowerCase();
   if (['success', 'completed', 'published'].includes(normalized)) {
-    return 'border-[#4cccb8]/40 bg-[#4cccb8]/10 text-[#4cccb8]';
+    return 'acadepost-status-pill is-success';
   }
   if (['failure', 'failed', 'error'].includes(normalized)) {
-    return 'border-[#fda100]/50 bg-[#fda100]/10 text-[#fda100]';
+    return 'acadepost-status-pill is-error';
   }
-  return 'border-newTableBorder bg-newBgColorInner text-textColor';
+  return 'acadepost-status-pill';
 };
 
 const displayJson = (value: unknown) => {
@@ -237,7 +237,7 @@ const ProviderFilters: FC<{
             className={clsx(
               'h-[38px] rounded-[6px] px-[10px] text-[13px] font-[700] transition',
               mode === value
-                ? 'acadepost-button-primary text-white'
+                ? 'acadepost-button-primary'
                 : 'text-textColor opacity-75 hover:opacity-100'
             )}
           >
@@ -351,7 +351,7 @@ const PublishAttemptsTable: FC<{
               <a
                 href={row.releaseURL}
                 target="_blank"
-                className="truncate text-[#4cccb8] underline-offset-2 hover:underline"
+                className="acadepost-link truncate underline-offset-2 hover:underline"
               >
                 open
               </a>
@@ -482,7 +482,7 @@ export const ProviderLogsComponent: FC = () => {
     <div className="flex min-h-0 flex-1 flex-col gap-[14px] overflow-auto bg-newBgColor p-[14px] text-textColor md:p-[20px]">
       <div className="flex flex-col gap-[8px] lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <div className="text-[12px] font-[700] uppercase tracking-[0.04em] text-[#4cccb8]">
+          <div className="acadepost-readable-accent text-[12px] font-[700] uppercase tracking-[0.04em]">
             Provider Publishing Pipeline
           </div>
           <h2 className="text-[24px] font-[800] leading-tight">
@@ -526,7 +526,7 @@ export const ProviderLogsComponent: FC = () => {
             <LoadingComponent />
           </div>
         ) : error ? (
-          <div className="p-[18px] text-[#fda100]">
+          <div className="acadepost-readable-warm p-[18px]">
             Failed to load provider logs.
           </div>
         ) : !data || data.items.length === 0 ? (
