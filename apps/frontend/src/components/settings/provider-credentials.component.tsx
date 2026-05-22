@@ -528,7 +528,7 @@ export const ProviderCredentialsComponent: FC = () => {
           )}
         </aside>
 
-        <main className="acadepost-credentials-card editor">
+        <main className="acadepost-credentials-card credentials-editor">
           <div className="acadepost-credentials-title-row">
             <div>
               <p className="acadepost-credentials-kicker">Configuration</p>
