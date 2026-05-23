@@ -55,7 +55,7 @@ export const AddProviderButton: FC<{
     <div className="flex group-[.sidebar]:block gap-[8px]">
       <button
         type="button"
-        className="acadepost-button-primary flex-1 group-[.sidebar]:w-[100%] group-[.sidebar]:flex-none h-[44px] text-[14px]"
+        className="acadepost-button-primary acadepost-button-standard flex-1 group-[.sidebar]:w-[100%] group-[.sidebar]:flex-none"
         onClick={add}
       >
         <div>
@@ -87,7 +87,7 @@ export const AddProviderButton: FC<{
           'invite_link',
           'Envoyer un lien d’invitation pour ajouter une destination'
         )}
-        className="acadepost-button-secondary group-[.sidebar]:hidden !min-h-[44px] !min-w-[44px] !w-[44px] !px-0"
+        className="acadepost-button-secondary acadepost-button-standard acadepost-button-square group-[.sidebar]:hidden !min-w-[42px] !w-[42px]"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -477,22 +477,21 @@ export const AddProviderComponent: FC<{
   }, [fetch]);
 
   const enabledCredentialsByProvider = useMemo(() => {
-    return providerCredentials.reduce<Record<string, ProviderCredentialOption[]>>(
-      (all, credential) => {
-        if (!credential.enabled) {
-          return all;
-        }
+    return providerCredentials.reduce<
+      Record<string, ProviderCredentialOption[]>
+    >((all, credential) => {
+      if (!credential.enabled) {
+        return all;
+      }
 
-        return {
-          ...all,
-          [credential.providerIdentifier]: [
-            ...(all[credential.providerIdentifier] || []),
-            credential,
-          ],
-        };
-      },
-      {}
-    );
+      return {
+        ...all,
+        [credential.providerIdentifier]: [
+          ...(all[credential.providerIdentifier] || []),
+          credential,
+        ],
+      };
+    }, {});
   }, [providerCredentials]);
 
   const chooseCredential = useCallback(
@@ -528,20 +527,20 @@ export const AddProviderComponent: FC<{
   );
   const getSocialLink = useCallback(
     (
-      invite: boolean,
-      identifier: string,
-      providerName: string,
-      isExternal: boolean,
-      isWeb3: boolean,
-      isChromeExtension?: boolean,
-      customFields?: Array<{
-        key: string;
-        label: string;
-        validation: string;
-        defaultValue?: string;
-        type: 'text' | 'password';
-      }>
-    ) =>
+        invite: boolean,
+        identifier: string,
+        providerName: string,
+        isExternal: boolean,
+        isWeb3: boolean,
+        isChromeExtension?: boolean,
+        customFields?: Array<{
+          key: string;
+          label: string;
+          validation: string;
+          defaultValue?: string;
+          type: 'text' | 'password';
+        }>
+      ) =>
       async () => {
         const onboardingParam = onboarding ? 'onboarding=true' : '';
         const credentialId = await chooseCredential(identifier, providerName);
@@ -671,7 +670,10 @@ export const AddProviderComponent: FC<{
           }
           if (!extensionId || !chrome?.runtime?.sendMessage) {
             modal.openModal({
-              title: t('extension_not_available_title', 'Extension introuvable'),
+              title: t(
+                'extension_not_available_title',
+                'Extension introuvable'
+              ),
               withCloseButton: true,
               children: <ExtensionNotFound />,
             });
@@ -726,19 +728,18 @@ export const AddProviderComponent: FC<{
               );
               return;
             }
-            const { url } = await (
-              // selected credential is bound to the temporary state on the
-              // backend; it is not sent to the final callback URL.
-              await fetch(
-                `/integrations/social/${identifier}${
-                  [onboardingParam, credentialParam].filter(Boolean).length
-                    ? `?${[onboardingParam, credentialParam]
-                        .filter(Boolean)
-                        .join('&')}`
-                    : ''
-                }`
-              )
-            ).json();
+            // selected credential is bound to the temporary state on the
+            // backend; it is not sent to the final callback URL.
+            const response = await fetch(
+              `/integrations/social/${identifier}${
+                [onboardingParam, credentialParam].filter(Boolean).length
+                  ? `?${[onboardingParam, credentialParam]
+                      .filter(Boolean)
+                      .join('&')}`
+                  : ''
+              }`
+            );
+            const { url } = await response.json();
             modal.closeAll();
             window.location.href = `/integrations/social/${identifier}?state=${url}&code=${Buffer.from(
               JSON.stringify(cookieResponse.cookies)

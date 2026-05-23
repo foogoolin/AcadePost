@@ -60,10 +60,20 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
   const ref = useRef(null);
   const existingData = useExistingData();
   const [loading, setLoading] = useState(false);
+  const [testingPost, setTestingPost] = useState(false);
   const toaster = useToaster();
   const modal = useModals();
   const [showSettings, setShowSettings] = useState(false);
   const { data: shortlinkPreferenceData } = useShortlinkPreference();
+  const persistedPostValueIds = useMemo(
+    () =>
+      new Set(
+        (existingData?.posts || [])
+          .map((post: any) => post.id)
+          .filter((id: string | undefined): id is string => Boolean(id))
+      ),
+    [existingData?.posts]
+  );
 
   const { addEditSets, mutate, customClose, dummy } = props;
 
@@ -394,7 +404,9 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
               providerOperation,
             },
             value: post.values.map((value: any) => ({
-              ...(value.id ? { id: value.id } : {}),
+              ...(value.id && persistedPostValueIds.has(value.id)
+                ? { id: value.id }
+                : {}),
               content: value.content,
               delay: value.delay || 0,
               image:
@@ -466,6 +478,204 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
       providerSelections,
     ]
   );
+
+  const testCurrentPost = useCallback(async () => {
+    if (selectedIntegrations.length === 0) {
+      toaster.show(
+        t(
+          'choose_destination_before_test',
+          'Choose a destination before testing'
+        ),
+        'warning'
+      );
+      return;
+    }
+
+    const checkAllValid = await ref.current.checkAllValid();
+    const target =
+      current !== 'global'
+        ? checkAllValid.find((item: any) => item.integration.id === current)
+        : selectedIntegrations.length === 1
+        ? checkAllValid[0]
+        : undefined;
+
+    if (!target) {
+      toaster.show(
+        t(
+          'choose_one_destination_before_test',
+          'Choose one destination tab before testing this post.'
+        ),
+        'warning'
+      );
+      return;
+    }
+
+    const hasContent = target.values.some((value: any) => {
+      const content = stripHtmlValidation('normal', value.content, true).trim();
+      return content.length > 0 || (value.media || []).length > 0;
+    });
+
+    if (!hasContent) {
+      toaster.show(
+        t(
+          'post_needs_content_or_image',
+          'Your post should have at least one character or one image.'
+        ),
+        'warning'
+      );
+      target.preview();
+      return;
+    }
+
+    if (target.valid === false) {
+      toaster.show(
+        `${capitalize(target.integration.identifier.split('-')[0])} (${
+          target.integration.name
+        }): ${t('please_fix_your_settings', 'Please fix your settings')}`,
+        'warning'
+      );
+      target.fix();
+      setShowSettings(true);
+      return;
+    }
+
+    if (target.errors !== true) {
+      toaster.show(
+        `${capitalize(target.integration.identifier.split('-')[0])} (${
+          target.integration.name
+        }): ${target.errors}`,
+        'warning'
+      );
+      target.preview();
+      setShowSettings(false);
+      return;
+    }
+
+    const firstTooLong = target.values.find((value: any) => {
+      const strip = stripHtmlValidation('normal', value.content, true);
+      const totalCharacters = Math.max(
+        countCharacters(strip, target?.integration?.identifier || ''),
+        strip.length
+      );
+      return totalCharacters > (target.maximumCharacters || 1000000);
+    });
+
+    if (firstTooLong) {
+      toaster.show(
+        `${target?.integration?.name} (${target?.integration?.identifier}) ${t(
+          'post_is_too_long',
+          'post is too long, please fix it'
+        )}`,
+        'warning'
+      );
+      target.preview();
+      return;
+    }
+
+    const providerOperation = buildComposerDestinationContract({
+      destinationId: target.integration.id,
+      providerIdentifier: target.integration.identifier,
+      stored: providerSelections[target.integration.id],
+      values: target.values,
+    });
+    const message =
+      target.values
+        .map((value: any) => value.content || '')
+        .filter((content: string) => content.trim())
+        .join('\n\n') || undefined;
+    const mediaUrls = target.values
+      .flatMap((value: any) => value.media || [])
+      .map((media: any) => media.path || media.url || '')
+      .filter(Boolean)
+      .map((mediaPath: string) => {
+        try {
+          return new URL(mediaPath, window.location.origin).href;
+        } catch {
+          return mediaPath;
+        }
+      });
+
+    const resolveCredentialId = async () => {
+      if (target.integration.providerCredentialId) {
+        return target.integration.providerCredentialId;
+      }
+
+      const response = await fetch('/provider-credentials');
+      if (!response.ok) {
+        return '';
+      }
+
+      const credentials = (await response.json()) || [];
+      const matches = credentials.filter(
+        (credential: any) =>
+          credential.enabled &&
+          credential.providerIdentifier === target.integration.identifier
+      );
+
+      return matches.length === 1 ? matches[0].id : '';
+    };
+
+    setTestingPost(true);
+    try {
+      const credentialId = await resolveCredentialId();
+      if (!credentialId) {
+        toaster.show(
+          t(
+            'no_provider_credential_for_test_post',
+            'No single enabled credential is linked to this destination.'
+          ),
+          'warning'
+        );
+        return;
+      }
+
+      const response = await fetch(
+        `/provider-credentials/${credentialId}/test-post`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            integrationId: target.integration.id,
+            message,
+            mediaUrls,
+            operationId: providerOperation.operationId,
+          }),
+        }
+      );
+      const responseText = await response.text();
+      let details: any = {};
+      try {
+        details = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        details = { message: responseText };
+      }
+
+      if (!response.ok) {
+        toaster.show(
+          details?.message || details?.error || 'Test post impossible',
+          'warning'
+        );
+        return;
+      }
+
+      toaster.show(
+        details?.releaseURL
+          ? `Test post publié: ${details.releaseURL}`
+          : 'Test post publié',
+        'success'
+      );
+    } catch (error: any) {
+      toaster.show(error?.message || 'Test post impossible', 'warning');
+    } finally {
+      setTestingPost(false);
+    }
+  }, [
+    current,
+    fetch,
+    providerSelections,
+    selectedIntegrations,
+    toaster,
+    t,
+  ]);
 
   return (
     <div className="w-full h-full flex-1 p-[40px] flex relative">
@@ -611,7 +821,10 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
               <button
                 type="button"
                 disabled={
-                  selectedIntegrations.length === 0 || loading || locked
+                  selectedIntegrations.length === 0 ||
+                  loading ||
+                  testingPost ||
+                  locked
                 }
                 onClick={schedule('draft')}
                 className="acadepost-button-secondary relative h-[44px] text-[15px]"
@@ -631,7 +844,10 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
                 type="button"
                 className="acadepost-button-primary h-[44px] min-w-[180px] text-[15px]"
                 disabled={
-                  selectedIntegrations.length === 0 || loading || locked
+                  selectedIntegrations.length === 0 ||
+                  loading ||
+                  testingPost ||
+                  locked
                 }
                 onClick={schedule('draft')}
               >
@@ -639,11 +855,36 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
               </button>
             )}
             {!addEditSets && (
+              <button
+                type="button"
+                disabled={
+                  selectedIntegrations.length === 0 ||
+                  loading ||
+                  testingPost ||
+                  locked
+                }
+                onClick={testCurrentPost}
+                className="acadepost-button-secondary relative h-[44px] text-[15px]"
+              >
+                {testingPost && (
+                  <div className="absolute left-[50%] top-[50%] -translate-y-[50%] -translate-x-[50%]">
+                    <div className="animate-spin h-[20px] w-[20px] rounded-full border-4 border-current border-t-transparent" />
+                  </div>
+                )}
+                <div className={clsx(testingPost && 'invisible')}>
+                  {t('test_post', 'Test post')}
+                </div>
+              </button>
+            )}
+            {!addEditSets && (
               <div className="group cursor-pointer relative">
                 <button
                   type="button"
                   disabled={
-                    selectedIntegrations.length === 0 || loading || locked
+                    selectedIntegrations.length === 0 ||
+                    loading ||
+                    testingPost ||
+                    locked
                   }
                   onClick={schedule('schedule')}
                   className="acadepost-button-primary relative h-[44px] min-w-[180px] text-[15px]"
@@ -681,13 +922,14 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
                     type="button"
                     onClick={schedule('now')}
                     disabled={
-                      selectedIntegrations.length === 0 || loading || locked
+                      selectedIntegrations.length === 0 ||
+                      loading ||
+                      testingPost ||
+                      locked
                     }
-                    className="acadepost-surface-card z-[300] hidden group-hover:flex w-[220px] absolute bottom-[100%] -left-[20px] p-[10px] disabled:cursor-not-allowed disabled:opacity-70"
+                    className="acadepost-button-secondary acadepost-button-standard post-now z-[300] hidden group-hover:flex w-[220px] absolute bottom-[100%] -left-[20px] disabled:cursor-not-allowed disabled:opacity-70"
                   >
-                    <div className="acadepost-button-secondary h-[44px] w-full post-now">
-                      {t('post_now', 'Post Now')}
-                    </div>
+                    {t('post_now', 'Post Now')}
                   </button>
                 )}
               </div>

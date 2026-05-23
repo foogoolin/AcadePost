@@ -73,4 +73,8 @@ export class ProviderCredentialTestPostDto {
   @IsOptional()
   @IsString()
   imageUrl?: string;
+
+  @IsOptional()
+  @IsString({ each: true })
+  mediaUrls?: string[];
 }

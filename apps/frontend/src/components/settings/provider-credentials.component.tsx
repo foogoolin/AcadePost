@@ -115,7 +115,7 @@ export const ProviderCredentialsComponent: FC = () => {
   const [draft, setDraft] = useState(emptyDraft);
   const [isSaving, setIsSaving] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
-  const [isTestingPost, setIsTestingPost] = useState(false);
+  const [testingPostCredentialId, setTestingPostCredentialId] = useState('');
   const [testPostIntegrationId, setTestPostIntegrationId] = useState('');
   const [testPostMessage, setTestPostMessage] = useState(
     defaultTestPostMessage
@@ -163,6 +163,7 @@ export const ProviderCredentialsComponent: FC = () => {
   const credentialList = (credentials || []) as ProviderCredential[];
   const integrationList = (integrationsData?.integrations ||
     []) as IntegrationDestination[];
+  const isTestingPost = Boolean(testingPostCredentialId);
   const currentProvider = useMemo(
     () =>
       providers.find(
@@ -179,16 +180,23 @@ export const ProviderCredentialsComponent: FC = () => {
       ),
     [credentialList, currentProvider?.identifier]
   );
-  const destinationsForCurrentProvider = useMemo(
-    () =>
+  const destinationsForProvider = useCallback(
+    (providerIdentifier: string) =>
       integrationList.filter(
         (integration) =>
-          integration.identifier === currentProvider?.identifier &&
+          integration.identifier === providerIdentifier &&
           !integration.disabled &&
           !integration.refreshNeeded &&
           !integration.inBetweenSteps
       ),
-    [currentProvider?.identifier, integrationList]
+    [integrationList]
+  );
+  const destinationsForCurrentProvider = useMemo(
+    () =>
+      currentProvider
+        ? destinationsForProvider(currentProvider.identifier)
+        : [],
+    [currentProvider, destinationsForProvider]
   );
 
   const groupedProviders = useMemo(() => {
@@ -256,7 +264,8 @@ export const ProviderCredentialsComponent: FC = () => {
     }
 
     setTestPostImageUrl(
-      (current) => current || `${window.location.origin}/brand/acadepost-logo.png`
+      (current) =>
+        current || `${window.location.origin}/brand/acadepost-logo.png`
     );
   }, []);
 
@@ -368,6 +377,75 @@ export const ProviderCredentialsComponent: FC = () => {
     }
   }, [credentialList, draft.id, testCredential]);
 
+  const testPostCredential = useCallback(
+    async (credential: ProviderCredential, requestedIntegrationId?: string) => {
+      if (!credential.enabled) {
+        toaster.show('Activez cet identifiant avant le test post', 'warning');
+        return;
+      }
+
+      const availableDestinations = destinationsForProvider(
+        credential.providerIdentifier
+      );
+      const destinationId =
+        requestedIntegrationId || availableDestinations[0]?.id || '';
+
+      if (!destinationId) {
+        toaster.show('Choisissez une destination pour le test post', 'warning');
+        return;
+      }
+
+      setTestingPostCredentialId(credential.id);
+      try {
+        const response = await fetch(
+          `/provider-credentials/${credential.id}/test-post`,
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              integrationId: destinationId,
+              message: testPostMessage,
+              imageUrl: testPostImageUrl,
+            }),
+          }
+        );
+        const responseText = await response.text();
+        let details: any = {};
+        try {
+          details = responseText ? JSON.parse(responseText) : {};
+        } catch {
+          details = { message: responseText };
+        }
+        if (!response.ok) {
+          toaster.show(
+            details?.message || details?.error || 'Test post impossible',
+            'warning'
+          );
+          return;
+        }
+
+        await mutate();
+        toaster.show(
+          details?.releaseURL
+            ? `Test post publié: ${details.releaseURL}`
+            : 'Test post publié',
+          'success'
+        );
+      } catch (error: any) {
+        toaster.show(error?.message || 'Test post impossible', 'warning');
+      } finally {
+        setTestingPostCredentialId('');
+      }
+    },
+    [
+      destinationsForProvider,
+      fetch,
+      mutate,
+      testPostImageUrl,
+      testPostMessage,
+      toaster,
+    ]
+  );
+
   const testPostDraftCredential = useCallback(async () => {
     if (!draft.id) {
       return;
@@ -377,50 +455,17 @@ export const ProviderCredentialsComponent: FC = () => {
       return;
     }
 
-    setIsTestingPost(true);
-    try {
-      const response = await fetch(`/provider-credentials/${draft.id}/test-post`, {
-        method: 'POST',
-        body: JSON.stringify({
-          integrationId: testPostIntegrationId,
-          message: testPostMessage,
-          imageUrl: testPostImageUrl,
-        }),
-      });
-      const responseText = await response.text();
-      let details: any = {};
-      try {
-        details = responseText ? JSON.parse(responseText) : {};
-      } catch {
-        details = { message: responseText };
-      }
-      if (!response.ok) {
-        toaster.show(
-          details?.message || details?.error || 'Test post impossible',
-          'warning'
-        );
-        return;
-      }
-
-      await mutate();
-      toaster.show(
-        details?.releaseURL
-          ? `Test post publié: ${details.releaseURL}`
-          : 'Test post publié',
-        'success'
-      );
-    } catch (error: any) {
-      toaster.show(error?.message || 'Test post impossible', 'warning');
-    } finally {
-      setIsTestingPost(false);
+    const credential = credentialList.find((item) => item.id === draft.id);
+    if (!credential) {
+      return;
     }
+
+    await testPostCredential(credential, testPostIntegrationId);
   }, [
+    credentialList,
     draft.id,
-    fetch,
-    mutate,
+    testPostCredential,
     testPostIntegrationId,
-    testPostImageUrl,
-    testPostMessage,
     toaster,
   ]);
 
@@ -624,9 +669,7 @@ export const ProviderCredentialsComponent: FC = () => {
           {draft.id && (
             <div className="acadepost-credentials-testpost">
               <div>
-                <p className="acadepost-credentials-kicker">
-                  Publication test
-                </p>
+                <p className="acadepost-credentials-kicker">Publication test</p>
                 <strong>Tester le post provider</strong>
                 <span>
                   Envoie un vrai post de test via cet identifiant vers une
@@ -670,11 +713,15 @@ export const ProviderCredentialsComponent: FC = () => {
                 type="button"
                 className="acadepost-credentials-button"
                 disabled={
-                  isTestingPost || !destinationsForCurrentProvider.length
+                  isTestingPost ||
+                  !draft.enabled ||
+                  !destinationsForCurrentProvider.length
                 }
                 onClick={testPostDraftCredential}
               >
-                {isTestingPost ? 'Publication en cours' : 'Envoyer test post'}
+                {testingPostCredentialId === draft.id
+                  ? 'Publication en cours'
+                  : 'Envoyer test post'}
               </button>
               {!destinationsForCurrentProvider.length && (
                 <div className="acadepost-credentials-muted">
@@ -774,13 +821,36 @@ export const ProviderCredentialsComponent: FC = () => {
                 )}
               </div>
               <div className="acadepost-credentials-row-actions">
-                <button type="button" onClick={() => editCredential(credential)}>
+                <button
+                  type="button"
+                  onClick={() => editCredential(credential)}
+                >
                   Modifier
                 </button>
-                <button type="button" onClick={() => testCredential(credential)}>
+                <button
+                  type="button"
+                  onClick={() => testCredential(credential)}
+                >
                   Tester
                 </button>
-                <button type="button" onClick={() => deleteCredential(credential)}>
+                <button
+                  type="button"
+                  disabled={
+                    isTestingPost ||
+                    !credential.enabled ||
+                    !destinationsForProvider(credential.providerIdentifier)
+                      .length
+                  }
+                  onClick={() => testPostCredential(credential)}
+                >
+                  {testingPostCredentialId === credential.id
+                    ? 'Publication'
+                    : 'Test post'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => deleteCredential(credential)}
+                >
                   Supprimer
                 </button>
               </div>

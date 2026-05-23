@@ -84,6 +84,7 @@ export interface Integrations {
   name: string;
   id: string;
   disabled?: boolean;
+  providerCredentialId?: string;
   inBetweenSteps: boolean;
   editor: 'none' | 'normal' | 'markdown' | 'html';
   display: string;

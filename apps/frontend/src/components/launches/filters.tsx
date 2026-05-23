@@ -364,7 +364,8 @@ export const Filters = () => {
             </div>
             <div className="bg-newBgColorInner flex h-full min-w-0 flex-1 items-center justify-center text-center md:min-w-[200px]">
               <div className="truncate py-[3px] px-[9px] rounded-[5px] transition-all text-[14px]">
-                {t('page', 'Page')} {calendar.listPage + 1} {t('of', 'of')} {Math.max(1, calendar.listTotalPages)}
+                {t('page', 'Page')} {calendar.listPage + 1} {t('of', 'of')}{' '}
+                {Math.max(1, calendar.listTotalPages)}
               </div>
             </div>
             <div
@@ -402,11 +403,11 @@ export const Filters = () => {
         integrations={calendar.integrations}
       />
       {!isListView && (
-        <div className="flex flex-row p-[4px] border border-newTableBorder rounded-[8px] text-[14px] font-[500]">
+        <div className="acadepost-segmented-control">
           <div
             className={clsx(
-              'pt-[6px] pb-[5px] cursor-pointer w-[74px] text-center rounded-[6px]',
-              calendar.display === 'day' && 'text-textItemFocused bg-boxFocused'
+              'acadepost-segmented-item w-[74px]',
+              calendar.display === 'day' && 'is-active'
             )}
             onClick={setDay}
           >
@@ -414,8 +415,8 @@ export const Filters = () => {
           </div>
           <div
             className={clsx(
-              'pt-[6px] pb-[5px] cursor-pointer w-[74px] text-center rounded-[6px]',
-              calendar.display === 'week' && 'text-textItemFocused bg-boxFocused'
+              'acadepost-segmented-item w-[74px]',
+              calendar.display === 'week' && 'is-active'
             )}
             onClick={setWeek}
           >
@@ -423,8 +424,8 @@ export const Filters = () => {
           </div>
           <div
             className={clsx(
-              'pt-[6px] pb-[5px] cursor-pointer w-[74px] text-center rounded-[6px]',
-              calendar.display === 'month' && 'text-textItemFocused bg-boxFocused'
+              'acadepost-segmented-item w-[74px]',
+              calendar.display === 'month' && 'is-active'
             )}
             onClick={setMonth}
           >
@@ -432,12 +433,12 @@ export const Filters = () => {
           </div>
         </div>
       )}
-      <div className="flex flex-row p-[4px] border border-newTableBorder rounded-[8px] text-[14px] font-[500]">
+      <div className="acadepost-segmented-control">
         <div
           onClick={setCalendarView}
           className={clsx(
-            'pt-[6px] pb-[5px] cursor-pointer flex justify-center items-center w-[34px] text-center rounded-[6px]',
-            !isListView && 'text-textItemFocused bg-boxFocused'
+            'acadepost-segmented-item w-[34px] px-0',
+            !isListView && 'is-active'
           )}
         >
           {/*calendar*/}
@@ -460,8 +461,8 @@ export const Filters = () => {
         <div
           onClick={setList}
           className={clsx(
-            'pt-[6px] pb-[5px] flex justify-center items-center cursor-pointer w-[34px] text-center rounded-[6px]',
-            isListView && 'text-textItemFocused bg-boxFocused'
+            'acadepost-segmented-item w-[34px] px-0',
+            isListView && 'is-active'
           )}
         >
           {/*list*/}

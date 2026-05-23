@@ -21,7 +21,12 @@ describe('provider credentials settings UI', () => {
     expect(source).toContain('/test-post');
     expect(source).toContain('testPostIntegrationId');
     expect(source).toContain('testPostImageUrl');
+    expect(source).toContain('testPostCredential');
+    expect(source).toContain('Activez cet identifiant avant le test post');
+    expect(source).toContain('!credential.enabled');
+    expect(source).toContain('!draft.enabled');
     expect(source).toContain('<s>barré</s>');
     expect(source).toContain('Envoyer test post');
+    expect(source).toContain('Test post');
   });
 });

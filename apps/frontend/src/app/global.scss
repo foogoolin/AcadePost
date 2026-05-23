@@ -416,14 +416,15 @@ div div .set-font-family {
 
 .col-calendar:hover:before {
   content: 'Date passed';
-  color: var(--color-text);
+  color: var(--acadepost-calendar-muted-text);
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   white-space: nowrap;
-  opacity: 30%;
+  opacity: 0.72;
   font-size: 14px;
+  font-weight: 600;
 }
 
 .loading-shimmer {
@@ -620,11 +621,12 @@ html[dir='rtl'] [dir='ltr'] {
 .repeated-strip {
   background: repeating-linear-gradient(
     135deg,
-    var(--new-bgColorInner),
-    var(--new-bgColorInner) 4px,
-    var(--new-big-strips) 4px,
-    var(--new-big-strips) 8px
+    var(--acadepost-calendar-past-bg),
+    var(--acadepost-calendar-past-bg) 6px,
+    var(--acadepost-calendar-past-stripe) 6px,
+    var(--acadepost-calendar-past-stripe) 12px
   );
+  border-color: var(--acadepost-calendar-past-border);
 }
 
 .mantine-Modal-inner {
@@ -1596,14 +1598,14 @@ html[dir='rtl'] [dir='ltr'] {
   margin-top: 6px;
   max-width: 680px;
   color: var(--new-table-text);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
 }
 
 .acadepost-credentials-kicker,
 .acadepost-credentials-group {
   color: var(--new-table-text);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1653,16 +1655,12 @@ html[dir='rtl'] [dir='ltr'] {
 
 .acadepost-credentials-provider:hover,
 .acadepost-credentials-provider.is-active {
-  border-color: var(--acadepost-readable-accent);
-  background: color-mix(
-    in srgb,
-    var(--new-bgColorInner) 88%,
-    var(--acadepost-readable-accent) 12%
-  );
+  border-color: var(--acadepost-selected-card-border);
+  background: var(--acadepost-selected-card-bg);
 }
 
 .acadepost-credentials-provider span {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -1686,7 +1684,7 @@ html[dir='rtl'] [dir='ltr'] {
 .acadepost-credentials-row span,
 .acadepost-credentials-inline-credential small {
   color: var(--new-table-text);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -1708,7 +1706,7 @@ html[dir='rtl'] [dir='ltr'] {
   flex-direction: column;
   gap: 8px;
   color: rgb(var(--new-textColor));
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -1732,7 +1730,7 @@ html[dir='rtl'] [dir='ltr'] {
   border-radius: 6px;
   background: var(--new-bgColor);
   color: rgb(var(--new-textColor));
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   outline: none;
   padding: 0 11px;
@@ -1767,7 +1765,6 @@ html[dir='rtl'] [dir='ltr'] {
 .acadepost-credentials-button,
 .acadepost-credentials-row-actions button {
   display: inline-flex;
-  min-height: 40px;
   min-width: max-content;
   align-items: center;
   justify-content: center;
@@ -1776,13 +1773,23 @@ html[dir='rtl'] [dir='ltr'] {
   background: var(--acadepost-button-primary-bg);
   box-shadow: var(--acadepost-button-shadow);
   color: var(--acadepost-button-primary-text);
-  font-size: 12px;
   font-weight: 800;
   gap: 8px;
   line-height: 1.15;
-  padding: 0 18px;
   text-align: center;
   white-space: nowrap;
+}
+
+.acadepost-credentials-button {
+  min-height: var(--acadepost-button-standard-height);
+  font-size: 14px;
+  padding: 0 20px;
+}
+
+.acadepost-credentials-row-actions button {
+  min-height: var(--acadepost-button-compact-height);
+  font-size: 13px;
+  padding: 0 14px;
 }
 
 .acadepost-credentials-button.secondary,
@@ -1792,7 +1799,8 @@ html[dir='rtl'] [dir='ltr'] {
   color: var(--acadepost-button-secondary-text);
 }
 
-.acadepost-credentials-button:disabled {
+.acadepost-credentials-button:disabled,
+.acadepost-credentials-row-actions button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -1826,7 +1834,7 @@ html[dir='rtl'] [dir='ltr'] {
 .acadepost-credentials-testpost strong {
   display: block;
   color: rgb(var(--new-textColor));
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
   margin-top: 4px;
 }
@@ -1834,7 +1842,7 @@ html[dir='rtl'] [dir='ltr'] {
 .acadepost-credentials-testpost span {
   display: block;
   color: var(--new-table-text);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.5;
   margin-top: 4px;
 }

@@ -33,6 +33,7 @@ describe('provider credential service', () => {
     expect(source).toContain('resolveClientInformationByCredentialId(');
     expect(source).toContain('.post(');
     expect(source).toContain('imageUrl');
+    expect(source).toContain('mediaUrls');
     expect(source).toContain('mediaCount: input.mediaCount');
   });
 

@@ -15,12 +15,12 @@
     --new-btn-simple: #313030;
     --new-btn-text: #ffffff;
     --new-btn-primary: #4cccb8;
-    --new-ai-btn: #d82d7e;
+    --new-ai-btn: #fda100;
     --new-box-hover: #201f1f;
     --new-table-border: #2b2b2b;
     --new-table-header: #1e1d1d;
     --new-table-text: #9c9c9c;
-    --new-table-text-focused: #fc69ff;
+    --new-table-text-focused: #4cccb8;
     --new-small-strips: #191818;
     --new-big-strips: #161515;
     --new-col-color: #2c2b2b;
@@ -51,20 +51,20 @@
     --new-bgColor: #f0f2f4;
     --new-bgColorInner: #ffffff;
     --new-bgLineColor: #e7e9eb;
-    --new-textItemFocused: #3900b2;
+    --new-textItemFocused: #050505;
     --new-textItemBlur: #777b7f;
-    --new-boxFocused: #ebe8ff;
+    --new-boxFocused: #101010;
     --new-textColor: 14 14 14;
     --new-blockSeparator: #f2f2f4;
     --new-btn-simple: #eceef1;
     --new-btn-text: #0e0e0e;
     --new-btn-primary: #4cccb8;
-    --new-ai-btn: #d82d7e;
+    --new-ai-btn: #fda100;
     --new-box-hover: #f4f6f8;
     --new-table-border: #e7e9eb;
     --new-table-header: #f5f7f9;
     --new-table-text: #777b7f;
-    --new-table-text-focused: #fc69ff;
+    --new-table-text-focused: #101010;
     --new-small-strips: #191818;
     --new-big-strips: #f5f7f9;
     --new-col-color: #eff1f3;
@@ -99,6 +99,9 @@
 :root {
   --acadepost-button-radius: 999px;
   --acadepost-button-border: rgba(255, 255, 255, 0.16);
+  --acadepost-button-compact-height: 34px;
+  --acadepost-button-standard-height: 42px;
+  --acadepost-button-large-height: 48px;
   --acadepost-card-radius: 12px;
   --acadepost-card-shadow: var(--acadepost-shadow);
 
@@ -120,6 +123,19 @@
     --acadepost-error-pill-bg: rgba(253, 161, 0, 0.12);
     --acadepost-error-pill-border: rgba(253, 161, 0, 0.5);
     --acadepost-error-pill-text: #fda100;
+    --acadepost-segmented-bg: #101010;
+    --acadepost-segmented-border: rgba(76, 204, 184, 0.26);
+    --acadepost-segmented-item-text: #ffffff;
+    --acadepost-segmented-item-hover-bg: rgba(76, 204, 184, 0.12);
+    --acadepost-segmented-active-bg: #4cccb8;
+    --acadepost-segmented-active-text: #050505;
+    --acadepost-calendar-past-bg: #141414;
+    --acadepost-calendar-past-stripe: #1f1f1f;
+    --acadepost-calendar-past-border: rgba(255, 255, 255, 0.08);
+    --acadepost-calendar-muted-text: #b8b8b8;
+    --acadepost-selected-card-bg: rgba(76, 204, 184, 0.12);
+    --acadepost-selected-card-border: rgba(76, 204, 184, 0.7);
+    --acadepost-selection-marker: var(--acadepost-accent);
   }
 
   .light {
@@ -140,6 +156,19 @@
     --acadepost-error-pill-bg: rgba(164, 98, 0, 0.1);
     --acadepost-error-pill-border: rgba(164, 98, 0, 0.28);
     --acadepost-error-pill-text: #884f00;
+    --acadepost-segmented-bg: #ffffff;
+    --acadepost-segmented-border: rgba(16, 16, 16, 0.1);
+    --acadepost-segmented-item-text: #101010;
+    --acadepost-segmented-item-hover-bg: #f4f4f4;
+    --acadepost-segmented-active-bg: #101010;
+    --acadepost-segmented-active-text: #ffffff;
+    --acadepost-calendar-past-bg: #f7f7f7;
+    --acadepost-calendar-past-stripe: #ececec;
+    --acadepost-calendar-past-border: rgba(16, 16, 16, 0.08);
+    --acadepost-calendar-muted-text: #5f6368;
+    --acadepost-selected-card-bg: #f4f4f4;
+    --acadepost-selected-card-border: #101010;
+    --acadepost-selection-marker: var(--acadepost-black);
   }
 }
 
@@ -159,12 +188,32 @@
   min-height: 42px;
   min-width: max-content;
   padding: 0 20px;
-  transition:
-    box-shadow 180ms ease,
-    filter 180ms ease,
-    transform 180ms ease;
+  transition: box-shadow 180ms ease, filter 180ms ease, transform 180ms ease;
   text-align: center;
   white-space: nowrap;
+}
+
+.acadepost-button-compact {
+  min-height: var(--acadepost-button-compact-height) !important;
+  padding: 0 14px !important;
+  font-size: 13px;
+}
+
+.acadepost-button-standard {
+  min-height: var(--acadepost-button-standard-height) !important;
+  padding: 0 20px !important;
+  font-size: 14px;
+}
+
+.acadepost-button-large {
+  min-height: var(--acadepost-button-large-height) !important;
+  padding: 0 24px !important;
+  font-size: 15px;
+}
+
+.acadepost-button-square {
+  aspect-ratio: 1;
+  padding: 0 !important;
 }
 
 .acadepost-button-primary {
@@ -231,6 +280,45 @@
   border-color: var(--acadepost-error-pill-border);
   background: var(--acadepost-error-pill-bg);
   color: var(--acadepost-error-pill-text);
+}
+
+.acadepost-segmented-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--acadepost-segmented-border);
+  border-radius: 8px;
+  background: var(--acadepost-segmented-bg);
+  color: var(--acadepost-segmented-item-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.acadepost-segmented-item {
+  display: inline-flex;
+  min-height: 30px;
+  min-width: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--acadepost-segmented-item-text);
+  cursor: pointer;
+  letter-spacing: 0;
+  line-height: 1;
+  padding: 0 12px;
+  transition: background-color 150ms ease, color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.acadepost-segmented-item:hover {
+  background: var(--acadepost-segmented-item-hover-bg);
+}
+
+.acadepost-segmented-item.is-active {
+  background: var(--acadepost-segmented-active-bg);
+  color: var(--acadepost-segmented-active-text);
+  box-shadow: var(--acadepost-button-shadow);
 }
 
 :root {
@@ -478,7 +566,8 @@
     --new-border: rgba(76, 204, 184, 0.22);
     --new-btn-primary: var(--acadepost-accent);
     --new-ai-btn: var(--acadepost-warm);
-    --new-boxFocused: rgba(76, 204, 184, 0.18);
+    --new-textItemFocused: #050505;
+    --new-boxFocused: var(--acadepost-accent);
     --new-table-text-focused: var(--acadepost-accent);
     --new-menu-hover: var(--acadepost-accent);
 
@@ -497,8 +586,9 @@
     --new-border: var(--acadepost-line);
     --new-btn-primary: var(--acadepost-black);
     --new-ai-btn: var(--acadepost-warm);
-    --new-boxFocused: rgba(76, 204, 184, 0.16);
-    --new-table-text-focused: var(--acadepost-accent);
+    --new-textItemFocused: #ffffff;
+    --new-boxFocused: var(--acadepost-black);
+    --new-table-text-focused: #101010;
     --new-menu-hover: var(--acadepost-black);
 
     --color-forth: var(--acadepost-accent);

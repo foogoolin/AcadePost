@@ -500,9 +500,7 @@ export const LaunchesComponent = () => {
         <div
           className={clsx(
             'flex relative h-[260px] w-full flex-none flex-col shrink-0 md:h-auto',
-            collapseMenu === '1'
-              ? 'group sidebar md:w-[100px]'
-              : 'md:w-[260px]'
+            collapseMenu === '1' ? 'group sidebar md:w-[100px]' : 'md:w-[260px]'
           )}
         >
           <div
@@ -511,7 +509,7 @@ export const LaunchesComponent = () => {
             )}
           >
             <div className="flex items-center">
-              <h2 className="group-[.sidebar]:hidden flex-1 text-[20px] font-[500]">
+              <h2 className="group-[.sidebar]:hidden flex-1 text-[18px] font-[700] leading-[1.2]">
                 {t('channels')}
               </h2>
               <div

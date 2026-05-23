@@ -240,18 +240,16 @@ export class ProviderCredentialsService {
       typeof body?.message === 'string' && body.message.trim()
         ? body.message.trim()
         : `AcadéPost test post ${new Date().toISOString()}`;
-    const imageUrl =
-      typeof body?.imageUrl === 'string' && body.imageUrl.trim()
-        ? body.imageUrl.trim()
-        : '';
-    const media: MediaContent[] = imageUrl
-      ? [
-          {
-            type: 'image',
-            path: imageUrl,
-          },
-        ]
-      : [];
+    const mediaUrls = [
+      ...(Array.isArray(body?.mediaUrls) ? body.mediaUrls : []),
+      ...(typeof body?.imageUrl === 'string' ? [body.imageUrl] : []),
+    ]
+      .map((url) => (typeof url === 'string' ? url.trim() : ''))
+      .filter(Boolean);
+    const media: MediaContent[] = mediaUrls.map((path) => ({
+      type: 'image',
+      path,
+    }));
     const postDetails = [
       {
         id: `provider-test-${Date.now()}`,
