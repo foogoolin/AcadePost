@@ -37,6 +37,22 @@ Normal update path:
 
 Domains, ports, database URLs, OAuth callbacks, and secrets belong in `.env` or reverse-proxy config, not inside the image.
 
+### 2026-05-23 — Release Proof Discipline
+
+Do not describe a feature as ready for the owner when it only exists in the local checkout or docs. For user-facing runtime changes, "done" means:
+
+- code is committed and pushed;
+- GitHub Build passes;
+- demo GHCR image build/push passes for the exact commit;
+- server `.env.demo.shared-infra` is pinned to that exact SHA tag;
+- runtime containers are recreated from the correct server checkout/project (`/opt/AcadePost`, compose project `acadepost`);
+- live `/api/monitor/ready` and container image IDs confirm the new image is running;
+- the actual live user flow is verified, including provider-side proof for Telegram test posts when requested.
+
+Avoid deploy attempts from alternate local checkouts such as `/opt/AcadePost-provider-rework` when the running Compose project was created from `/opt/AcadePost`; this creates container-name conflicts and does not update the live stack. If the wrong-project deploy starts creating stray networks, stop, inspect `com.docker.compose.project`, and resume from the server checkout.
+
+Do not treat documentation updates as delivery. Docs can record state, but they are not a substitute for image publication, server deploy, and live provider verification.
+
 ## BYAN Output
 
 `_byan/` is the local BYAN framework source. `_byan-output/` is generated session state and must not be committed.
