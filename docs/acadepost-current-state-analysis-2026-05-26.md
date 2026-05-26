@@ -6,14 +6,15 @@
 
 ## Текущая точка
 
-На сервере сейчас развернут рабочий AcadePost `v1.1.8`:
+На сервере сейчас развернут рабочий AcadePost `v1.1.9`:
 
 - публичный URL: `https://post.fgln.pro`;
 - backend readiness: `GET /api/monitor/ready` возвращает `200`;
-- backend, frontend и orchestrator работают на `ghcr.io/foogoolin/acadepost:v1.1.8`;
-- версия в репозитории была поднята до `1.1.8` перед деплоем, согласно правилу: каждый деплой приложения требует обновления версии AcadePost.
+- backend, frontend и orchestrator работают на `ghcr.io/foogoolin/acadepost:v1.1.9`;
+- frontend runtime `NEXT_PUBLIC_VERSION` равен `v1.1.9-6c99f9a8`;
+- версия в репозитории была поднята до `1.1.9` перед деплоем, согласно правилу: каждый деплой приложения требует обновления версии AcadePost.
 
-Следующий hotfix `v1.1.9` уже подготовлен и отправлен в GitHub:
+Hotfix `v1.1.9` подготовлен, собран, опубликован в GHCR и развернут:
 
 - удалено логирование полного тела создания поста из app API;
 - удален остаточный debug log из media video route;
@@ -21,13 +22,20 @@
 - `version.txt` обновлен до `v1.1.9`;
 - changelog обновлен.
 
-Статус `v1.1.9` на момент этого документа:
+Статус `v1.1.9`:
 
 - локальные таргетные тесты прошли: 4 suites / 16 tests;
 - GitHub `Build` прошел;
 - GitHub `Code Quality Analysis` прошел;
-- GitHub `Build demo image` еще выполняется;
-- сервер еще не переключен на `v1.1.9`.
+- GitHub `Build demo image` прошел, включая size gate, Compose smoke и GHCR push;
+- сервер переключен на `ghcr.io/foogoolin/acadepost:v1.1.9`;
+- backend/frontend/orchestrator/proxy healthy;
+- `acadepost-migrate` завершился с `Exited (0)`.
+
+Deployment note:
+
+- update wrapper пришлось остановить вручную после успешного runtime health, потому что `docker compose ps -q acadepost-migrate` не вернул stopped migrate container, хотя `docker ps -a` показывал `acadepost-migrate ... Exited (0)`.
+- дефект deploy script исправлен в репозитории: health gate теперь делает fallback на `docker compose ps -a -q` для one-shot services, а `scripts/docker/test-update-script.sh` покрывает этот кейс.
 
 ## Что уже сделано по процессу анализа
 
@@ -162,7 +170,7 @@ Content Routing должен решать, куда отправлять пуб�
 
 ## Что уже реально доказано
 
-1. `v1.1.8` реально развернут на `https://post.fgln.pro`.
+1. `v1.1.9` реально развернут на `https://post.fgln.pro`.
 2. Readiness endpoint публично отвечает `200`.
 3. Текущая версия приложения перед деплоем была обновлена.
 4. Основные regression tests для последних изменений прошли.
@@ -171,6 +179,7 @@ Content Routing должен решать, куда отправлять пуб�
 7. n8n интеграция имеет backend/API основу, но требует self-host smoke.
 8. Docker demo/shared-infra путь работает на текущем сервере, но clean client install еще не доказан.
 9. Один security finding уже переведен в hotfix `v1.1.9`.
+10. Deploy script bug по one-shot `acadepost-migrate` найден и исправлен в репозитории.
 
 ## Дополнительные наблюдения по UI/API связям
 
@@ -219,10 +228,9 @@ Minor follow-up:
 
 P0:
 
-1. Дождаться `v1.1.9` GHCR image build.
-2. Развернуть `v1.1.9` на сервер.
-3. Проверить readiness и контейнеры.
-4. Зафиксировать deployment evidence.
+1. Зафиксировать deployment evidence для `v1.1.9`.
+2. Протянуть исправленный deploy script в серверный checkout перед следующим деплоем.
+3. Продолжить smoke-проверки по матрице.
 
 P1:
 

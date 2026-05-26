@@ -138,3 +138,88 @@ if ! grep -q " up .* --no-deps" "${LOG_FILE_NO_DEPS}"; then
 fi
 
 echo "update.sh no-deps gate ok"
+
+LOG_FILE_MIGRATE="${TMP_DIR}/docker-migrate.log"
+cat > "${TMP_DIR}/bin/docker" <<'SH'
+#!/usr/bin/env bash
+set -euo pipefail
+echo "docker $*" >> "${UPDATE_TEST_LOG}"
+
+if [[ "$*" == *"config --quiet"* ]]; then
+  exit 0
+fi
+
+if [[ "$*" == *"config --services"* ]]; then
+  printf '%s\n' acadepost-migrate acadepost-backend
+  exit 0
+fi
+
+if [[ "$*" == *" ps -q acadepost-migrate" ]]; then
+  exit 0
+fi
+
+if [[ "$*" == *" ps -a -q acadepost-migrate" ]]; then
+  printf 'migrate-container\n'
+  exit 0
+fi
+
+if [[ "$*" == *" ps -q acadepost-backend" ]]; then
+  printf 'backend-container\n'
+  exit 0
+fi
+
+if [[ "$*" == "inspect --format {{.State.Status}} migrate-container" ]]; then
+  printf 'exited\n'
+  exit 0
+fi
+
+if [[ "$*" == "inspect --format {{.State.ExitCode}} migrate-container" ]]; then
+  printf '0\n'
+  exit 0
+fi
+
+if [[ "$*" == "inspect --format {{if .State.Health}}{{.State.Health.Status}}{{end}} migrate-container" ]]; then
+  printf ''
+  exit 0
+fi
+
+if [[ "$*" == "inspect --format {{.State.Status}} backend-container" ]]; then
+  printf 'running\n'
+  exit 0
+fi
+
+if [[ "$*" == "inspect --format {{.State.ExitCode}} backend-container" ]]; then
+  printf '0\n'
+  exit 0
+fi
+
+if [[ "$*" == "inspect --format {{if .State.Health}}{{.State.Health.Status}}{{end}} backend-container" ]]; then
+  printf 'healthy\n'
+  exit 0
+fi
+
+if [[ "$*" == "inspect --format {{.Image}} migrate-container" || "$*" == "inspect --format {{.Image}} backend-container" ]]; then
+  printf 'sha256:test\n'
+  exit 0
+fi
+
+if [[ "$*" == "inspect --format {{.Config.Image}} migrate-container" || "$*" == "inspect --format {{.Config.Image}} backend-container" ]]; then
+  printf 'ghcr.io/foogoolin/acadepost:test\n'
+  exit 0
+fi
+
+exit 0
+SH
+chmod +x "${TMP_DIR}/bin/docker"
+
+UPDATE_TEST_LOG="${LOG_FILE_MIGRATE}" PATH="${TMP_DIR}/bin:${PATH}" \
+  ACADEPOST_HEALTH_PATH="/" ACADEPOST_SERVICE_HEALTH_ATTEMPTS=1 \
+  bash "${ROOT_DIR}/deploy/demo/update.sh" --env "${ENV_FILE}" --compose "${COMPOSE_FILE}" --service "acadepost-migrate acadepost-backend" >/tmp/acadepost-update-test-migrate.out 2>/tmp/acadepost-update-test-migrate.err
+
+if ! grep -q " ps -a -q acadepost-migrate" "${LOG_FILE_MIGRATE}"; then
+  echo "update.sh did not inspect stopped one-shot migrate container with ps -a" >&2
+  cat "${LOG_FILE_MIGRATE}" >&2
+  exit 1
+fi
+
+echo "update.sh one-shot migrate gate ok"

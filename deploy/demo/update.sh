@@ -107,6 +107,9 @@ for service in $selected_services; do
   for attempt in $(seq 1 "$SERVICE_HEALTH_ATTEMPTS"); do
     service_container_id="$(docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps -q "$service" 2>/dev/null || true)"
     if [[ -z "$service_container_id" ]]; then
+      service_container_id="$(docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps -a -q "$service" 2>/dev/null || true)"
+    fi
+    if [[ -z "$service_container_id" ]]; then
       if [[ "$attempt" == "$SERVICE_HEALTH_ATTEMPTS" ]]; then
         echo "Service did not create a container: $service" >&2
         docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps
