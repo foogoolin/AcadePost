@@ -1,0 +1,87 @@
+{
+  "name": "AcadePost Agent Smoke",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "acadepost-agent-smoke",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "7f5bfe86-1f2b-42fd-b26c-57d091e7b8a2",
+      "name": "AcadePost Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ],
+      "webhookId": "acadepost-agent-smoke"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\nreturn [{\n  json: {\n    ok: true,\n    source: 'n8n-acadepost-agent-smoke',\n    receivedAt: new Date().toISOString(),\n    received: input,\n    acadepost: {\n      content: input.content || input.payload?.content || 'AcadePost n8n smoke response',\n      mode: input.mode || input.payload?.mode || 'proposal'\n    }\n  }\n}];"
+      },
+      "id": "1f4d0fe6-c020-42ec-a3a3-ccbdad3aa824",
+      "name": "Build Smoke Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "58ea73fc-73ab-405b-8513-053e18ba9fde",
+      "name": "Return JSON",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        820,
+        300
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AcadePost Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build Smoke Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Smoke Response": {
+      "main": [
+        [
+          {
+            "node": "Return JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "acadepost-agent-smoke-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "acadepost-agent-smoke",
+  "tags": []
+}
