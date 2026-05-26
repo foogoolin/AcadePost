@@ -52,7 +52,11 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
   }
 
   private botToken(clientInformation?: ClientInformation) {
-    return clientInformation?.botToken || process.env.TELEGRAM_TOKEN || '';
+    return (
+      clientInformation?.botToken ||
+      process.env.TELEGRAM_TOKEN ||
+      ''
+    ).trim();
   }
 
   private getBot(clientInformation?: ClientInformation) {
@@ -69,9 +73,9 @@ export class TelegramProvider extends SocialAbstract implements SocialProvider {
     const me = await bot.getMe();
     return {
       botName:
+        me.username ||
         clientInformation?.botName ||
         process.env.TELEGRAM_BOT_NAME ||
-        me.username ||
         '',
       botId: me.id,
     };

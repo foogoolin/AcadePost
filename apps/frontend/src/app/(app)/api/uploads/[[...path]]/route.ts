@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createReadStream, statSync } from 'fs';
+import { NextRequest } from 'next/server';
+import { createReadStream, existsSync, statSync } from 'fs';
+import { resolve, sep } from 'node:path';
 // @ts-ignore
 import mime from 'mime';
 async function* nodeStreamToIterator(stream: any) {
@@ -28,10 +29,28 @@ export const GET = async (
   }
 ) => {
   const { path } = await context.params;
-  const filePath =
-    process.env.UPLOAD_DIRECTORY + '/' + (path ?? []).join('/');
-  const response = createReadStream(filePath);
+  const uploadRoot = resolve(process.env.UPLOAD_DIRECTORY || '/uploads');
+  const requestedPath = (path ?? []).join('/');
+
+  if (!requestedPath || requestedPath.includes('\0')) {
+    return new Response('Not found', { status: 404 });
+  }
+
+  const filePath = resolve(uploadRoot, requestedPath);
+  if (filePath !== uploadRoot && !filePath.startsWith(`${uploadRoot}${sep}`)) {
+    return new Response('Not found', { status: 404 });
+  }
+
+  if (!existsSync(filePath)) {
+    return new Response('Not found', { status: 404 });
+  }
+
   const fileStats = statSync(filePath);
+  if (!fileStats.isFile()) {
+    return new Response('Not found', { status: 404 });
+  }
+
+  const response = createReadStream(filePath);
   const contentType = mime.getType(filePath) || 'application/octet-stream';
   const iterator = nodeStreamToIterator(response);
   const webStream = iteratorToStream(iterator);

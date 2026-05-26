@@ -15,6 +15,7 @@ import {
   PROVIDER_CREDENTIAL_DEFINITIONS,
   PROVIDER_CREDENTIAL_LOOKUP,
 } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.registry';
+import { TelegramProvider } from '@gitroom/nestjs-libraries/integrations/social/telegram.provider';
 
 type EncryptedPayload = {
   v: 1;
@@ -344,9 +345,6 @@ export class ProviderCredentialsService {
     try {
       switch (providerIdentifier) {
         case 'telegram':
-          const { TelegramProvider } = await import(
-            '@gitroom/nestjs-libraries/integrations/social/telegram.provider'
-          );
           await new TelegramProvider().getBotConfiguration(
             this.clientInformationFromRuntimeCredentials({
               providerIdentifier,

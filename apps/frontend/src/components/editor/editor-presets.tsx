@@ -1,12 +1,20 @@
 'use client';
 
-import React, { FC, useCallback, useMemo, useRef, useState } from 'react';
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import useSWR from 'swr';
 import clsx from 'clsx';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import { useToaster } from '@gitroom/react/toaster/toaster';
 import { useModals } from '@gitroom/frontend/components/layout/new-modal';
 import { MediaBox } from '@gitroom/frontend/components/media/media.component';
+import { useMediaDirectory } from '@gitroom/react/helpers/use.media.directory';
 
 type TemplateType = 'post_1_1' | 'post_3_4' | 'carousel_1_1' | 'carousel_3_4';
 type OverlayPosition =
@@ -74,13 +82,18 @@ export const EditorPresets: FC = () => {
   const fetch = useFetch();
   const toaster = useToaster();
   const modals = useModals();
+  const { set: resolveMedia } = useMediaDirectory();
   const fileRef = useRef<HTMLInputElement>(null);
+  const localPreviewUrlRef = useRef<string | undefined>(undefined);
   const [templateId, setTemplateId] = useState<string | undefined>();
   const [templateName, setTemplateName] = useState('Modele AcadeNice');
   const [templateType, setTemplateType] = useState<TemplateType>('post_1_1');
   const [overlay, setOverlay] = useState(defaultOverlay);
-  const [media, setMedia] = useState<{ id: string; path: string } | undefined>();
+  const [media, setMedia] = useState<
+    { id: string; path: string } | undefined
+  >();
   const [previewMediaId, setPreviewMediaId] = useState<string | undefined>();
+  const [localPreviewUrl, setLocalPreviewUrl] = useState<string | undefined>();
   const [isRendering, setIsRendering] = useState(false);
 
   const loadTemplates = useCallback(async () => {
@@ -106,58 +119,109 @@ export const EditorPresets: FC = () => {
     [overlay, preset]
   );
 
-  const chooseTemplate = useCallback((template: any) => {
-    const templateConfig = template.config || {};
-    setTemplateId(template.id);
-    setTemplateName(template.name);
-    setTemplateType(template.type);
-    setOverlay({ ...defaultOverlay, ...(templateConfig.overlay || {}) });
-    setPreviewMediaId(template.previewMediaId || undefined);
-    if (template.previewMedia?.path) {
-      setMedia({
-        id: template.previewMedia.id,
-        path: template.previewMedia.path,
-      });
+  const replaceLocalPreviewUrl = useCallback((nextUrl?: string) => {
+    if (localPreviewUrlRef.current) {
+      URL.revokeObjectURL(localPreviewUrlRef.current);
     }
+
+    localPreviewUrlRef.current = nextUrl;
+    setLocalPreviewUrl(nextUrl);
   }, []);
+
+  useEffect(
+    () => () => {
+      if (localPreviewUrlRef.current) {
+        URL.revokeObjectURL(localPreviewUrlRef.current);
+      }
+    },
+    []
+  );
+
+  const mediaPreviewPath = useMemo(
+    () =>
+      localPreviewUrl || (media?.path ? resolveMedia(media.path) : undefined),
+    [localPreviewUrl, media?.path, resolveMedia]
+  );
+
+  const chooseTemplate = useCallback(
+    (template: any) => {
+      const templateConfig = template.config || {};
+      replaceLocalPreviewUrl(undefined);
+      setTemplateId(template.id);
+      setTemplateName(template.name);
+      setTemplateType(template.type);
+      setOverlay({ ...defaultOverlay, ...(templateConfig.overlay || {}) });
+      setPreviewMediaId(template.previewMediaId || undefined);
+      if (template.previewMedia?.path) {
+        setMedia({
+          id: template.previewMedia.id,
+          path: template.previewMedia.path,
+        });
+      } else {
+        setMedia(undefined);
+      }
+    },
+    [replaceLocalPreviewUrl]
+  );
 
   const openMediaLibrary = useCallback(() => {
     modals.openModal({
       title: 'Choisir une image',
       size: '900px',
+      height: 'min(720px, calc(100vh - 160px))',
       children: (close) => (
         <MediaBox
           type="image"
           closeModal={close}
           setMedia={(items) => {
-            if (items?.[0]) {
-              setMedia(items[0]);
+            const selected = items?.[0];
+            if (selected) {
+              replaceLocalPreviewUrl(undefined);
+              setMedia(selected);
+              setPreviewMediaId(selected.id);
             }
             close();
           }}
         />
       ),
     });
-  }, [modals]);
+  }, [modals, replaceLocalPreviewUrl]);
 
   const uploadLocalFile = useCallback(
     async (file: File) => {
-      const form = new FormData();
-      form.append('file', file);
-      const response = await fetch('/media/upload-simple', {
-        method: 'POST',
-        body: form,
-      });
-      const uploaded = await response.json();
-      setMedia({ id: uploaded.id, path: uploaded.path });
-      setPreviewMediaId(uploaded.id);
-      toaster.show('Image importee', 'success');
+      const objectUrl = URL.createObjectURL(file);
+      replaceLocalPreviewUrl(objectUrl);
+
+      try {
+        const form = new FormData();
+        form.append('file', file);
+        const response = await fetch('/media/upload-simple', {
+          method: 'POST',
+          body: form,
+        });
+
+        if (!response.ok) {
+          throw new Error('Import impossible');
+        }
+
+        const uploaded = await response.json();
+        if (!uploaded?.id || !uploaded?.path) {
+          throw new Error('Reponse media invalide');
+        }
+
+        setMedia({ id: uploaded.id, path: uploaded.path });
+        setPreviewMediaId(uploaded.id);
+        toaster.show('Image importee', 'success');
+      } catch (error: any) {
+        replaceLocalPreviewUrl(undefined);
+        toaster.show(error?.message || 'Image non importee', 'warning');
+      }
     },
-    [fetch, toaster]
+    [fetch, replaceLocalPreviewUrl, toaster]
   );
 
   const saveTemplate = useCallback(
-    async (nextPreviewMediaId = previewMediaId) => {
+    async (nextPreviewMediaId = previewMediaId || media?.id) => {
       const payload = {
         name: templateName,
         type: templateType,
@@ -183,6 +247,7 @@ export const EditorPresets: FC = () => {
       fetch,
       mutate,
       previewMediaId,
+      media?.id,
       templateId,
       templateName,
       templateType,
@@ -191,14 +256,18 @@ export const EditorPresets: FC = () => {
   );
 
   const renderPreview = useCallback(async () => {
-    if (!media?.path) {
+    if (!mediaPreviewPath) {
       toaster.show('Ajoutez une image avant de generer le rendu', 'warning');
       return;
     }
 
     setIsRendering(true);
     try {
-      const blob = await renderTemplateToBlob(media.path, preset, overlay);
+      const blob = await renderTemplateToBlob(
+        mediaPreviewPath,
+        preset,
+        overlay
+      );
       const form = new FormData();
       form.append('file', blob, `${templateName || 'template'}.png`);
       const uploaded = await (
@@ -211,11 +280,22 @@ export const EditorPresets: FC = () => {
       await saveTemplate(uploaded.id);
       toaster.show('Rendu ajoute a la bibliotheque media', 'success');
     } catch (error: any) {
-      toaster.show(error?.message || 'Impossible de generer le rendu', 'warning');
+      toaster.show(
+        error?.message || 'Impossible de generer le rendu',
+        'warning'
+      );
     } finally {
       setIsRendering(false);
     }
-  }, [fetch, media?.path, overlay, preset, saveTemplate, templateName, toaster]);
+  }, [
+    fetch,
+    mediaPreviewPath,
+    overlay,
+    preset,
+    saveTemplate,
+    templateName,
+    toaster,
+  ]);
 
   const updateOverlay = <K extends keyof typeof overlay>(
     key: K,
@@ -230,9 +310,7 @@ export const EditorPresets: FC = () => {
         <aside className="acadepost-editor-panel p-4">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
-              <h1 className="text-[20px] font-[700] text-textColor">
-                Editeur
-              </h1>
+              <h1 className="text-[20px] font-[700] text-textColor">Editeur</h1>
               <p className="mt-1 text-[12px] text-newTableText">
                 Modeles visuels reutilisables
               </p>
@@ -244,6 +322,7 @@ export const EditorPresets: FC = () => {
                 setTemplateName('Modele AcadeNice');
                 setTemplateType('post_1_1');
                 setOverlay(defaultOverlay);
+                replaceLocalPreviewUrl(undefined);
                 setMedia(undefined);
                 setPreviewMediaId(undefined);
               }}
@@ -330,20 +409,24 @@ export const EditorPresets: FC = () => {
               className="acadepost-editor-preview"
               style={{
                 aspectRatio: `${preset.width} / ${preset.height}`,
-                backgroundImage: media?.path ? `url(${media.path})` : undefined,
+                backgroundImage: mediaPreviewPath
+                  ? `url("${mediaPreviewPath.replace(/"/g, '\\"')}")`
+                  : undefined,
               }}
             >
-              {!media?.path && (
+              {!mediaPreviewPath && (
                 <div className="flex h-full w-full items-center justify-center text-center text-[14px] text-newTableText">
                   Ajoutez une image pour preparer le template.
                 </div>
               )}
               <div
                 className={clsx('acadepost-editor-gradient', overlay.position)}
-                style={{
-                  '--overlay-color': hexToRgb(overlay.gradientColor),
-                  '--overlay-opacity': String(overlay.opacity),
-                } as React.CSSProperties}
+                style={
+                  {
+                    '--overlay-color': hexToRgb(overlay.gradientColor),
+                    '--overlay-opacity': String(overlay.opacity),
+                  } as React.CSSProperties
+                }
               />
               <div
                 className={clsx(
@@ -399,7 +482,10 @@ export const EditorPresets: FC = () => {
               <select
                 value={overlay.position}
                 onChange={(event) =>
-                  updateOverlay('position', event.target.value as OverlayPosition)
+                  updateOverlay(
+                    'position',
+                    event.target.value as OverlayPosition
+                  )
                 }
               >
                 {positions.map((item) => (
@@ -504,7 +590,10 @@ async function renderTemplateToBlob(
     throw new Error('Canvas non disponible');
   }
 
-  const scale = Math.max(canvas.width / image.width, canvas.height / image.height);
+  const scale = Math.max(
+    canvas.width / image.width,
+    canvas.height / image.height
+  );
   const width = image.width * scale;
   const height = image.height * scale;
   const left = (canvas.width - width) / 2;
@@ -514,7 +603,10 @@ async function renderTemplateToBlob(
   const gradient = canvasGradient(ctx, canvas, overlay.position);
   const [r, g, b] = parseHex(overlay.gradientColor);
   gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${overlay.opacity})`);
-  gradient.addColorStop(0.72, `rgba(${r}, ${g}, ${b}, ${overlay.opacity * 0.28})`);
+  gradient.addColorStop(
+    0.72,
+    `rgba(${r}, ${g}, ${b}, ${overlay.opacity * 0.28})`
+  );
   gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
