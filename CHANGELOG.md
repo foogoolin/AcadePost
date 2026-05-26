@@ -4,7 +4,8 @@
 
 - Fix: Removed raw post creation request-body logging from the app API to avoid leaking post content, media payloads or provider settings into container logs.
 - Fix: Removed a leftover debug log from the media video-generation route.
-- Updated release metadata to `v1.1.9` for the next AcadePost deployment.
+- Fix: Updated the demo update script so successful one-shot migrate containers that have already exited are handled through `docker compose ps -a -q` instead of hanging the deploy wrapper.
+- Updated release metadata to `v1.1.9` and deployed `ghcr.io/foogoolin/acadepost:v1.1.9` to the shared-infra stack with public readiness and all AcadePost app containers healthy.
 
 ## v1.1.8 - 2026-05-26
 

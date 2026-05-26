@@ -2,7 +2,7 @@
 
 Date: 2026-05-26
 Runtime target: `https://post.fgln.pro`
-Version checked: `v1.1.8`
+Version checked: `v1.1.9`
 
 ## Bottom Line
 

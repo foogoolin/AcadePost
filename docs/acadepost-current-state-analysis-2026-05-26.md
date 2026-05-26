@@ -129,7 +129,7 @@ Content Routing должен решать, куда отправлять пуб�
 
 Что доказано:
 
-- `v1.1.8` развернут через GHCR image;
+- `v1.1.9` развернут через GHCR image;
 - backend/frontend/orchestrator healthy;
 - public readiness endpoint отвечает `200`;
 - app-only update path работает на текущем сервере;
