@@ -140,6 +140,8 @@ fi
 echo "update.sh no-deps gate ok"
 
 LOG_FILE_MIGRATE="${TMP_DIR}/docker-migrate.log"
+# One-shot migrate services can exit successfully before `docker compose ps -q`
+# returns a running container. The update script must fall back to `ps -a -q`.
 cat > "${TMP_DIR}/bin/docker" <<'SH'
 #!/usr/bin/env bash
 set -euo pipefail
