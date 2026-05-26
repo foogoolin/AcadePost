@@ -53,8 +53,6 @@ async function start() {
     app.getHttpAdapter().getInstance().set('trust proxy', 1);
   }
 
-  await startMcp(app);
-
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -80,10 +78,25 @@ async function start() {
 
     checkConfiguration(); // Do this last, so that users will see obvious issues at the end of the startup log without having to scroll up.
 
+    startMcpAfterListen(app);
+
     Logger.log(`Backend is running on: http://localhost:${port}`);
   } catch (e) {
     Logger.error(`Backend failed to start on port ${port}`, e);
   }
+}
+
+function startMcpAfterListen(app: Awaited<ReturnType<typeof NestFactory.create>>) {
+  if (process.env.ENABLE_MCP_STARTUP !== 'true') {
+    Logger.log('MCP server startup skipped; set ENABLE_MCP_STARTUP=true to enable it.');
+    return;
+  }
+
+  setImmediate(() => {
+    startMcp(app)
+      .then(() => Logger.log('MCP server initialized.'))
+      .catch((error) => Logger.error('MCP server failed to initialize.', error));
+  });
 }
 
 function checkConfiguration() {

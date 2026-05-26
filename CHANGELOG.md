@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.11 - 2026-05-26
+
+- Reliability: Moved MCP/Mastra bootstrap out of the backend pre-listen path and gated it behind `ENABLE_MCP_STARTUP=true`, so MCP initialization cannot block `/monitor/ready` or a production restart.
+- Updated release metadata to `v1.1.11` for the next AcadePost deployment.
+
 ## v1.1.10 - 2026-05-26
 
 - Security: Disabled Swagger docs by default unless `ENABLE_SWAGGER=true` is set.
