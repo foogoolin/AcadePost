@@ -108,3 +108,20 @@ Can AcadePost be controlled through API?
 Partially, yes. Core publishing automation and agent workflows have API surfaces. Full AcadePost administration through API is not proven and is currently missing important product areas: Content Routing, provider credential management, users/roles/projects, and complete provider setup.
 
 Do not claim "all functionality is API-manageable" until the smoke collection and missing endpoint map are complete.
+
+## Evidence Log
+
+2026-05-26, deployed `v1.1.9` negative auth smoke:
+
+| Request | Result |
+|---|---|
+| `GET /api/public/v1/posts` without `Authorization` | `401 {"msg":"No API Key found"}` |
+| `GET /api/public/v1/integrations` without `Authorization` | `401 {"msg":"No API Key found"}` |
+| `GET /api/public/v1/post-templates` without `Authorization` | `401 {"msg":"Invalid API key"}` |
+| `GET /api/public/v1/posts` with `Authorization: Bearer invalid-acadepost-key` | `401 {"msg":"Invalid API key"}` |
+| `GET /api/public/v1/integrations` with `Authorization: Bearer invalid-acadepost-key` | `401 {"msg":"Invalid API key"}` |
+
+Finding:
+
+- Public API rejects missing and invalid API keys on checked endpoints.
+- Error message consistency can be cleaned up later, but no auth bypass was observed in this negative smoke.
