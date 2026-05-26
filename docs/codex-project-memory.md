@@ -29,6 +29,13 @@ If this returns results:
 
 Do not touch the production server during Docker image work unless the owner explicitly asks for it in that turn.
 
+Every AcadePost deployment must include a version bump before the deploy. Update both:
+
+- `package.json` `version`
+- `version.txt`
+
+For server runtime deployments, also update the production env version marker, for example `NEXT_PUBLIC_VERSION=vX.Y.Z-<short-sha>`, so the deployed UI can be distinguished from older images.
+
 Normal update path:
 
 - GitHub Actions builds and publishes `ghcr.io/foogoolin/acadepost:latest`.

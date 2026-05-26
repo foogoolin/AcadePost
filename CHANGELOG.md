@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.1.8 - 2026-05-26
+
+- Fix: Normalized local media paths so saved upload URLs from older hosts resolve through the current `/uploads` route.
+- Fix: Served local uploads through the runtime upload route without a build-time `STORAGE_PROVIDER` gate.
+- Fix: Improved editor preset previews for media-library selections and local file uploads, including local object URL cleanup and upload failure handling.
+- Fix: Trimmed Telegram bot tokens before API client creation and preferred the username returned by Telegram for bot configuration.
+- Added regression coverage for upload routing, media path normalization and Telegram credential behavior.
+- Updated release metadata to `v1.1.8` and deployed `ghcr.io/foogoolin/acadepost:v1.1.8` to the shared-infra stack with public readiness and all AcadePost app containers healthy.
+
 ## v1.1.7 - 2026-05-20
 
 - Fix: Prevented Settings > Identifiants actions from accidentally submitting the global profile form.
