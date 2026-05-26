@@ -44,6 +44,7 @@ Deployment note:
 - `docs/acadepost-functional-validation-plan.md` - общий BYAN-план проверки функционала.
 - `docs/feature-readiness-matrix.md` - матрица готовности функций по статусам `UI_ONLY`, `API_EXISTS`, `E2E_VERIFIED` и так далее.
 - `docs/public-api-readiness.md` - отдельный разбор Public API: что покрыто, что не покрыто, какие smoke-проверки нужны.
+- `docs/acadepost-api-route-inventory-2026-05-26.md` - inventory app/Public API routes and auth boundaries found in code.
 - `docs/integrations/n8n-acadepost-smoke.md` - smoke-процедура для self-host n8n.
 - `docs/integrations/n8n-acadepost-agent-smoke-workflow.json` - импортируемый workflow для n8n.
 - `docs/content-routing.md` - продуктовый brief по будущему routing engine.
@@ -180,6 +181,8 @@ Content Routing должен решать, куда отправлять пуб�
 8. Docker demo/shared-infra путь работает на текущем сервере, но clean client install еще не доказан.
 9. Один security finding уже переведен в hotfix `v1.1.9`.
 10. Deploy script bug по one-shot `acadepost-migrate` найден и исправлен в репозитории.
+11. Runtime `v1.1.9` и исходники не содержат удаленный server-side raw body log в `POST /posts`.
+12. API route inventory создан; Public API и app API поверхности разделены по auth boundary.
 
 ## Дополнительные наблюдения по UI/API связям
 
