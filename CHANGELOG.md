@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.9 - 2026-05-26
+
+- Fix: Removed raw post creation request-body logging from the app API to avoid leaking post content, media payloads or provider settings into container logs.
+- Fix: Removed a leftover debug log from the media video-generation route.
+- Updated release metadata to `v1.1.9` for the next AcadePost deployment.
+
 ## v1.1.8 - 2026-05-26
 
 - Fix: Normalized local media paths so saved upload URLs from older hosts resolve through the current `/uploads` route.
