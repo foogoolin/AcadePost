@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  NotFoundException,
   Param,
   ServiceUnavailableException,
 } from '@nestjs/common';
@@ -88,6 +89,10 @@ export class MonitorController {
 
   @Get('/queue/:name')
   async getMessagesGroup(@Param('name') name: string) {
+    if (process.env.ENABLE_MONITOR_QUEUE !== 'true') {
+      throw new NotFoundException();
+    }
+
     return {
       status: 'success',
       message: `Queue ${name} is healthy.`,

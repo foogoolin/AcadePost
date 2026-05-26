@@ -6,7 +6,7 @@
 
 ## Текущая точка
 
-На сервере сейчас развернут рабочий AcadePost `v1.1.9`:
+На сервере сейчас развернут рабочий AcadePost `v1.1.9`; следующий security hardening release `v1.1.10` подготовлен в репозитории:
 
 - публичный URL: `https://post.fgln.pro`;
 - backend readiness: `GET /api/monitor/ready` возвращает `200`;
@@ -21,6 +21,14 @@ Hotfix `v1.1.9` подготовлен, собран, опубликован в 
 - `package.json` обновлен до `1.1.9`;
 - `version.txt` обновлен до `v1.1.9`;
 - changelog обновлен.
+
+Security hardening `v1.1.10`:
+
+- Swagger docs disabled by default unless `ENABLE_SWAGGER=true`.
+- Monitor queue debug disabled by default unless `ENABLE_MONITOR_QUEUE=true`.
+- `package.json` updated to `1.1.10`.
+- `version.txt` updated to `v1.1.10`.
+- Backend build passed with `NODE_OPTIONS=--max-old-space-size=4096`.
 
 Статус `v1.1.9`:
 
@@ -45,6 +53,7 @@ Deployment note:
 - `docs/feature-readiness-matrix.md` - матрица готовности функций по статусам `UI_ONLY`, `API_EXISTS`, `E2E_VERIFIED` и так далее.
 - `docs/public-api-readiness.md` - отдельный разбор Public API: что покрыто, что не покрыто, какие smoke-проверки нужны.
 - `docs/acadepost-api-route-inventory-2026-05-26.md` - inventory app/Public API routes and auth boundaries found in code.
+- `docs/security/acadepost-security-review-current.md` - current incremental security review after `v1.1.9`, with `v1.1.10` hardening findings.
 - `docs/integrations/n8n-acadepost-smoke.md` - smoke-процедура для self-host n8n.
 - `docs/integrations/n8n-acadepost-agent-smoke-workflow.json` - импортируемый workflow для n8n.
 - `docs/content-routing.md` - продуктовый brief по будущему routing engine.

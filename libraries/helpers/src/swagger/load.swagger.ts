@@ -2,6 +2,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { INestApplication } from '@nestjs/common';
 
 export const loadSwagger = (app: INestApplication) => {
+  if (process.env.ENABLE_SWAGGER !== 'true') {
+    return;
+  }
+
   const config = new DocumentBuilder()
     .setTitle('AcadéPost Swagger file')
     .setDescription('API description')

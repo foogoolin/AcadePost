@@ -44,6 +44,13 @@ Normal update path:
 
 Domains, ports, database URLs, OAuth callbacks, and secrets belong in `.env` or reverse-proxy config, not inside the image.
 
+Security-sensitive debug surfaces are disabled by default:
+
+- Swagger docs require `ENABLE_SWAGGER=true`.
+- Monitor queue debug requires `ENABLE_MONITOR_QUEUE=true`.
+
+Do not enable these on client-facing public domains unless the owner explicitly accepts that exposure.
+
 ## BYAN Output
 
 `_byan/` is the local BYAN framework source. `_byan-output/` is generated session state and must not be committed.

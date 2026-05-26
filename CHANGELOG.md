@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.10 - 2026-05-26
+
+- Security: Disabled Swagger docs by default unless `ENABLE_SWAGGER=true` is set.
+- Security: Disabled the debug queue monitor endpoint unless `ENABLE_MONITOR_QUEUE=true` is set.
+- Updated release metadata to `v1.1.10` for the next AcadePost deployment.
+
 ## v1.1.9 - 2026-05-26
 
 - Fix: Removed raw post creation request-body logging from the app API to avoid leaking post content, media payloads or provider settings into container logs.
