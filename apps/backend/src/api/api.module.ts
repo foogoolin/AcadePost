@@ -41,6 +41,8 @@ import { AdminController } from '@gitroom/backend/api/routes/admin.controller';
 import { PostTemplatesController } from '@gitroom/backend/api/routes/post-templates.controller';
 import { AgentWebhooksController } from '@gitroom/backend/api/routes/agent-webhooks.controller';
 import { ProviderCredentialsController } from '@gitroom/backend/api/routes/provider-credentials.controller';
+import { TelegramIntakeController } from '@gitroom/backend/api/routes/telegram-intake.controller';
+import { TelegramIntakeWebhookController } from '@gitroom/backend/api/routes/telegram-intake.webhook.controller';
 import { AuthProviderManager } from '@gitroom/backend/services/auth/providers/providers.manager';
 import { GithubProvider } from '@gitroom/backend/services/auth/providers/github.provider';
 import { GoogleProvider } from '@gitroom/backend/services/auth/providers/google.provider';
@@ -71,6 +73,7 @@ const authenticatedController = [
   PostTemplatesController,
   AgentWebhooksController,
   ProviderCredentialsController,
+  TelegramIntakeController,
 ];
 @Module({
   imports: [UploadModule],
@@ -81,6 +84,7 @@ const authenticatedController = [
     PublicController,
     MonitorController,
     EnterpriseController,
+    TelegramIntakeWebhookController,
     NoAuthIntegrationsController,
     OAuthController,
     ...authenticatedController,

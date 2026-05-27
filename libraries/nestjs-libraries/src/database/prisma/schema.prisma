@@ -47,6 +47,8 @@ model Organization {
   oauthApp            OAuthApp[]
   oauthAuthorizations OAuthAuthorization[]
   providerCredentials ProviderCredential[]
+  telegramIntakeBindings TelegramIntakeBinding[]
+  telegramIntakeSessions TelegramIntakeSession[]
 
   @@index([apiKey])
   @@index([streakSince])
@@ -117,6 +119,8 @@ model User {
   sendFailureEmails     Boolean              @default(true)
   sendStreakEmails      Boolean              @default(true)
   oauthAuthorizations   OAuthAuthorization[]
+  telegramIntakeBindings TelegramIntakeBinding[]
+  telegramIntakeSessions TelegramIntakeSession[]
 
   @@unique([email, providerName])
   @@index([lastReadNotifications])
@@ -715,6 +719,68 @@ model ProviderCredential {
   @@index([providerIdentifier])
   @@index([enabled])
   @@index([deletedAt])
+}
+
+model TelegramIntakeBinding {
+  id             String       @id @default(uuid())
+  organizationId String
+  userId         String
+  telegramUserId String
+  telegramChatId String?
+  telegramUsername String?
+  enabled        Boolean      @default(true)
+  deletedAt      DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
+  sessions       TelegramIntakeSession[]
+
+  @@unique([organizationId, telegramUserId])
+  @@index([organizationId])
+  @@index([userId])
+  @@index([telegramUserId])
+  @@index([telegramChatId])
+  @@index([enabled])
+  @@index([deletedAt])
+}
+
+model TelegramIntakeSession {
+  id                     String                 @id @default(uuid())
+  organizationId         String
+  userId                 String?
+  bindingId              String?
+  telegramUpdateId       String                 @unique
+  telegramChatId         String
+  telegramUserId         String?
+  telegramMessageId      String?
+  telegramReplyMessageId String?
+  originalText           String?
+  originalCaption        String?
+  mediaReferences        Json?
+  selectedIntegrationIds Json?
+  mode                   String                 @default("draft")
+  status                 String                 @default("received")
+  publishDate            DateTime?
+  warnings               Json?
+  errors                 Json?
+  resultPostIds          Json?
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+  organization           Organization           @relation(fields: [organizationId], references: [id])
+  user                   User?                  @relation(fields: [userId], references: [id])
+  binding                TelegramIntakeBinding? @relation(fields: [bindingId], references: [id])
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([bindingId])
+  @@index([telegramChatId])
+  @@index([telegramUserId])
+  @@index([telegramMessageId])
+  @@index([telegramReplyMessageId])
+  @@index([status])
+  @@index([mode])
+  @@index([createdAt])
 }
 
 model AgentRun {
