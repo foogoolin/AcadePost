@@ -12,6 +12,12 @@ AcadéPost remains the source of truth for content, drafts, scheduling, destinat
 
 All user-facing Telegram bot copy for this flow must be in French. Internal callback payloads and persistence states may remain technical English identifiers.
 
+Product model update:
+
+- AcadéPost is a sellable client product. Telegram setup must become repeatable by a client admin, not only by an operator editing server environment variables.
+- The Telegram publishing bot and the AcadéPost control bot are separate roles. The publishing bot sends posts to Telegram destinations; the control bot is a Telegram mini-UI for controlling AcadéPost posts.
+- The current deployed control bot proves the server path, but it is not the final B2C onboarding flow.
+
 ## Source Artifacts
 
 - Project memory: `/root/_byan-output/project-memory.md`
@@ -56,6 +62,8 @@ Each checkpoint must include current stage/card, files or artifacts changed, val
 - Do not put full state inside Telegram callback payloads.
 - Do not refactor unrelated provider publishing code during Stage 0.
 - Do not deploy or release without explicit release validation.
+- Do not treat a single global `TELEGRAM_INTAKE_BOT_TOKEN` as the final client-facing model.
+- Do not require customers to discover Telegram user IDs or chat IDs manually.
 
 ## Delivery Order
 

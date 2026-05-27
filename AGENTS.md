@@ -6,6 +6,7 @@
 - The repository/project slug is AcadePost.
 - The codebase is being adapted into a demo-ready AcadéPost MVP.
 - The immediate priority is working software for customer demonstration.
+- AcadéPost must be treated as a product that will be sold to customers, not as an internal-only demo. Prefer client-repeatable onboarding, setup, and support flows over operator-only shortcuts.
 - The public `A` logo is the supplied raster asset at `apps/frontend/public/brand/acadepost-logo.png`; do not replace it with generated text, a new glyph, or an approximate recreation.
 
 ## Implementation Rules
@@ -53,6 +54,8 @@
 - Do not present content routing as a standalone AcadéPost UI screen for normal users.
 - Routing decisions should appear only as destination consequences, warnings, validation errors, or backend-owned intake behavior.
 - Telegram intake is the planned control surface for fast post intake; AcadéPost remains the source of truth for drafts, schedule state, publishing state, rendering, and errors.
+- Keep the Telegram publishing bot and the AcadéPost control bot separate. The publishing bot sends posts to Telegram destinations; the control bot is a mini-UI for creating, selecting, scheduling, and confirming posts from Telegram.
+- Client-facing Telegram setup must not require manual database edits, hard-coded chat IDs, or operator-only `.env` changes. Those are acceptable only for temporary demos and must be documented as such.
 - Existing backend/API routing logic can be kept only when it supports validation, planning, or publishing.
 
 ## Legal Track

@@ -9,6 +9,7 @@ AcadéPost is a fast demo-ready social publishing MVP adapted from an existing s
 - UI product name: AcadéPost.
 - Repository/project slug: AcadePost.
 - Product language: all user-facing AcadéPost development must be in French by default, including UI labels, bot messages, receipts, validation errors, demo flows, public-facing documentation, runbooks, and release notes. Technical identifiers may remain in English when needed for implementation safety.
+- Positionnement produit: AcadéPost est construit comme un produit B2C/client final vendable. Les parcours doivent donc viser un onboarding autonome par le client, pas seulement une configuration operateur sur le serveur de demonstration.
 - Public logo mark: keep the supplied `A` raster asset at `apps/frontend/public/brand/acadepost-logo.png`; do not replace it with a generated or approximate mark.
 - Technical base: the existing upstream monorepo structure.
 - Priority: customer-demo readiness before deep refactors.
@@ -428,6 +429,7 @@ The first workflow should classify content into one of these groups, make the ma
 - BYAN MCP session active: `acadepost-telegram-intake`.
 - Stage 0 a retire l'ecran standalone `/content-routing` de l'UI normale: plus de route Next active, plus de navigation `Routage`, styles routing retires, docs demo mises a jour.
 - Stage 1-12 ajoutent le backend Telegram intake derriere feature flag: persistence `TelegramIntakeBinding` / `TelegramIntakeSession`, mapping Telegram user/chat vers utilisateur/projet AcadéPost, webhook public protege par secret Telegram, callbacks avec state stocke en base, keyboard inline, mode cycling, confirm draft/now/schedule, parsing simple des dates, validation media/platform, import media via Telegram `getFile`, receipts Telegram, tests de securite/idempotence et release gate.
+- Decision produit Telegram: separer le bot de publication Telegram, qui sert de destination pour publier vers un canal/groupe, et le bot de controle AcadéPost, qui sert de mini-UI Telegram pour creer, selectionner, programmer et confirmer des posts. Le premier est une integration de publication; le second est une surface de controle.
 - Feature flag runtime: `TELEGRAM_INTAKE_ENABLED=true`. Webhook secret: `TELEGRAM_INTAKE_WEBHOOK_SECRET`. Bot token runtime pour callbacks/media/receipts: `TELEGRAM_INTAKE_BOT_TOKEN`.
 - Validation locale: Prisma validate passe, 5 suites Jest Telegram intake passent, backend build passe, frontend build passe, route table Next confirme que `/content-routing` n'est plus une route active.
 - Validation live initiale: un bot Telegram reel a ete configure, le webhook public a ete branche sur `https://post.fgln.pro/api/telegram-intake/webhook`, un binding Telegram user/chat vers l'organisation de test a ete cree, et le serveur a ete valide via `/api/monitor/ready`.

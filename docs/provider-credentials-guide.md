@@ -51,19 +51,21 @@ bash deploy/demo/update.sh \
   --no-deps
 ```
 
-## Telegram Example
+## Exemple Telegram
 
-1. Create a Telegram bot in BotFather.
-2. Copy the bot token.
-3. Open `Paramètres > Identifiants`.
-4. Search for `Telegram`.
-5. Save `Bot Token` and optional `Bot Name`.
-6. Click `Tester la connexion`.
-7. Add the bot to the Telegram group or channel.
-8. Connect Telegram from the AcadéPost integration flow.
-9. If more than one enabled Telegram credential exists, choose the credential instance in the Add Channel selector before the connect URL is opened.
+Ce flux configure un bot de publication Telegram. Il ne configure pas le bot de contrôle AcadéPost décrit dans `docs/telegram-bots-product-model.md`.
 
-The Telegram test calls the provider runtime and validates the bot token with Telegram Bot API configuration lookup. A successful test means the token is valid. It does not prove the bot has been added to the final group/channel or has the channel permissions needed for publishing.
+1. Créer un bot Telegram dans BotFather.
+2. Copier le token du bot.
+3. Ouvrir `Paramètres > Identifiants`.
+4. Chercher `Telegram`.
+5. Enregistrer `Bot Token` et, si besoin, `Bot Name`.
+6. Cliquer sur `Tester la connexion`.
+7. Ajouter le bot au groupe ou canal Telegram cible.
+8. Connecter Telegram depuis le flux d'intégration AcadéPost.
+9. Si plusieurs identifiants Telegram actifs existent, choisir l'instance d'identifiant dans le sélecteur `Add Channel` avant l'ouverture de l'URL de connexion.
+
+Le test Telegram appelle le runtime provider et valide le token via Telegram Bot API. Un test réussi signifie que le token est valide. Il ne prouve pas que le bot a été ajouté au groupe ou canal final, ni qu'il dispose des permissions nécessaires pour publier.
 
 ## Credential Selection During Connect
 

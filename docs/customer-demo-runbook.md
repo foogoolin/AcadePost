@@ -76,16 +76,41 @@ Vérifier ces écrans dans le navigateur :
    - vérifier le statut et les erreurs dans AcadéPost.
 3. Montrer que le produit conserve la structure robuste existante : frontend Next.js, backend NestJS, Prisma, PostgreSQL, Redis, Temporal.
 4. Expliquer que le rebrand public est nettoyé, mais que les alias techniques internes restent stables pendant le MVP.
-5. Finir sur le flux Telegram : intake backend-owned, sélection de destinations, modes `draft` / `now` / `schedule`, validations et reçus en français.
+5. Finir sur le flux Telegram : bot de contrôle AcadéPost, sélection de destinations, modes `Brouillon` / `Publier maintenant` / `Programmer`, validations et reçus en français.
 
-## 6. Risques connus
+## 6. Modèle Telegram pour client
+
+AcadéPost doit présenter deux usages Telegram distincts :
+
+- Bot de publication Telegram : le client l'utilise comme destination de sortie pour publier vers un canal, groupe ou chat Telegram.
+- Bot de contrôle AcadéPost : le client l'utilise comme mini-interface Telegram pour créer un contenu, choisir les destinations AcadéPost, choisir le mode et confirmer l'action.
+
+Document de référence : `docs/telegram-bots-product-model.md`.
+
+État actuel 2026-05-27 :
+
+- Le bot de contrôle de démonstration est connecté au webhook public `https://post.fgln.pro/api/telegram-intake/webhook`.
+- Le webhook Telegram est sain : pas d'erreur de livraison et aucun update en attente lors de la vérification.
+- Les bindings utilisateur Telegram vers organisation AcadéPost existent en base pour la démonstration.
+- Ce chemin reste configuré côté opérateur avec variables runtime et binding manuel. Ce n'est pas encore un onboarding autonome pour un client final.
+
+Parcours cible vendable :
+
+1. Le client crée un bot de contrôle dédié dans BotFather.
+2. Il colle le token dans AcadéPost, dans une page de configuration dédiée.
+3. AcadéPost valide le bot, stocke le secret chiffré, configure le webhook et affiche un lien de connexion.
+4. L'utilisateur ouvre le bot via ce lien ; AcadéPost crée le binding automatiquement.
+5. Le client connecte séparément ses destinations de publication, dont Telegram si nécessaire.
+
+## 7. Risques connus
 
 - L'environnement local observé utilise Node `v24.13.0`, alors que le projet cible Node 22.
 - Les scripts backend/orchestrator peuvent nécessiter `NODE_OPTIONS=--max-old-space-size=8192`.
 - Les décisions légales/licence restent une piste propriétaire séparée.
 - FlutterFlow ou un outil no-code doit être considéré comme une couche cliente au-dessus des APIs, pas comme un import direct du monorepo.
+- L'onboarding autonome du bot de contrôle AcadéPost n'est pas encore implémenté ; la configuration actuelle est suffisante pour démonstration contrôlée, pas pour un client B2C sans assistance.
 
-## 7. Critère de réussite
+## 8. Critère de réussite
 
 La démo est prête si un utilisateur peut comprendre en moins de cinq minutes :
 
@@ -94,7 +119,7 @@ La démo est prête si un utilisateur peut comprendre en moins de cinq minutes :
 - quelles destinations connectées sont disponibles ;
 - pourquoi l'architecture actuelle permet d'ajouter l'intake Telegram sans refactor profond.
 
-## 8. Publication Docker
+## 9. Publication Docker
 
 Terminologie :
 
