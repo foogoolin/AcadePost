@@ -97,7 +97,7 @@ jobs:
           push: false
           outputs: type=oci,dest=/tmp/acadepost-image.tar
           build-args: |
-            NEXT_PUBLIC_VERSION=v${{ steps.package-version.outputs.version }}
+            NEXT_PUBLIC_VERSION=${{ steps.package-version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -131,7 +131,7 @@ jobs:
           load: true
           tags: acadepost:ci-smoke
           build-args: |
-            NEXT_PUBLIC_VERSION=v${{ steps.package-version.outputs.version }}
+            NEXT_PUBLIC_VERSION=${{ steps.package-version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -214,9 +214,9 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:demo
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v${{ steps.package-version.outputs.version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.package-version.outputs.version }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           build-args: |
-            NEXT_PUBLIC_VERSION=v${{ steps.package-version.outputs.version }}
+            NEXT_PUBLIC_VERSION=${{ steps.package-version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
