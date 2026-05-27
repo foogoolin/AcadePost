@@ -432,6 +432,7 @@ The first workflow should classify content into one of these groups, make the ma
 - Validation locale: Prisma validate passe, 5 suites Jest Telegram intake passent, backend build passe, frontend build passe, route table Next confirme que `/content-routing` n'est plus une route active.
 - Validation live initiale: un bot Telegram reel a ete configure, le webhook public a ete branche sur `https://post.fgln.pro/api/telegram-intake/webhook`, un binding Telegram user/chat vers l'organisation de test a ete cree, et le serveur a ete valide via `/api/monitor/ready`.
 - Discipline de release: l'etat final ne doit pas rester sur une image locale Docker. Publier une image GHCR, recreer les conteneurs depuis cette image, et afficher uniquement la version produit `1.11.1` sans suffixe fonctionnel.
+- Release Docker/GHCR: GitHub Actions `Build demo image` run `26517785041` a publie `ghcr.io/foogoolin/acadepost:1.11.1` avec le digest index `sha256:f94dd8aa5c2e4cf80c007171d64891878c128b4856129e6b1c09827f5a4492f5`; `post.fgln.pro` tourne maintenant avec backend/frontend/orchestrator recrees depuis cette image GHCR et `/api/monitor/ready` retourne `ok`.
 
 ## Open Questions
 

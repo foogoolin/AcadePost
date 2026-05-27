@@ -1,7 +1,7 @@
 # Telegram Intake and Routing Rework Plan
 
 Date: 2026-05-27
-Status: release candidate; GitHub/GHCR publication required for final delivery
+Status: branche GitHub poussee; image GHCR publiee; conteneurs serveur recrees depuis l'image publiee
 BYAN session: `acadepost-telegram-intake`
 
 ## Goal
@@ -29,6 +29,13 @@ Use only the product version in public runtime display:
 - no feature suffix;
 - no local label;
 - no commit hash in the user-visible version.
+
+Preuve release :
+
+- Image GHCR : `ghcr.io/foogoolin/acadepost:1.11.1`.
+- Digest GHCR index : `sha256:f94dd8aa5c2e4cf80c007171d64891878c128b4856129e6b1c09827f5a4492f5`.
+- GitHub Actions `Build demo image` run `26517785041` : succes, avec smoke Compose et push GHCR.
+- Serveur `post.fgln.pro` : backend/frontend/orchestrator tournent depuis `ghcr.io/foogoolin/acadepost:1.11.1`; health Docker et `/api/monitor/ready` sont sains.
 
 ## BYAN MCP Operating Rule
 

@@ -109,3 +109,10 @@ Règles de release :
 - Utiliser uniquement la version produit, actuellement `1.11.1`.
 - Mettre `ACADEPOST_IMAGE` sur une image GHCR publiée avant de considérer le déploiement terminé.
 - Vérifier après déploiement : `/api/monitor/ready`, health Docker, image réellement utilisée par `acadepost-backend`, `acadepost-frontend` et `acadepost-orchestrator`.
+
+Preuve release 2026-05-27 :
+
+- Image publiée : `ghcr.io/foogoolin/acadepost:1.11.1`.
+- Digest GHCR index : `sha256:f94dd8aa5c2e4cf80c007171d64891878c128b4856129e6b1c09827f5a4492f5`.
+- GitHub Actions `Build demo image` run `26517785041` : succès, avec smoke Compose et push GHCR.
+- Serveur `post.fgln.pro` : `acadepost-backend`, `acadepost-frontend` et `acadepost-orchestrator` recréés depuis cette image GHCR, tous `healthy`.
