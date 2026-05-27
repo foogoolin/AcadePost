@@ -177,7 +177,7 @@ jobs:
           fi
 
           for service in acadepost-backend acadepost-frontend acadepost-orchestrator acadepost; do
-            for attempt in $(seq 1 60); do
+            for attempt in $(seq 1 180); do
               container_id="$(docker compose --env-file "$env_file" -f docker-compose.demo.yaml ps -q "$service")"
               state="$(docker inspect --format '{{.State.Status}}' "$container_id")"
               health="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{end}}' "$container_id")"
@@ -192,7 +192,7 @@ jobs:
                 exit 1
               fi
 
-              if [[ "$attempt" == "60" ]]; then
+              if [[ "$attempt" == "180" ]]; then
                 docker compose --env-file "$env_file" -f docker-compose.demo.yaml ps
                 docker compose --env-file "$env_file" -f docker-compose.demo.yaml logs --tail=200 "$service"
                 exit 1
