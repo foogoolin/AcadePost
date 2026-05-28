@@ -24,7 +24,7 @@ For AcadéPost:
 - keep legal/licensing as a separate owner track;
 - do not remove `LICENSE` or copyright notices casually;
 - do not claim partnership, official approval, or transferred platform credentials unless the owner has written proof;
-- keep `docs/legal-notes.md` as the place for owner-level legal decisions.
+- keep `docs/legal/legal-notes.md` as the place for owner-level legal decisions.
 
 Sources:
 
@@ -158,7 +158,7 @@ For AcadéPost:
 
 - UI language is French;
 - work communication may be Russian;
-- run the mojibake search documented in `docs/codex-project-memory.md` before committing docs, prompts, translations, or UI text;
+- run the mojibake search documented in `docs/internal/codex-byan/codex-project-memory.md` before committing docs, prompts, translations, or UI text;
 - keep files UTF-8.
 
 ### 10. Demo readiness is not production readiness

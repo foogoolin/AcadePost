@@ -141,7 +141,7 @@ Pour mettre a jour AcadePost sans build sur le VPS :
 bash deploy/demo/update.sh --env .env.demo.shared-infra --compose docker-compose.demo.shared-infra.yaml
 ```
 
-Voir aussi `docs/demo-docker-update.md`. Le script tire `ACADEPOST_IMAGE` depuis `.env`, recree les services applicatifs et le proxy avec `--no-build`, puis attend `/api/monitor/ready`.
+Voir aussi `docs/operations/docker-update.md`. Le script tire `ACADEPOST_IMAGE` depuis `.env`, recree les services applicatifs et le proxy avec `--no-build`, puis attend `/api/monitor/ready`.
 
 ## Donnees et backups
 

@@ -299,7 +299,7 @@ Likely missing or unstable for "full control":
 
 Acceptance:
 
-- Produce `docs/public-api-readiness.md`.
+- Produce `docs/development/public-api-readiness.md`.
 - Mark each workflow as supported, partial, missing or unsafe.
 
 ## Phase 10 - Docker and Self-Hosted Install
