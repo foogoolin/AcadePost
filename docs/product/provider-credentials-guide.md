@@ -53,7 +53,7 @@ bash deploy/demo/update.sh \
 
 ## Exemple Telegram
 
-Ce flux configure un bot de publication Telegram. Il ne configure pas le bot de contrôle AcadéPost décrit dans `docs/telegram-bots-product-model.md`.
+Ce flux configure un bot de publication Telegram. Il ne configure pas le bot de contrôle AcadéPost décrit dans `docs/product/telegram-bots-product-model.md`.
 
 1. Créer un bot Telegram dans BotFather.
 2. Copier le token du bot.

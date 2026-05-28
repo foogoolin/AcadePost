@@ -85,7 +85,7 @@ AcadéPost doit présenter deux usages Telegram distincts :
 - Bot de publication Telegram : le client l'utilise comme destination de sortie pour publier vers un canal, groupe ou chat Telegram.
 - Bot de contrôle AcadéPost : le client l'utilise comme mini-interface Telegram pour créer un contenu, choisir les destinations AcadéPost, choisir le mode et confirmer l'action.
 
-Document de référence : `docs/telegram-bots-product-model.md`.
+Document de référence : `docs/product/telegram-bots-product-model.md`.
 
 État actuel 2026-05-27 :
 

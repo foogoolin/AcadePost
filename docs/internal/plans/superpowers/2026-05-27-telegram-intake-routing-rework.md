@@ -23,7 +23,7 @@ Product model update:
 - Project memory: `/root/_byan-output/project-memory.md`
 - BYAN kanban: `/root/_byan-output/party-mode-sessions/acadepost-telegram-intake/kanban.json`
 - BYAN peer review: `/root/_byan-output/reviews/acadepost-telegram-intake-memory-review.json`
-- Superseded UI note: `docs/content-routing.md`
+- Superseded UI note: `docs/product/content-routing.md`
 
 ## Release Rule
 
@@ -307,7 +307,7 @@ Final local validation:
 - `git diff --check`: passed.
 - Deleted `apps/frontend/src/app/(app)/(site)/content-routing/page.tsx`.
 - Removed `acadepost-routing-*` styles from `apps/frontend/src/app/global.scss`.
-- Updated `AGENTS.md`, `docs/content-routing.md`, and `docs/customer-demo-runbook.md`.
+- Updated `AGENTS.md`, `docs/product/content-routing.md`, and `docs/internal/runbooks/customer-demo-runbook.md`.
 - Installed local dependencies with `corepack pnpm install --frozen-lockfile` because the first frontend build attempt failed with missing `node_modules`.
 
 Release validation required after GitHub/GHCR publication:

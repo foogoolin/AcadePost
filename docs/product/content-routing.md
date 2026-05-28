@@ -20,7 +20,7 @@ AcadéPost distingue deux rôles Telegram :
 
 Ces deux rôles ne doivent pas être mélangés. Un client peut avoir un bot de publication pour ses canaux Telegram et un bot de contrôle dédié à AcadéPost.
 
-Le modèle complet est décrit dans `docs/telegram-bots-product-model.md`.
+Le modèle complet est décrit dans `docs/product/telegram-bots-product-model.md`.
 
 ## Garde-fous d'implémentation
 

@@ -78,7 +78,7 @@ The first workflow should classify content into one of these groups, make the ma
 - Root `build:extension` no longer calls Unix `rm`.
 - Verification: `corepack pnpm --filter ./apps/extension run build` passes locally. The generated ZIP contains `background.js`, `manifest.json`, `icon-32.png`, and `icon-128.png`.
 - Remaining caveat: local shell still uses Node `v24.13.0`; repo target remains `>=22.12.0 <23.0.0`.
-- Customer demo runbook added at `docs/customer-demo-runbook.md`.
+- Customer demo runbook added at `docs/internal/runbooks/customer-demo-runbook.md`.
 
 ## Mise a jour acces multi-projets - 2026-05-13
 
@@ -107,7 +107,7 @@ The first workflow should classify content into one of these groups, make the ma
 - `var/docker/docker-build.sh` et `var/docker/docker-create.sh` pointent maintenant vers le workflow demo AcadéPost au lieu des anciennes commandes upstream.
 - `.dockerignore` evite d'envoyer les secrets locaux, BYAN, Codex, Claude et artefacts locaux dans le contexte Docker.
 - `var/docker/nginx.conf` ajoute les headers proxy et timeouts necessaires pour un serveur demo.
-- Documentation de deploiement ajoutee: `docs/demo-server-deploy.md`.
+- Documentation de deploiement ajoutee: `docs/installation/demo-server-deploy.md`.
 - Validation locale: `docker compose --env-file .env.demo.example -f docker-compose.demo.yaml config --quiet` passe; les builds frontend/backend/orchestrator/extension passent hors Docker.
 - Limite locale: Docker Desktop Windows a interrompu le build image pendant `next build` avec une erreur engine `EOF`, puis a continue a produire des timeouts. La verification runtime doit donc etre faite sur le serveur Linux cible.
 
@@ -115,9 +115,9 @@ The first workflow should classify content into one of these groups, make the ma
 
 - Problème récurrent enregistré pour Codex/BYAN: certains fichiers texte peuvent contenir du mojibake UTF-8 dans les accents français et dans le nom produit visible.
 - Correction appliquée dans `AGENTS.md`, `PROJECT_PLAN.md` et `_byan-output/project-context.md`.
-- Mémoire dédiée ajoutée dans `docs/codex-project-memory.md`.
+- Mémoire dédiée ajoutée dans `docs/internal/codex-byan/codex-project-memory.md`.
 - `.editorconfig` ajouté pour demander `charset = utf-8` et `end_of_line = lf`.
-- Nouvelle règle: avant chaque commit qui touche docs, prompts, traductions ou labels UI, lancer la recherche mojibake documentée dans `docs/codex-project-memory.md`.
+- Nouvelle règle: avant chaque commit qui touche docs, prompts, traductions ou labels UI, lancer la recherche mojibake documentée dans `docs/internal/codex-byan/codex-project-memory.md`.
 
 ## Shared Infra Deployment Update - 2026-05-14
 
@@ -125,8 +125,8 @@ The first workflow should classify content into one of these groups, make the ma
 - Nouveau compose: `docker-compose.demo.shared-infra.yaml`.
 - Nouveau template env: `.env.demo.shared-infra.example`.
 - Nouveau launcher: `deploy/demo/server-up-shared-infra.sh`.
-- Nouveau runbook: `docs/demo-shared-infra-deploy.md`.
-- Prompt agent serveur ajoute: `docs/server-agent-shared-infra-prompt.md`.
+- Nouveau runbook: `docs/installation/demo-shared-infra-deploy.md`.
+- Prompt agent serveur ajoute: `docs/internal/server/server-agent-shared-infra-prompt.md`.
 - Le build Docker n'embarque plus de domaine public; la valeur build-time de `NEXT_PUBLIC_BACKEND_URL` est relative: `/api`.
 - Le domaine public reste une configuration runtime via `ACADEPOST_PUBLIC_URL`, afin que la meme image puisse etre lancee derriere n'importe quel domaine.
 - Le runtime `.env` doit fournir un `NEXT_PUBLIC_BACKEND_URL` absolu, par exemple `https://domain.example/api`, car le backend l'utilise pour MCP/OAuth et les callbacks externes.
@@ -212,8 +212,8 @@ The first workflow should classify content into one of these groups, make the ma
 - Public auth accepte maintenant aussi le format `Authorization: Bearer <token>` en plus du format historique direct.
 - Le calendrier affiche les posts agent avec labels `Généré par agent`, `À valider` ou `Planifié` selon `agentStatus`.
 - Docker update normalise: `deploy/demo/update.sh` valide Compose, fait `docker compose pull acadepost`, recrée le service avec `--no-build --force-recreate`, attend `/api/monitor/ready` et affiche l'image active.
-- Documentation ajoutee: `docs/demo-docker-update.md`; les runbooks clean-VPS et shared-infra pointent vers le nouveau script.
-- Verification locale: `prisma generate`, backend build, frontend build, orchestrator build, `docker compose config --quiet` pour clean-VPS et shared-infra, `git diff --check`, recherche mojibake hors `docs/codex-project-memory.md`.
+- Documentation ajoutee: `docs/operations/docker-update.md`; les runbooks clean-VPS et shared-infra pointent vers le nouveau script.
+- Verification locale: `prisma generate`, backend build, frontend build, orchestrator build, `docker compose config --quiet` pour clean-VPS et shared-infra, `git diff --check`, recherche mojibake hors `docs/internal/codex-byan/codex-project-memory.md`.
 - Caveat local inchangé: Node local `v24.13.0` est hors plage cible repo `>=22.12.0 <23.0.0`; les builds passent quand même avec l'avertissement.
 
 ## Security Pass n8n/Docker - 2026-05-16
@@ -255,7 +255,7 @@ The first workflow should classify content into one of these groups, make the ma
 
 ## Vibe-coding / Open-source Rework Guardrails - 2026-05-16
 
-- Ajout de `docs/vibecoder-open-source-rework-guardrails.md` comme checklist owner-facing pour travailler avec des LLM sur un fork open-source.
+- Ajout de `docs/internal/workflow/vibecoder-open-source-rework-guardrails.md` comme checklist owner-facing pour travailler avec des LLM sur un fork open-source.
 - Les regles projet `AGENTS.md` incluent maintenant des garde-fous explicites: verifier avant de declarer une feature fonctionnelle, ne pas exposer de secrets, garder Docker domain-agnostic, controler les agents Full Access et ne pas pretendre qu'un provider social fonctionne sans smoke test reel.
 - Decisions appliquees a AcadéPost: le rebrand ne doit pas masquer les contraintes de licence/attribution, le fork n'herite pas des approvals/credentials SaaS du produit upstream, et les integrations sociales restent le risque produit prioritaire.
 - Nouveau gate de travail: toute demande LLM substantielle doit finir par un artefact verifiable, par exemple source, reference de fichier, build/test, smoke flow ou risque ouvert dans `PROJECT_PLAN.md`.
@@ -329,7 +329,7 @@ The first workflow should classify content into one of these groups, make the ma
 
 - Version produit preparee: `v1.1.2`.
 - Source design chargee: `C:\Users\my\Documents\byan-test\DESIGN.md`; elle s'applique strictement aux calendriers/date-pickers, pas comme redesign complet de tout le produit.
-- Plan de review ajoute: `docs/build-web-apps-ui-review-plan.md`.
+- Plan de review ajoute: `docs/internal/design/build-web-apps-ui-review-plan.md`.
 - Browser UI pass a trouve que `/brand/acadepost-logo.png` etait intercepte par le proxy frontend et renvoyait du HTML; le logo raster `A` etait donc casse sur l'auth/app shell.
 - Fix applique dans `apps/frontend/src/proxy.ts`: les chemins `/brand/*` bypassent maintenant la logique auth/proxy comme les assets publics.
 - Workflow GHCR publie maintenant `ghcr.io/foogoolin/acadepost:latest` en plus de `:demo`, du tag versionne et du SHA.
@@ -386,7 +386,7 @@ The first workflow should classify content into one of these groups, make the ma
 - Correction UI demo: les cards de providers credentials affichent maintenant les icones sociales locales, et la version `NEXT_PUBLIC_VERSION` est visible en bas a gauche dans le rail applicatif et le menu Settings.
 - Correction backend: le test d'un credential Telegram appelle maintenant la configuration Bot API via le provider Telegram, au lieu de seulement valider les champs requis.
 - Correction runtime: le provider Telegram est charge en lazy import pendant le test credential, afin que le backend ne charge pas Telegram Bot API pendant le bootstrap.
-- Documentation ajoutee: `docs/provider-credentials-guide.md` avec commande de generation de la cle de chiffrement, exemple Telegram, differences avec n8n et edge cases.
+- Documentation ajoutee: `docs/product/provider-credentials-guide.md` avec commande de generation de la cle de chiffrement, exemple Telegram, differences avec n8n et edge cases.
 - Verification: tests rouge/vert ajoutes sur la registry credentials et le test provider Telegram pour garder Telegram visible et verifier que le bouton de test declenche une vraie verification provider.
 - Deploiement serveur: GitHub Actions run `26040847349` a publie `ghcr.io/foogoolin/acadepost:v1.1.6`; le serveur Contabo shared-infra a ete epingle sur ce tag avec `NEXT_PUBLIC_VERSION=v1.1.6` et une cle `ACADEPOST_CREDENTIALS_ENCRYPTION_KEY` generee cote serveur.
 - Verification serveur: `/api/monitor/ready` public retourne `ok`, l'image runtime expose `NEXT_PUBLIC_VERSION=v1.1.6`, et la registry credentials embarquee contient Telegram dans `Core social` avec `Bot Token` / `Bot Name`.
@@ -398,7 +398,7 @@ The first workflow should classify content into one of these groups, make the ma
 - Correction n8n-like connect: le flow Add Channel charge les credentials projet enregistres, affiche un selector quand le provider a des credentials actifs, transmet `credentialId` a `/integrations/social/{provider}`, puis le backend valide le credential par org/provider avant de le lier au `state` Redis.
 - Correction securite: `ACADEPOST_CREDENTIALS_ENCRYPTION_KEY` active les credentials seulement si la valeur est un `64 hex` ou un base64 de 32 bytes; les placeholders `change-me`, `change-this`, `CHANGE_ME...`, les valeurs vides et les passphrases arbitraires gardent l'UI en mode disabled.
 - Correction deploy: `deploy/demo/update.sh --no-deps` propage maintenant `--no-deps` a `docker compose up`, et `ACADEPOST_SERVICE_HEALTH_ATTEMPTS` vaut `180` par defaut pour reduire les faux echecs pendant le cold start orchestrator.
-- Documentation mise a jour: `README.md`, `CHANGELOG.md`, `docs/provider-credentials-guide.md`, `docs/demo-docker-update.md` et ce plan.
+- Documentation mise a jour: `README.md`, `CHANGELOG.md`, `docs/product/provider-credentials-guide.md`, `docs/operations/docker-update.md` et ce plan.
 - Deploiement serveur: GitHub Actions runs `26153076783`, `26153076845` et `26153076848` ont valide `Build`, `Code Quality Analysis` et `Build demo image`; GHCR publie `ghcr.io/foogoolin/acadepost:v1.1.7` avec digest index `sha256:8ca16a5a405e3e570e54b9964abf36c38308630fd3381d238c4c26f4bd24d27a`.
 - Verification serveur: le serveur Contabo shared-infra est epingle sur `ACADEPOST_IMAGE=ghcr.io/foogoolin/acadepost:v1.1.7` et `NEXT_PUBLIC_VERSION=v1.1.7`; `/api/monitor/ready` public retourne `ok`, `acadepost-backend`, `acadepost-frontend`, `acadepost-orchestrator` et `acadepost` sont healthy, et `acadepost-migrate` termine avec exit code `0`.
 - Caveat release: le chemin UI/API et le deploiement serveur sont verifies, mais le smoke publish Telegram reel reste conditionne a des credentials bot/channel reels.
@@ -418,7 +418,7 @@ The first workflow should classify content into one of these groups, make the ma
 ## Provider Integration Platform Plan Refresh - 2026-05-21
 
 - BYAN FD actif: `DOC`; ne pas fermer le FD avant validation explicite `ok doc`.
-- Le handoff terminal demandait le plan `docs/superpowers/plans/2026-05-20-provider-integration-platform.md`, mais ce fichier etait absent du checkout serveur.
+- Le handoff terminal demandait le plan `docs/internal/plans/superpowers/2026-05-20-provider-integration-platform.md`, mais ce fichier etait absent du checkout serveur.
 - Plan/spec restaure a cet emplacement avec la nouvelle pipeline Composer: `Editor -> optional Template -> Destination -> Operation -> Provider Options -> Publish/Schedule -> Logs`.
 - Decisions confirmees dans le plan: `Identifiants` garde les credentials API, `Canaux` / `Destinations` garde les cibles de publication, et `Integration` reste l'implementation interne MVP.
 - Le plan ajoute le dictionnaire de donnees, les operations Telegram MVP explicites, les deux couches de logs (`ProviderConnectionLog`, `ProviderPublishAttempt`) et les criteres d'acceptation Docker/server-first.

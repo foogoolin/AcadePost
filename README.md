@@ -2,7 +2,7 @@
 
 AcadéPost is a self-hostable social publishing workspace for planning, preparing, scheduling and publishing content across multiple social platforms.
 
-Current version: `v1.1.7`
+Current version: `1.11.1`
 
 ## Overview
 
@@ -54,7 +54,7 @@ For normal installs, use `:latest`. For rollback, pin a version tag, SHA tag, or
 Versioned images are published for releases, for example:
 
 ```text
-ghcr.io/foogoolin/acadepost:v1.1.7
+ghcr.io/foogoolin/acadepost:1.11.1
 ```
 
 Two Compose modes are provided:
@@ -64,13 +64,9 @@ Two Compose modes are provided:
 
 The install path uses prebuilt images only. The public service is an nginx proxy named `acadepost`; backend, frontend and orchestrator run as separate internal containers from the same optimized app image. The server must not run `docker build` for normal installs or updates.
 
-Before `:latest` is published, GitHub Actions builds the image, checks the archive size, starts the Compose stack, waits for `/api/monitor/ready` and checks the backend, frontend, orchestrator and proxy service health. This validation can take several minutes in CI, but it happens before the VPS update path.
+Before `:latest` is published, GitHub Actions builds the image, checks the archive size, starts the Compose stack, waits for `/api/monitor/ready` and checks the backend, frontend, orchestrator and proxy service health. This validation can take several minutes in CI, but it happens before the normal update path.
 
-Release evidence for `v1.1.5`: the hotfixed Docker workflow for commit `b4aad511` passed the Compose smoke gate in run `26035055443` and published `ghcr.io/foogoolin/acadepost:latest`. The follow-up Contabo shared-infra update pulled that image successfully and reached public readiness.
-
-Release evidence for `v1.1.6`: commit `34045ef7` passed `Build`, `Code Quality Analysis` and `Build demo image`; Docker run `26040847349` published the image after Compose smoke. The Contabo shared-infra stack was then pinned to `ghcr.io/foogoolin/acadepost:v1.1.6`, public readiness returned `ok`, and the frontend runtime reported `NEXT_PUBLIC_VERSION=v1.1.6`.
-
-Release evidence for `v1.1.7`: commit `313ac5fe` passed `Build` run `26153076783`, `Code Quality Analysis` run `26153076845` and `Build demo image` run `26153076848`. The workflow published `ghcr.io/foogoolin/acadepost:v1.1.7` with index digest `sha256:8ca16a5a405e3e570e54b9964abf36c38308630fd3381d238c4c26f4bd24d27a`. The Contabo shared-infra stack was pinned to `v1.1.7`, public readiness returned `ok`, backend/frontend/orchestrator/proxy containers were healthy, and the frontend runtime reported `NEXT_PUBLIC_VERSION=v1.1.7`.
+Release history is tracked in `CHANGELOG.md`. Internal deployment evidence and old server notes are kept under `docs/internal/`.
 
 Example first-time setup:
 
@@ -103,10 +99,11 @@ bash deploy/demo/update.sh \
 
 Deployment docs:
 
-- `docs/demo-server-deploy.md`
-- `docs/demo-shared-infra-deploy.md`
-- `docs/demo-docker-update.md`
-- `docs/provider-credentials-guide.md`
+- `docs/README.md`
+- `docs/installation/demo-server-deploy.md`
+- `docs/installation/demo-shared-infra-deploy.md`
+- `docs/operations/docker-update.md`
+- `docs/product/provider-credentials-guide.md`
 
 ## Configuration
 
@@ -198,11 +195,13 @@ $env:NODE_OPTIONS='--max-old-space-size=8192'
 
 ## Documentation
 
-- `PROJECT_PLAN.md` - current implementation plan and decisions.
-- `CHANGELOG.md` - version history.
-- `AGENTS.md` - working rules for coding agents.
-- `docs/integrations/social-provider-readiness-2026-05-16.md` - provider readiness matrix.
-- `docs/product/postiz-feature-comparison-2026-05-16.md` - feature comparison and product gaps.
-- `docs/provider-credentials-guide.md` - n8n-like provider credentials setup, examples and edge cases.
-- `docs/security/acadepost-security-review-2026-05-16.md` - latest security review.
-- `docs/codex-project-memory.md` - encoding and Docker guardrails.
+Start with `docs/README.md`.
+
+- `docs/installation/` - self-host install guides.
+- `docs/operations/` - update and runtime operations.
+- `docs/product/` - product behavior and provider setup.
+- `docs/integrations/` - external integration notes.
+- `docs/development/` - developer and API readiness notes.
+- `docs/security/` - security reviews and remaining risks.
+- `docs/legal/` - legal and ownership notes.
+- `docs/internal/` - BYAN/Codex, server, migration, audit and historical material.

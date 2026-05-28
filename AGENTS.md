@@ -45,9 +45,9 @@
 ## Encoding Guardrails
 
 - Keep project files in UTF-8, especially French UI text, docs, translations, BYAN prompts, and Codex memory files.
-- Known mojibake examples and the exact verification command are documented in `docs/codex-project-memory.md`.
+- Known mojibake examples and the exact verification command are documented in `docs/internal/codex-byan/codex-project-memory.md`.
 - Before committing text changes, run the documented mojibake search and repair visible strings back to UTF-8 French.
-- Longer Codex memory for this issue lives in `docs/codex-project-memory.md`.
+- Longer Codex memory for this issue lives in `docs/internal/codex-byan/codex-project-memory.md`.
 
 ## Telegram Intake / Routing Rules
 
@@ -71,4 +71,4 @@
 - Do not paste or preserve real secrets in prompts, docs, logs, screenshots, or reports. Any exposed token should be considered compromised and rotated.
 - Keep Docker images domain-agnostic. Domains, ports, credentials, database URLs, and OAuth callback hosts belong in `.env` or reverse-proxy config.
 - For agent automation, keep Human in the loop as the default. Full Access must be explicit, scoped, revocable, and separate from the project API key.
-- Use `docs/vibecoder-open-source-rework-guardrails.md` as the owner-facing checklist when adapting upstream open-source behavior into AcadéPost.
+- Use `docs/internal/workflow/vibecoder-open-source-rework-guardrails.md` as the owner-facing checklist when adapting upstream open-source behavior into AcadéPost.

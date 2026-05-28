@@ -23,7 +23,7 @@ Known symptoms:
 Before commits that touch docs, UI labels, translations, prompts, or deploy scripts, run:
 
 ```bash
-rg -n --glob '!docs/codex-project-memory.md' "AcadР|AcadГ|AcadÃ|DР|DГ|DÃ©|franР|franГ|franÃ|Р“|Гѓ" AGENTS.md PROJECT_PLAN.md docs README.md deploy apps libraries
+rg -n --glob '!docs/internal/codex-byan/codex-project-memory.md' "AcadР|AcadГ|AcadÃ|DР|DГ|DÃ©|franР|franГ|franÃ|Р“|Гѓ" AGENTS.md PROJECT_PLAN.md docs README.md deploy apps libraries
 ```
 
 If this returns results:

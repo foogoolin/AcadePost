@@ -215,7 +215,7 @@ Files:
 
 - `docker-compose.demo.shared-infra.yaml`
 - `.env.demo.shared-infra.example`
-- `docs/demo-shared-infra-deploy.md`
+- `docs/installation/demo-shared-infra-deploy.md`
 
 ### 10. Docker update path не показывал previous digest
 
@@ -266,7 +266,7 @@ docker compose --env-file .env.demo.shared-infra.example -f docker-compose.demo.
 git diff --check
 ```
 
-Также выполнена mojibake-проверка по правилу из `docs/codex-project-memory.md`.
+Также выполнена mojibake-проверка по правилу из `docs/internal/codex-byan/codex-project-memory.md`.
 
 Known local caveat:
 
