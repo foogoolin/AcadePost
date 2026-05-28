@@ -51,12 +51,12 @@ Deployment note:
 
 - `docs/acadepost-functional-validation-plan.md` - общий BYAN-план проверки функционала.
 - `docs/feature-readiness-matrix.md` - матрица готовности функций по статусам `UI_ONLY`, `API_EXISTS`, `E2E_VERIFIED` и так далее.
-- `docs/public-api-readiness.md` - отдельный разбор Public API: что покрыто, что не покрыто, какие smoke-проверки нужны.
+- `docs/development/public-api-readiness.md` - отдельный разбор Public API: что покрыто, что не покрыто, какие smoke-проверки нужны.
 - `docs/acadepost-api-route-inventory-2026-05-26.md` - inventory app/Public API routes and auth boundaries found in code.
 - `docs/security/acadepost-security-review-current.md` - current incremental security review after `v1.1.9`, with `v1.1.10` hardening findings.
 - `docs/integrations/n8n-acadepost-smoke.md` - smoke-процедура для self-host n8n.
 - `docs/integrations/n8n-acadepost-agent-smoke-workflow.json` - импортируемый workflow для n8n.
-- `docs/content-routing.md` - продуктовый brief по будущему routing engine.
+- `docs/product/content-routing.md` - продуктовый brief по будущему routing engine.
 
 Эти документы переводят работу из режима “ощущений” в режим проверяемых статусов.
 
