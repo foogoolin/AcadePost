@@ -90,11 +90,12 @@ export async function proxy(request: NextRequest) {
   if (!nextUrl.pathname.startsWith('/auth') && !authCookie) {
     const providers = ['google', 'settings'];
     const findIndex = providers.find((p) => nextUrl.href.indexOf(p) > -1);
+    const genericOauthEnabled = process.env.POSTIZ_GENERIC_OAUTH === 'true';
     const additional = !findIndex
       ? ''
       : (url.indexOf('?') > -1 ? '&' : '?') +
         `provider=${(findIndex === 'settings'
-          ? process.env.POSTIZ_GENERIC_OAUTH
+          ? genericOauthEnabled
             ? 'generic'
             : 'github'
           : findIndex

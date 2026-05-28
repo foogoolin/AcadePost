@@ -12,7 +12,6 @@ import { GithubProvider } from '@gitroom/frontend/components/auth/providers/gith
 import { useRouter, useSearchParams } from 'next/navigation';
 import { LoadingComponent } from '@gitroom/frontend/components/layout/loading';
 import clsx from 'clsx';
-import { GoogleProvider } from '@gitroom/frontend/components/auth/providers/google.provider';
 import { OauthProvider } from '@gitroom/frontend/components/auth/providers/oauth.provider';
 import { useFireEvents } from '@gitroom/helpers/utils/use.fire.events';
 import { useVariables } from '@gitroom/react/helpers/variable.context';
@@ -33,7 +32,6 @@ const WalletProvider = dynamic(
 type Inputs = {
   email: string;
   password: string;
-  company: string;
   providerToken: string;
   provider: string;
 };
@@ -102,6 +100,12 @@ export function RegisterAfter({
   const resolver = useMemo(() => {
     return classValidatorResolver(CreateOrgUserDto);
   }, []);
+  const showGenericOauth = !isAfterProvider && isGeneral && genericOauth;
+  const showGithubOauth = !isAfterProvider && !isGeneral;
+  const showFarcaster = !isAfterProvider && isGeneral && !!neynarClientId;
+  const showWallet = !isAfterProvider && isGeneral && billingEnabled;
+  const hasSocialRegistration =
+    showGenericOauth || showGithubOauth || showFarcaster || showWallet;
   const form = useForm<Inputs>({
     resolver,
     defaultValues: {
@@ -154,35 +158,33 @@ export function RegisterAfter({
               {t('sign_up', 'Créer un compte')}
             </h1>
           </div>
-          <div className="text-[14px] mt-[32px] mb-[12px] font-[700]">
-            {t('continue_with', 'Continuer avec')}
-          </div>
           <div className="flex flex-col">
-            {!isAfterProvider &&
-              (!isGeneral ? (
-                <GithubProvider />
-              ) : (
-                <div className="gap-[8px] flex">
-                  {genericOauth && isGeneral ? (
-                    <OauthProvider />
-                  ) : (
-                    <GoogleProvider />
-                  )}
-                  {!!neynarClientId && <FarcasterProvider />}
-                  {billingEnabled && <WalletProvider />}
+            {hasSocialRegistration && (
+              <>
+                <div className="text-[14px] mt-[32px] mb-[12px] font-[700]">
+                  {t('continue_with', 'Continuer avec')}
                 </div>
-              ))}
-            {!isAfterProvider && (
-              <div className="h-[20px] mb-[24px] mt-[24px] relative">
-                <div className="absolute w-full h-[1px] bg-fifth top-[50%] -translate-y-[50%]" />
-                <div
-                  className={`absolute z-[1] justify-center items-center w-full start-0 -top-[4px] flex`}
-                >
-                  <div className="acadepost-auth-divider px-[16px]">
-                    {t('or', 'ou')}
+                {showGithubOauth ? (
+                  <GithubProvider />
+                ) : showGenericOauth ? (
+                  <OauthProvider />
+                ) : (
+                  <div className="gap-[8px] flex">
+                    {showFarcaster && <FarcasterProvider />}
+                    {showWallet && <WalletProvider />}
+                  </div>
+                )}
+                <div className="h-[20px] mb-[24px] mt-[24px] relative">
+                  <div className="absolute w-full h-[1px] bg-fifth top-[50%] -translate-y-[50%]" />
+                  <div
+                    className={`absolute z-[1] justify-center items-center w-full start-0 -top-[4px] flex`}
+                  >
+                    <div className="acadepost-auth-divider px-[16px]">
+                      {t('or', 'ou')}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </>
             )}
             <div className="flex flex-col gap-[12px]">
               <div className="text-textColor">
@@ -205,14 +207,6 @@ export function RegisterAfter({
                     />
                   </>
                 )}
-                <Input
-                  label="Company"
-                  translationKey="label_company"
-                  {...form.register('company')}
-                  autoComplete="off"
-                  type="text"
-                  placeholder={t('label_company', 'Nom du projet')}
-                />
               </div>
               <div className={clsx('text-[12px]')}>
                 {t(

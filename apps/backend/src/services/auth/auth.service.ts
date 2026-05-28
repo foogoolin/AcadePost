@@ -161,7 +161,6 @@ export class AuthService {
 
     const create = await this._organizationService.createOrgAndUser(
       {
-        company: body.company,
         email: providerUser.email,
         password: '',
         provider,
