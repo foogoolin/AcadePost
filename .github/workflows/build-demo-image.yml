@@ -80,7 +80,10 @@ jobs:
         shell: bash
         run: |
           forbidden='(^|/)(\.env(\.|$)|\.mcp(\.json)?(/|$)|\.codex/(agents|config\.toml|hooks|hooks\.json)(/|$)|\.agents/|_byan-output/|reports/|secrets/|\.secrets/)'
-          if git ls-files | grep -E "$forbidden" | grep -vE '^\.env(\.demo(\.shared-infra)?|)\.example$' | grep -vE '^\.env\.example$'; then
+          if git ls-files | grep -E "$forbidden" \
+            | grep -vE '^\.env(\.demo(\.shared-infra)?|)\.example$' \
+            | grep -vE '^\.env\.example$' \
+            | grep -vE '(^|/)reports/README\.md$'; then
             echo "Tracked local/runtime or secret-like files would be sent to Docker context." >&2
             exit 1
           fi
