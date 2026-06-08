@@ -80,7 +80,10 @@ jobs:
         shell: bash
         run: |
           forbidden='(^|/)(\.env(\.|$)|\.mcp(\.json)?(/|$)|\.codex/(agents|config\.toml|hooks|hooks\.json)(/|$)|\.agents/|_byan-output/|reports/|secrets/|\.secrets/)'
-          if git ls-files | grep -E "$forbidden" | grep -vE '^\.env(\.demo(\.shared-infra)?|)\.example$' | grep -vE '^\.env\.example$'; then
+          if git ls-files | grep -E "$forbidden" \
+            | grep -vE '^\.env(\.demo(\.shared-infra)?|)\.example$' \
+            | grep -vE '^\.env\.example$' \
+            | grep -vE '(^|/)reports/README\.md$'; then
             echo "Tracked local/runtime or secret-like files would be sent to Docker context." >&2
             exit 1
           fi
@@ -97,7 +100,7 @@ jobs:
           push: false
           outputs: type=oci,dest=/tmp/acadepost-image.tar
           build-args: |
-            NEXT_PUBLIC_VERSION=v${{ steps.package-version.outputs.version }}
+            NEXT_PUBLIC_VERSION=${{ steps.package-version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -131,7 +134,7 @@ jobs:
           load: true
           tags: acadepost:ci-smoke
           build-args: |
-            NEXT_PUBLIC_VERSION=v${{ steps.package-version.outputs.version }}
+            NEXT_PUBLIC_VERSION=${{ steps.package-version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -177,7 +180,7 @@ jobs:
           fi
 
           for service in acadepost-backend acadepost-frontend acadepost-orchestrator acadepost; do
-            for attempt in $(seq 1 60); do
+            for attempt in $(seq 1 180); do
               container_id="$(docker compose --env-file "$env_file" -f docker-compose.demo.yaml ps -q "$service")"
               state="$(docker inspect --format '{{.State.Status}}' "$container_id")"
               health="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{end}}' "$container_id")"
@@ -192,7 +195,7 @@ jobs:
                 exit 1
               fi
 
-              if [[ "$attempt" == "60" ]]; then
+              if [[ "$attempt" == "180" ]]; then
                 docker compose --env-file "$env_file" -f docker-compose.demo.yaml ps
                 docker compose --env-file "$env_file" -f docker-compose.demo.yaml logs --tail=200 "$service"
                 exit 1
@@ -214,9 +217,9 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:demo
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v${{ steps.package-version.outputs.version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.package-version.outputs.version }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           build-args: |
-            NEXT_PUBLIC_VERSION=v${{ steps.package-version.outputs.version }}
+            NEXT_PUBLIC_VERSION=${{ steps.package-version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

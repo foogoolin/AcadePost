@@ -8,6 +8,8 @@ AcadéPost is a fast demo-ready social publishing MVP adapted from an existing s
 
 - UI product name: AcadéPost.
 - Repository/project slug: AcadePost.
+- Product language: all user-facing AcadéPost development must be in French by default, including UI labels, bot messages, receipts, validation errors, demo flows, public-facing documentation, runbooks, and release notes. Technical identifiers may remain in English when needed for implementation safety.
+- Positionnement produit: AcadéPost est construit comme un produit B2C/client final vendable. Les parcours doivent donc viser un onboarding autonome par le client, pas seulement une configuration operateur sur le serveur de demonstration.
 - Public logo mark: keep the supplied `A` raster asset at `apps/frontend/public/brand/acadepost-logo.png`; do not replace it with a generated or approximate mark.
 - Technical base: the existing upstream monorepo structure.
 - Priority: customer-demo readiness before deep refactors.
@@ -76,7 +78,7 @@ The first workflow should classify content into one of these groups, make the ma
 - Root `build:extension` no longer calls Unix `rm`.
 - Verification: `corepack pnpm --filter ./apps/extension run build` passes locally. The generated ZIP contains `background.js`, `manifest.json`, `icon-32.png`, and `icon-128.png`.
 - Remaining caveat: local shell still uses Node `v24.13.0`; repo target remains `>=22.12.0 <23.0.0`.
-- Customer demo runbook added at `docs/customer-demo-runbook.md`.
+- Customer demo runbook added at `docs/internal/runbooks/customer-demo-runbook.md`.
 
 ## Mise a jour acces multi-projets - 2026-05-13
 
@@ -124,7 +126,7 @@ The first workflow should classify content into one of these groups, make the ma
 - Nouveau template env: `.env.demo.shared-infra.example`.
 - Nouveau launcher: `deploy/demo/server-up-shared-infra.sh`.
 - Nouveau runbook: `docs/installation/demo-shared-infra-deploy.md`.
-- Prompt agent serveur ajoute: `docs/server-agent-shared-infra-prompt.md`.
+- Prompt agent serveur ajoute: `docs/internal/server/server-agent-shared-infra-prompt.md`.
 - Le build Docker n'embarque plus de domaine public; la valeur build-time de `NEXT_PUBLIC_BACKEND_URL` est relative: `/api`.
 - Le domaine public reste une configuration runtime via `ACADEPOST_PUBLIC_URL`, afin que la meme image puisse etre lancee derriere n'importe quel domaine.
 - Le runtime `.env` doit fournir un `NEXT_PUBLIC_BACKEND_URL` absolu, par exemple `https://domain.example/api`, car le backend l'utilise pour MCP/OAuth et les callbacks externes.
@@ -412,6 +414,27 @@ The first workflow should classify content into one of these groups, make the ma
 - Constat storage: AcadéPost ne stocke pas les binaires image en PostgreSQL; la table `Media` garde les metadonnees et `path`, tandis que le fichier vit dans le provider choisi par `STORAGE_PROVIDER`.
 - Constat demo: le provider cible reste `local`, avec `UPLOAD_DIRECTORY=/uploads` et `NEXT_PUBLIC_UPLOAD_STATIC_DIRECTORY=/uploads`; les compose demo montent ce dossier comme volume persistant.
 - Constat template: `PostTemplate.previewMediaId` garde le lien vers l'image de preview; sauver un modele sans ce champ donne l'impression que l'image n'est pas conservee.
+
+## Provider Integration Platform Plan Refresh - 2026-05-21
+
+- BYAN FD actif: `DOC`; ne pas fermer le FD avant validation explicite `ok doc`.
+- Le handoff terminal demandait le plan `docs/internal/plans/superpowers/2026-05-20-provider-integration-platform.md`, mais ce fichier etait absent du checkout serveur.
+- Plan/spec restaure a cet emplacement avec la nouvelle pipeline Composer: `Editor -> optional Template -> Destination -> Operation -> Provider Options -> Publish/Schedule -> Logs`.
+- Decisions confirmees dans le plan: `Identifiants` garde les credentials API, `Canaux` / `Destinations` garde les cibles de publication, et `Integration` reste l'implementation interne MVP.
+- Le plan ajoute le dictionnaire de donnees, les operations Telegram MVP explicites, les deux couches de logs (`ProviderConnectionLog`, `ProviderPublishAttempt`) et les criteres d'acceptation Docker/server-first.
+- Configuration BYAN projet corrigee: `_byan/config.yaml` utilise maintenant `user_name: Ilya`.
+
+## Telegram Intake Routing Rework - 2026-05-27
+
+- BYAN MCP session active: `acadepost-telegram-intake`.
+- Stage 0 a retire l'ecran standalone `/content-routing` de l'UI normale: plus de route Next active, plus de navigation `Routage`, styles routing retires, docs demo mises a jour.
+- Stage 1-12 ajoutent le backend Telegram intake derriere feature flag: persistence `TelegramIntakeBinding` / `TelegramIntakeSession`, mapping Telegram user/chat vers utilisateur/projet AcadéPost, webhook public protege par secret Telegram, callbacks avec state stocke en base, keyboard inline, mode cycling, confirm draft/now/schedule, parsing simple des dates, validation media/platform, import media via Telegram `getFile`, receipts Telegram, tests de securite/idempotence et release gate.
+- Decision produit Telegram: separer le bot de publication Telegram, qui sert de destination pour publier vers un canal/groupe, et le bot de controle AcadéPost, qui sert de mini-UI Telegram pour creer, selectionner, programmer et confirmer des posts. Le premier est une integration de publication; le second est une surface de controle.
+- Feature flag runtime: `TELEGRAM_INTAKE_ENABLED=true`. Webhook secret: `TELEGRAM_INTAKE_WEBHOOK_SECRET`. Bot token runtime pour callbacks/media/receipts: `TELEGRAM_INTAKE_BOT_TOKEN`.
+- Validation locale: Prisma validate passe, 5 suites Jest Telegram intake passent, backend build passe, frontend build passe, route table Next confirme que `/content-routing` n'est plus une route active.
+- Validation live initiale: un bot Telegram reel a ete configure, le webhook public a ete branche sur `https://post.fgln.pro/api/telegram-intake/webhook`, un binding Telegram user/chat vers l'organisation de test a ete cree, et le serveur a ete valide via `/api/monitor/ready`.
+- Discipline de release: l'etat final ne doit pas rester sur une image locale Docker. Publier une image GHCR, recreer les conteneurs depuis cette image, et afficher uniquement la version produit `1.11.1` sans suffixe fonctionnel.
+- Release Docker/GHCR: GitHub Actions `Build demo image` run `26517785041` a publie `ghcr.io/foogoolin/acadepost:1.11.1` avec le digest index `sha256:f94dd8aa5c2e4cf80c007171d64891878c128b4856129e6b1c09827f5a4492f5`; `post.fgln.pro` tourne maintenant avec backend/frontend/orchestrator recrees depuis cette image GHCR et `/api/monitor/ready` retourne `ok`.
 
 ## Open Questions
 

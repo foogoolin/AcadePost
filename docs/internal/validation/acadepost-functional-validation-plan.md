@@ -33,7 +33,7 @@ Goal: create one place where every claim is tracked.
 
 Tasks:
 
-- Create `docs/feature-readiness-matrix.md`.
+- Create `docs/internal/validation/feature-readiness-matrix.md`.
 - Add columns: feature, UI route, API route, backend service, persistence, auth boundary, Docker/env impact, smoke command, current status, evidence, blocker, next action.
 - Create or update a Postman/Bruno collection for Public API checks.
 - Create a browser smoke checklist for deployed `https://post.fgln.pro`.
@@ -379,7 +379,7 @@ Validation tasks:
 Acceptance:
 
 - Produce a dated demo evidence folder with screenshots/log snippets.
-- Update `docs/customer-demo-runbook.md`.
+- Update `docs/internal/runbooks/customer-demo-runbook.md`.
 - Final readiness summary lists what is real, what is demo-only and what is blocked by external credentials.
 
 ## Priority Order
@@ -418,7 +418,7 @@ P3 - Production hardening:
 
 Recommended first work package:
 
-1. Create `docs/feature-readiness-matrix.md`.
+1. Create `docs/internal/validation/feature-readiness-matrix.md`.
 2. Mark Content Routing as suspected `UI_ONLY` with code evidence.
 3. Build the first API collection for posts, uploads, templates and agent-runs.
 4. Test one real n8n webhook connection.

@@ -2,7 +2,7 @@
 
 AcadéPost is a self-hostable social publishing workspace for planning, preparing, scheduling and publishing content across multiple social platforms.
 
-Current version: `1.1.11`
+Current version: `1.11.1`
 
 ## Overview
 
@@ -54,7 +54,7 @@ For normal installs, use `:latest`. For rollback, pin a version tag, SHA tag, or
 Versioned images are published for releases, for example:
 
 ```text
-ghcr.io/foogoolin/acadepost:1.1.11
+ghcr.io/foogoolin/acadepost:1.11.1
 ```
 
 Two Compose modes are provided:

@@ -50,6 +50,9 @@ import { AgentRunsRepository } from '@gitroom/nestjs-libraries/database/prisma/a
 import { AgentRunsService } from '@gitroom/nestjs-libraries/database/prisma/agent-runs/agent.runs.service';
 import { ProviderCredentialsRepository } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.repository';
 import { ProviderCredentialsService } from '@gitroom/nestjs-libraries/database/prisma/provider-credentials/provider.credentials.service';
+import { TelegramIntakeRepository } from '@gitroom/nestjs-libraries/database/prisma/telegram-intake/telegram.intake.repository';
+import { TelegramIntakeService } from '@gitroom/nestjs-libraries/database/prisma/telegram-intake/telegram.intake.service';
+import { TelegramIntakeBotClient } from '@gitroom/nestjs-libraries/database/prisma/telegram-intake/telegram.intake.bot-client';
 
 @Global()
 @Module({
@@ -109,6 +112,9 @@ import { ProviderCredentialsService } from '@gitroom/nestjs-libraries/database/p
     AgentRunsService,
     ProviderCredentialsRepository,
     ProviderCredentialsService,
+    TelegramIntakeRepository,
+    TelegramIntakeService,
+    TelegramIntakeBotClient,
   ],
   get exports() {
     return this.providers;

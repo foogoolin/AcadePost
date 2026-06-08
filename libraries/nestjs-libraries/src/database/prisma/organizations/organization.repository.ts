@@ -263,9 +263,18 @@ export class OrganizationRepository {
     ip: string,
     userAgent: string
   ) {
+    const emailName = body.email
+      .split('@')[0]
+      ?.trim()
+      .replace(/[^a-zA-Z0-9._ -]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .slice(0, 64)
+      .trim();
+    const organizationName = emailName ? `Projet ${emailName}` : 'Mon projet';
+
     return this._organization.model.organization.create({
       data: {
-        name: body.company,
+        name: organizationName,
         apiKey: AuthService.fixedEncryption(makeId(20)),
         allowTrial: true,
         isTrailing: true,

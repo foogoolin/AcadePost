@@ -1043,55 +1043,6 @@ html[dir='rtl'] [dir='ltr'] {
   color: rgb(var(--new-textColor));
 }
 
-.acadepost-routing-hero {
-  border-bottom: 1px solid var(--new-bgLineColor);
-  background: color-mix(in srgb, var(--new-bgColorInner) 82%, transparent);
-}
-
-.acadepost-routing-badge {
-  border: 1px solid rgba(76, 204, 184, 0.35);
-  border-radius: 9999px;
-  background: rgba(76, 204, 184, 0.1);
-  color: var(--acadepost-accent);
-}
-
-.acadepost-routing-card {
-  border: 1px solid var(--new-bgLineColor);
-  border-radius: 8px;
-  background: var(--new-bgColorInner);
-  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.12);
-}
-
-.acadepost-routing-card:hover {
-  border-color: rgba(76, 204, 184, 0.34);
-}
-
-.acadepost-routing-chip {
-  border: 1px solid var(--new-bgLineColor);
-  border-radius: 9999px;
-  background: color-mix(in srgb, var(--new-bgColor) 82%, transparent);
-  color: rgb(var(--new-textColor));
-}
-
-.acadepost-routing-workflow {
-  border: 1px solid var(--new-bgLineColor);
-  border-radius: 8px;
-  background: var(--new-bgColorInner);
-}
-
-.acadepost-routing-primary-action {
-  border-radius: 8px;
-  background: var(--new-btn-primary);
-  color: #ffffff;
-  font-weight: 800;
-}
-
-.acadepost-routing-secondary-action {
-  border: 1px solid var(--new-bgLineColor);
-  border-radius: 8px;
-  color: rgb(var(--new-textColor));
-}
-
 .acadepost-date-picker-trigger {
   border: 1px solid var(--new-bgLineColor);
   border-radius: 8px;
@@ -1754,18 +1705,26 @@ html[dir='rtl'] [dir='ltr'] {
 .acadepost-credentials-row-actions button {
   min-height: 38px;
   border-radius: 6px;
-  background: #292929;
-  color: #ffffff;
+  border: 1px solid transparent;
+  background: #4cccb8;
+  color: #061916 !important;
+  -webkit-text-fill-color: #061916;
   font-size: 12px;
   font-weight: 800;
   padding: 0 13px;
+}
+
+.acadepost-credentials-button:not(.secondary):hover:not(:disabled),
+.acadepost-credentials-row-actions button:first-child:hover:not(:disabled) {
+  background: #39b8a5;
 }
 
 .acadepost-credentials-button.secondary,
 .acadepost-credentials-row-actions button:not(:first-child) {
   border: 1px solid var(--new-bgLineColor);
   background: transparent;
-  color: rgb(var(--new-textColor));
+  color: rgb(var(--new-textColor)) !important;
+  -webkit-text-fill-color: rgb(var(--new-textColor));
 }
 
 .acadepost-credentials-button:disabled {

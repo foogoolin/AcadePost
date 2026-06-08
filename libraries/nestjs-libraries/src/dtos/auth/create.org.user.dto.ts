@@ -30,11 +30,5 @@ export class CreateOrgUserDto {
   @ValidateIf((o) => !o.providerToken)
   email: string;
 
-  @IsString()
-  @IsDefined()
-  @MinLength(3)
-  @MaxLength(128)
-  company: string;
-
   datafast_visitor_id: string;
 }

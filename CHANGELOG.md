@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.11.1 - 2026-05-27
+
+- Added the Telegram intake control flow behind `TELEGRAM_INTAKE_ENABLED=true`, with webhook secret validation, Telegram user/chat bindings, inline destination selection, draft/now/schedule modes, date parsing, media import, receipts and targeted tests.
+- Removed the standalone `/content-routing` UI from the normal app surface and moved routing behavior behind publishing/intake validation.
+- Documented the Telegram control bot versus Telegram publishing bot model and release proof for the GHCR image `ghcr.io/foogoolin/acadepost:1.11.1`.
+- Updated release metadata to `1.11.1` without feature/hash suffixes in the user-visible version marker.
+
 ## v1.1.11 - 2026-05-26
 
 - Reliability: Moved MCP/Mastra bootstrap out of the backend pre-listen path and gated it behind `ENABLE_MCP_STARTUP=true`, so MCP initialization cannot block `/monitor/ready` or a production restart.
